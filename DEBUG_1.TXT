@@ -1,0 +1,32 @@
+MIH solution lower bound: ,135,Calculation time: ,0,02
+MIH solution upper bound: ,311,Calculation time: ,0,00
+SA solution lower bound: ,101.0,Calculation time: ,0.0
+
+Task0: 87 101 42
+Task1: 87 100 26
+Task2: 36 111 12
+Task3: 91 76 97
+Task4: 4 17 60
+Task5: 73 36 76
+Task6: 22 69 33
+Task7: 24 14 87
+Task8: 75 42 97
+Task9: 12 137 86
+
+Using init temp 357.28 (target init acceptance prob 0.93)
+Using init temp 159.49 (target init acceptance prob 0.93)
+Using init temp 294.65 (target init acceptance prob 0.93)
+Using init temp 748.82 (target init acceptance prob 0.93)
+Using init temp 910.21 (target init acceptance prob 0.93)
+
+3
+Task0: 46|87 52|101 42|65
+Task1: 87|91 69|100 26|39
+Task2: 36|75 76|111 12|56
+Task3: 91|91 40|76 48|97
+Task4: 4|9 17|41 41|60
+Task5: 73|96 36|41 28|76
+Task6: 22|47 69|115 33|33
+Task7: 24|38 14|53 47|87
+Task8: 75|87 42|82 97|110
+Task9: 12|25 100|137 55|86
