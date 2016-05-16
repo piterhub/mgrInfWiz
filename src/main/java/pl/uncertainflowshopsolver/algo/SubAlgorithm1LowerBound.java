@@ -1,4 +1,4 @@
-package pl.uncertainflowshopsolver.algorithm;
+package pl.uncertainflowshopsolver.algo;
 
 import pl.uncertainflowshopsolver.flowshop.FlowShop;
 import pl.uncertainflowshopsolver.flowshop.Task;

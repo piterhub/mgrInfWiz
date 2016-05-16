@@ -1,4 +1,4 @@
-package pl.uncertainflowshopsolver.algorithm.util;
+package pl.uncertainflowshopsolver.algo.util;
 
 /**
  * @author Piotr Kubicki, created on 30.04.2016.
@@ -30,14 +30,15 @@ public class SimulatedAnnealingConfigurationUtil {
      * This method only works on states whose neighbor generation is
      * irrespective of the temperature.
      *
-     * The algorithm used by this method is from:
+     * The algo used by this method is from:
      * Computing the Initial Temperature of Simulated Annealing
      * Walid Ben-Ameur, 2004
      */
     public static double calculateInitialTemperatureFromDesiredProbability(
             double desiredProbability,
             double[] positiveEnergyDeltas,
-            double errorThreshold) {
+            double errorThreshold)
+    {
         double highestDelta = positiveEnergyDeltas[0];  //java.lang.ArrayIndexOutOfBoundsException: 0
         for (int i = 0; i < positiveEnergyDeltas.length; ++i) {
             if (positiveEnergyDeltas[i] < Double.MIN_NORMAL) {

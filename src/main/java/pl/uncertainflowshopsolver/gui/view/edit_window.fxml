@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox fx:controller="pl.uncertainflowshopsolver.gui.EditWindowController" prefHeight="400.0" prefWidth="640.0" spacing="5.0"
+      xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+        <HBox spacing="5.0" VBox.vgrow="ALWAYS">
+            <children>
+                <VBox HBox.hgrow="ALWAYS">
+                    <children>
+                        <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Configuration"/>
+                        <TextArea fx:id="configurationTextArea" prefHeight="335.0" prefWidth="545.0"
+                                  VBox.vgrow="ALWAYS"/>
+                    </children>
+                </VBox>
+                <VBox HBox.hgrow="NEVER">
+                    <children>
+                        <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Example"/>
+                        <TextArea fx:id="exampleTextArea" editable="false" maxWidth="-Infinity" prefHeight="211.0" prefWidth="350.0" VBox.vgrow="ALWAYS"/>
+                    </children>
+                </VBox>
+            </children>
+        </HBox>
+        <Button fx:id="acceptButton" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
+                onAction="#onAcceptButton" prefHeight="50.0" prefWidth="640.0" text="Accept" VBox.vgrow="NEVER"/>
+    </children>
+    <padding>
+        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+    </padding>
+</VBox>

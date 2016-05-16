@@ -1,4 +1,4 @@
-package pl.uncertainflowshopsolver.algorithm;
+package pl.uncertainflowshopsolver.algo;
 
 import pl.uncertainflowshopsolver.flowshop.FlowShop;
 import pl.uncertainflowshopsolver.flowshop.FlowShopWithUncertainty;
@@ -22,7 +22,7 @@ public class SubAlgorithm2 {
      * It doesn't  change uncertainFlowShop, i.e. given FlowShop permutation is constant (changes only inside NEH).
      *
      * @param uncertainFlowShop - the {@link FlowShopWithUncertainty}
-     * @param lowerBound - should calculate C_max,LB like described in "Evolutionary algorithm for min-max regret flow shop problem" (Cwik, Józefczyk - 2015)
+     * @param lowerBound - should calculate C_max,LB like described in "Evolutionary algo for min-max regret flow shop problem" (Cwik, Józefczyk - 2015)
      * @param printDebug boolean, true if there should be matrix result on console
      * @return result of given above optimization problem
      */

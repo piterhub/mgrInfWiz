@@ -23,9 +23,6 @@ public class FlowShopWithUncertainty implements Cloneable {
 
     public FlowShopWithUncertainty() {
         taskWithUncertaintyList = new ArrayList<>(Arrays.asList(
-//                new TaskWithUncertainty(Arrays.asList(3,1,3),Arrays.asList(4,2,5),1),
-//                new TaskWithUncertainty(Arrays.asList(5,7,2),Arrays.asList(6,8,6),2),
-//                new TaskWithUncertainty(Arrays.asList(4,2,1),Arrays.asList(7,3,5),3)
                 new TaskWithUncertainty(Arrays.asList(3, 5, 4), Arrays.asList(4, 6, 7), 1),
                 new TaskWithUncertainty(Arrays.asList(1, 7, 2), Arrays.asList(2, 8, 3), 2),
                 new TaskWithUncertainty(Arrays.asList(3, 2, 1), Arrays.asList(5, 6, 5), 3)

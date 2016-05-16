@@ -1,4 +1,4 @@
-package pl.uncertainflowshopsolver.algorithm;
+package pl.uncertainflowshopsolver.algo;
 
 import pl.uncertainflowshopsolver.flowshop.FlowShop;
 import pl.uncertainflowshopsolver.flowshop.FlowShopConfig;
@@ -9,7 +9,7 @@ import pl.uncertainflowshopsolver.flowshop.FlowShopConfig;
 public final class NehAlgorithm {
 
     /**
-     * Solves Flow Shop problem with NEH algorithm.
+     * Solves Flow Shop problem with NEH algo.
      * It should always print the same result.
      * @param config FlowShop problem config
      */
@@ -23,7 +23,7 @@ public final class NehAlgorithm {
     }
 
     /**
-     * Solves Flow Shop problem with NEH algorithm.
+     * Solves Flow Shop problem with NEH algo.
      * It should always print the same result.
      */
     public static FlowShop solve(FlowShop flowShop) {

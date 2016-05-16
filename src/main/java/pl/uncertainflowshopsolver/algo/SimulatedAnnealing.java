@@ -1,17 +1,29 @@
-package pl.uncertainflowshopsolver.algorithm;
+package pl.uncertainflowshopsolver.algo;
 
+import pl.uncertainflowshopsolver.algo.init.SolutionInitializer;
+import pl.uncertainflowshopsolver.config.SAConfiguration;
+import pl.uncertainflowshopsolver.config.ConfigurationProvider;
 import pl.uncertainflowshopsolver.flowshop.FlowShopWithUncertainty;
+import pl.uncertainflowshopsolver.gui.GUIController;
+import pl.uncertainflowshopsolver.gui.event.AlgorithmEventDispatcher;
 import pl.uncertainflowshopsolver.testdata.InstanceGenerator;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
-import static pl.uncertainflowshopsolver.algorithm.util.SimulatedAnnealingConfigurationUtil.*;
+import static pl.uncertainflowshopsolver.algo.util.SimulatedAnnealingConfigurationUtil.*;
 
 /**
  * @author Piotr Kubicki, created on 24.04.2016.
  */
 public class SimulatedAnnealing {
+
+    private AlgorithmEventDispatcher eventDispatcher;
+    private ConfigurationProvider configurationProvider;
+
+    private SolutionInitializer initializer;
+    private SAConfiguration configuration;
+    private volatile boolean running;   //volatile to avoid "visibility" problem, when the updates of one thread are not visible to other threads.
 
     private FlowShopWithUncertainty uncertainFlowShop;
     private int L;  //epoche, equals to N -> see constructor
@@ -29,6 +41,31 @@ public class SimulatedAnnealing {
     {
         this.uncertainFlowShop = uncertainFlowShop;
         this.L = uncertainFlowShop.getTaskCount();
+    }
+
+    public SimulatedAnnealing(GUIController guiController) {
+        this.configurationProvider = guiController;
+        this.eventDispatcher = new AlgorithmEventDispatcher(guiController);
+    }
+
+    public void start() {
+        prepareConfiguration();
+        running = true;
+        eventDispatcher.dispatchAlgorithmStarted();
+        solve();
+    }
+
+    public void stop() {
+        running = false;
+    }
+
+    private void prepareConfiguration() {
+        configuration = configurationProvider.getSAConfiguration();
+        try {
+            initializer = configuration.getSolutionInitializerClass().newInstance();
+        } catch (InstantiationException | IllegalAccessException e) {
+            throw new RuntimeException("Cant create solution initializer", e);
+        }
     }
 
     public Object[] solveSA(boolean lowerBound, boolean printDebug) {

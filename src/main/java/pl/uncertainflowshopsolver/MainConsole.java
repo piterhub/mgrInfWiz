@@ -1,7 +1,7 @@
 package pl.uncertainflowshopsolver;
 
-import pl.uncertainflowshopsolver.algorithm.MIH;
-import pl.uncertainflowshopsolver.algorithm.SimulatedAnnealing;
+import pl.uncertainflowshopsolver.algo.MIH;
+import pl.uncertainflowshopsolver.algo.SimulatedAnnealing;
 import pl.uncertainflowshopsolver.flowshop.FlowShopWithUncertainty;
 import pl.uncertainflowshopsolver.testdata.InstanceGenerator;
 
@@ -15,7 +15,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class Main {
+public class MainConsole {
 
     public static final int HOW_MANY_RANDOM_INSTANCES = 50;
     public static final int REPETITION_FOR_SIMULATED_ANNEALING = 5;
@@ -26,7 +26,7 @@ public class Main {
         final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM.dd-HH.mm-ss.SSS");
         final String timestamp = simpleDateFormat.format(new Date());
 
-        int n = 15;
+        int n = 7;
 
         PrintWriter pw = new PrintWriter(new File(PATH_TO_RESOURCES + "/" + n + "_test_" + timestamp +".csv"));
         StringBuilder sb = new StringBuilder();
