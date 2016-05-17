@@ -3,3 +3,10 @@ out/*
 .idea/*
 .target/*
 .resources/*
+
+*.class
+
+# Package Files #
+*.jar
+*.war
+*.ear
