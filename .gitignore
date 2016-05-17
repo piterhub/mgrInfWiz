@@ -1,10 +1,9 @@
-*.iml
-out/*
 .idea/*
-.target/*
-.resources/*
+target/*
+resources/*
 
 *.class
+*.iml
 
 # Package Files #
 *.jar
