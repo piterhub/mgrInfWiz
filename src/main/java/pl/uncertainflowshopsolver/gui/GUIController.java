@@ -52,6 +52,12 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
     public Button startStopButton;
     public TextArea logsTextArea;
     public TextArea bestSolutionTextArea;
+    public Button exportFlowShopToFileButton;
+
+    public IntegerTextBox taskCount;
+    public IntegerTextBox machineCount;
+    public IntegerTextBox K;
+    public IntegerTextBox C;
 
     private FlowShopWithUncertainty flowShop;
 
@@ -292,6 +298,17 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
 
     private boolean solutionIsBest(FlowShopWithUncertainty flowShop) {
         return bestSolutionIteration == -1 /**|| bestSolution.makeSpan() > flowShop.makeSpan()*/;
+    }
+
+    @FXML
+    public void saveToFileButton(ActionEvent event) {
+        FileChooser chooser = new FileChooser();
+        File file = chooser.showOpenDialog(exportFlowShopToFileButton.getScene().getWindow());
+
+        if (file != null) {
+
+            //TODO save directory to write there result
+        }
     }
 
     private enum AlgorithmState {
