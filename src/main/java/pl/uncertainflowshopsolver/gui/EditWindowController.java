@@ -22,7 +22,7 @@ public class EditWindowController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        exampleTextArea.setText("<jobs> <machines> upper:xx lower:yy\njob 1 times\njob 2 times\n...\n\n3 6\n5 7 3 7 4 3\n5 7 3 6 8 5\n3 5 7 4 6 7\n\nUpper i lower nie sa brane pod uwage");
+        exampleTextArea.setText("<jobs> <machines> \njob 1 times\njob 2 times\n...\n\n3  \nTask0: 93|115 46|60 100|123  \nTask1: 63|104 58|60 64|72  \nTask2: 64|111 75|113 55|76  \nTask3: 15|20 18|51 45|80  \nTask4: 98|117 13|33 73|123  \nTask5: 30|45 15|33 46|80  \nTask6: 9|19 52|68 33|52  \nTask7: 88|109 91|108 29|75  \nTask8: 36|76 44|73 70|118  \nTask9: 91|131 38|50 7|39  \nTask10: 0|15 74|122 29|35");
     }
 
     @FXML

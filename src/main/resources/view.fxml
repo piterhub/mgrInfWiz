@@ -17,7 +17,7 @@
 <?import javafx.scene.text.Font?>
 <?import pl.uncertainflowshopsolver.gui.*?>
 
-<HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="700.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/null" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.uncertainflowshopsolver.gui.GUIController">
+<HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefWidth="1200.0" xmlns="http://javafx.com/javafx/null" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.uncertainflowshopsolver.gui.GUIController">
     <children>
         <VBox maxHeight="1.7976931348623157E308" prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
             <children>
@@ -97,12 +97,12 @@
             <children>
                 <HBox VBox.vgrow="ALWAYS">
                     <children>
-                        <TitledPane animated="false" collapsible="false" maxHeight="1.7976931348623157E308" prefHeight="458.0" prefWidth="208.0" text="Algorithm options" HBox.hgrow="ALWAYS">
+                        <TitledPane animated="false" collapsible="false" maxHeight="1.7976931348623157E308" prefHeight="473.0" prefWidth="210.0" text="Algorithm options" HBox.hgrow="ALWAYS">
                             <content>
-                                <VBox alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="200.0" prefWidth="100.0" spacing="5.0">
+                                <VBox alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="447.0" prefWidth="208.0" spacing="5.0">
                                     <children>
 
-                                        <VBox>
+                                        <VBox prefWidth="198.0">
                                             <children>
                                                 <VBox prefHeight="200.0" prefWidth="100.0">
                                                     <children>
@@ -146,7 +146,7 @@
                                                         <IntegerTextBox fx:id="samplesCardinalityIntegerTextBox" />
                                                     </children>
                                                 </VBox>
-                                                <VBox prefHeight="200.0" prefWidth="100.0">
+                                                <VBox prefHeight="200.0" prefWidth="198.0">
                                                     <children>
                                                         <Label text="Maximum iterations" />
                                                         <IntegerTextBox fx:id="maxNumberOfIterationsIntegerTextBox" />
@@ -170,7 +170,7 @@
                                         <!--<labelPadding>-->
                                         <!--<Insets bottom="5.0" right="5.0" top="5.0" />-->
                                         <!--</labelPadding>-->
-                                        <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="1000.0" prefWidth="178.0" />
+                                        <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="1000.0" prefWidth="198.0" />
                                     </children>
                                     <padding>
                                         <Insets left="5.0" right="5.0" top="5.0" />
@@ -182,7 +182,7 @@
                 </HBox>
                 <HBox maxHeight="-Infinity" prefHeight="270.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
                     <children>
-                        <TitledPane animated="false" collapsible="false" maxHeight="1.7976931348623157E308" minHeight="-Infinity" prefHeight="311.0" prefWidth="209.0" text="Input and output" HBox.hgrow="ALWAYS">
+                        <TitledPane animated="false" collapsible="false" maxHeight="1.7976931348623157E308" minHeight="-Infinity" prefHeight="322.0" prefWidth="209.0" text="Input and output" HBox.hgrow="ALWAYS">
                             <content>
                                 <VBox prefHeight="200.0" prefWidth="100.0" spacing="5.0">
                                     <children>

@@ -15,6 +15,7 @@ import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import pl.uncertainflowshopsolver.algo.SimulatedAnnealing;
@@ -302,13 +303,18 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
 
     @FXML
     public void saveToFileButton(ActionEvent event) {
-        FileChooser chooser = new FileChooser();
-        File file = chooser.showOpenDialog(exportFlowShopToFileButton.getScene().getWindow());
+        DirectoryChooser chooser = new DirectoryChooser();
+        chooser.setTitle("Choose a folder to save the result");
+        File defaultDirectory = new File("c:/");
+        chooser.setInitialDirectory(defaultDirectory);
+        File selectedDirectory = chooser.showDialog(exportFlowShopToFileButton.getScene().getWindow());
 
-        if (file != null) {
+        if (selectedDirectory != null) {
 
             //TODO save directory to write there result
         }
+
+
     }
 
     private enum AlgorithmState {
