@@ -6,8 +6,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.stage.Stage;
-import pl.agh.bo.algo.FlowShop;
-import pl.agh.bo.parser.FlowshopParser;
+import pl.uncertainflowshopsolver.flowshop.FlowShopWithUncertainty;
+import pl.uncertainflowshopsolver.testdata.FlowShopParser;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -27,8 +27,8 @@ public class EditWindowController implements Initializable {
 
     @FXML
     public void onAcceptButton(ActionEvent actionEvent) {
-        if (FlowshopParser.validateText(configurationTextArea.getText())) {
-            FlowShop flowShop = FlowshopParser.parseFlowShop(configurationTextArea.getText());
+        if (FlowShopParser.validateText(configurationTextArea.getText())) {
+            FlowShopWithUncertainty flowShop = FlowShopParser.parseTextToFlowShop(configurationTextArea.getText());
             guiController.setFlowShop(flowShop);
             stage.close();
         }

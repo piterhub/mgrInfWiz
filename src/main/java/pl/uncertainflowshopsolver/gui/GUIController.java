@@ -27,6 +27,7 @@ import pl.uncertainflowshopsolver.config.impl.SAConfigurationImpl;
 import pl.uncertainflowshopsolver.flowshop.FlowShopWithUncertainty;
 import pl.uncertainflowshopsolver.gui.event.AlgorithmEventDispatcher;
 import pl.uncertainflowshopsolver.gui.event.AlgorithmEventListener;
+import pl.uncertainflowshopsolver.testdata.FlowShopParser;
 
 import java.io.*;
 import java.net.URL;
@@ -34,14 +35,15 @@ import java.util.*;
 
 public class GUIController implements ConfigurationProvider, AlgorithmEventListener, Initializable {
     public ChoiceBox<String> initializerChoiceBox;
-    public IntegerTextBox eliteSolutionsIntegerTextBox;
-    public IntegerTextBox bestSolutionsIntegerTextBox;
-    public IntegerTextBox beesPerEliteSolutionIntegerTextBox;
-    public IntegerTextBox beesPerBestSolutionIntegerTextBox;
-    public IntegerTextBox scoutBeesIntegerTextBox;
-    public IntegerTextBox iterationsWithoutImprovementIntegerTextBox;
-    public IntegerTextBox maximumIterationsIntegerTextBox;
-    public IntegerTextBox solutionFitnessIntegerTextBox;
+    public DoubleTextBox desiredInitialAcceptanceProbabilityDoubleTextBox;
+    public IntegerTextBox epocheLengthIntegerTextBox;
+    public DoubleTextBox decayRateDoubleTextBox;
+    public DoubleTextBox endTemperatureDoubleTextBox;
+    public DoubleTextBox errorThresholdDoubleTextBox;
+    public IntegerTextBox samplesCardinalityIntegerTextBox;
+    public IntegerTextBox maxNumberOfIterationsIntegerTextBox;
+//    public IntegerTextBox maxIterationsWithoutImprovementIntegerTextBox;
+    public DoubleTextBox cutOffEnergyLevelDoubleTextBox;
     public Label totalBeesLabel;
     public Button importFlowShopFromFileButton;
     public Button editFlowshopManuallyButton;
@@ -82,7 +84,7 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
         initializerChoiceBox.setItems(FXCollections.observableArrayList(initializerNameClassMap.keySet()));
         initializerChoiceBox.getSelectionModel().select(0);
 
-        maximumIterationsIntegerTextBox.integerProperty().addListener(new ChangeListener<Number>() {
+        maxNumberOfIterationsIntegerTextBox.integerProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observableValue, Number oldValue, Number newValue) {
                 progressLabel.setText("0/" + newValue.intValue());
@@ -99,8 +101,8 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
 
     @FXML
     public void onStartStopButton(ActionEvent actionEvent) {
-        if(maximumIterationsIntegerTextBox.getValue() == 0) {
-            maximumIterationsIntegerTextBox.setText("1000");
+        if(maxNumberOfIterationsIntegerTextBox.getValue() == 0) {
+            maxNumberOfIterationsIntegerTextBox.setText("1000");
         }
         activeSAConfiguration = getSAConfiguration();
         if (algorithmState == AlgorithmState.STOPPED) {
@@ -125,14 +127,13 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
         FileChooser chooser = new FileChooser();
         File file = chooser.showOpenDialog(importFlowShopFromFileButton.getScene().getWindow());
 
-        //TODO
-//        if (file != null) {
-//            try {
-//                flowShop = FlowshopParser.parseFlowShop(new BufferedReader(new FileReader(file)));
-//            } catch (FileNotFoundException e) {
-//                e.printStackTrace();
-//            }
-//        }
+        if (file != null) {
+            try {
+                flowShop = FlowShopParser.parseFileToFlowShopWithUncertainty(file.getAbsolutePath());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @FXML
@@ -161,16 +162,16 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
     public SAConfiguration getSAConfiguration() {
         Class<? extends SolutionInitializer> solutionInitializerClass = initializerNameClassMap.get(initializerChoiceBox.getValue());
         this.activeSAConfiguration = SAConfigurationImpl.newBuilder()
-                .withEliteSolutionsNumber(eliteSolutionsIntegerTextBox.getValue())
-                .withBestSolutionsNumber(bestSolutionsIntegerTextBox.getValue())
-                .withBeesPerEliteSolution(beesPerEliteSolutionIntegerTextBox.getValue())
-                .withBeesPerBestSolution(beesPerBestSolutionIntegerTextBox.getValue())
-                .withScoutBeesNumber(scoutBeesIntegerTextBox.getValue())
+                .withDesiredInitialAcceptanceProbability(desiredInitialAcceptanceProbabilityDoubleTextBox.getValue())
+                .withEpocheLength(epocheLengthIntegerTextBox.getValue())
+                .withDecayRate(decayRateDoubleTextBox.getValue())
+                .withEndTemperature(endTemperatureDoubleTextBox.getValue())
+                .withErrorThreshold(errorThresholdDoubleTextBox.getValue())
+                .withSamplesCardinality(samplesCardinalityIntegerTextBox.getValue())
+                .withMaxNumberOfIterations(maxNumberOfIterationsIntegerTextBox.getValue())
+                .withCutOffEnergyLevel(cutOffEnergyLevelDoubleTextBox.getValue())
                 .withSolutionInitializerClass(solutionInitializerClass)
-                .withMaxNumberOfIterations(maximumIterationsIntegerTextBox.getValue())
-                .withMaxIterationsWithoutImprovement(iterationsWithoutImprovementIntegerTextBox.getValue())
-                .withMinFitness(solutionFitnessIntegerTextBox.getValue())
-                .withFlowshop(flowShop)
+                .withUncertainFlowshop(flowShop)
                 .build();
 
         return activeSAConfiguration;
@@ -186,19 +187,19 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
     @Override
     public void onIterationUpdated(int iteration, FlowShopWithUncertainty flowShop) {
 //        iterationFitnessMap.put(iteration, flowShop.makeSpan());
-        iterationFitnessMap.put(iteration, flowShop.g);
-        if (solutionIsBest(flowShop)) {
-            bestSolutionIteration = iteration;
-            bestSolution = flowShop;
-
-            bestSolutionTextArea.clear();
-            bestSolutionTextArea.appendText("Iteration: " + bestSolutionIteration + ":\n");
-            bestSolutionTextArea.appendText("Makespan: " + bestSolution.makeSpan() + "\n");
-            bestSolutionTextArea.appendText(flowShop.toString() + "\n");
-        }
-        logsTextArea.appendText("Iteration " + iteration + ":\n");
-        logsTextArea.appendText("Makespan: " + iterationFitnessMap.get(iteration) + "\n");
-        logsTextArea.appendText(flowShop.toString() + "\n");
+//        iterationFitnessMap.put(iteration, flowShop.g);
+//        if (solutionIsBest(flowShop)) {
+//            bestSolutionIteration = iteration;
+//            bestSolution = flowShop;
+//
+//            bestSolutionTextArea.clear();
+//            bestSolutionTextArea.appendText("Iteration: " + bestSolutionIteration + ":\n");
+//            bestSolutionTextArea.appendText("Makespan: " + bestSolution.makeSpan() + "\n");
+//            bestSolutionTextArea.appendText(flowShop.toString() + "\n");
+//        }
+//        logsTextArea.appendText("Iteration " + iteration + ":\n");
+//        logsTextArea.appendText("Makespan: " + iterationFitnessMap.get(iteration) + "\n");
+//        logsTextArea.appendText(flowShop.toString() + "\n");
 
         updateChart(iteration);
         updateProgressBar(iteration);
@@ -246,15 +247,15 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
     }
 
     private void prepareTotalBeesBinding() {
-        eliteBeesProperty = Bindings.multiply(eliteSolutionsIntegerTextBox.integerProperty(), beesPerEliteSolutionIntegerTextBox.integerProperty());
-        bestBeesProperty = Bindings.multiply(bestSolutionsIntegerTextBox.integerProperty(), beesPerBestSolutionIntegerTextBox.integerProperty());
-        allBeesBinding = Bindings.add(Bindings.add(scoutBeesIntegerTextBox.integerProperty(), eliteBeesProperty), bestBeesProperty);
-        allBeesBinding.addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observableValue, Number oldValue, Number newValue) {
-                totalBeesLabel.setText("Total bees: " + newValue);
-            }
-        });
+//        eliteBeesProperty = Bindings.multiply(desiredInitialAcceptanceProbabilityDoubleTextBox.integerProperty(), decayRateDoubleTextBox.integerProperty());
+//        bestBeesProperty = Bindings.multiply(epocheLengthIntegerTextBox.integerProperty(), endTemperatureDoubleTextBox.integerProperty());
+//        allBeesBinding = Bindings.add(Bindings.add(errorThresholdDoubleTextBox.integerProperty(), eliteBeesProperty), bestBeesProperty);
+//        allBeesBinding.addListener(new ChangeListener<Number>() {
+//            @Override
+//            public void changed(ObservableValue<? extends Number> observableValue, Number oldValue, Number newValue) {
+//                totalBeesLabel.setText("Total bees: " + newValue);
+//            }
+//        });
     }
 
     private void enableEditingConfiguration() {
@@ -266,14 +267,14 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
     }
 
     private void setEditingConfiguration(boolean isEnabled) {
-        eliteSolutionsIntegerTextBox.setDisable(isEnabled);
-        bestSolutionsIntegerTextBox.setDisable(isEnabled);
-        beesPerEliteSolutionIntegerTextBox.setDisable(isEnabled);
-        beesPerBestSolutionIntegerTextBox.setDisable(isEnabled);
-        scoutBeesIntegerTextBox.setDisable(isEnabled);
-        iterationsWithoutImprovementIntegerTextBox.setDisable(isEnabled);
-        maximumIterationsIntegerTextBox.setDisable(isEnabled);
-        solutionFitnessIntegerTextBox.setDisable(isEnabled);
+        desiredInitialAcceptanceProbabilityDoubleTextBox.setDisable(isEnabled);
+        epocheLengthIntegerTextBox.setDisable(isEnabled);
+        decayRateDoubleTextBox.setDisable(isEnabled);
+        endTemperatureDoubleTextBox.setDisable(isEnabled);
+        errorThresholdDoubleTextBox.setDisable(isEnabled);
+        samplesCardinalityIntegerTextBox.setDisable(isEnabled);
+        maxNumberOfIterationsIntegerTextBox.setDisable(isEnabled);
+        cutOffEnergyLevelDoubleTextBox.setDisable(isEnabled);
         editFlowshopManuallyButton.setDisable(isEnabled);
         importFlowShopFromFileButton.setDisable(isEnabled);
         initializerChoiceBox.setDisable(isEnabled);
@@ -290,7 +291,7 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
 
 
     private boolean solutionIsBest(FlowShopWithUncertainty flowShop) {
-        return bestSolutionIteration == -1 || bestSolution.makeSpan() > flowShop.makeSpan();
+        return bestSolutionIteration == -1 /**|| bestSolution.makeSpan() > flowShop.makeSpan()*/;
     }
 
     private enum AlgorithmState {

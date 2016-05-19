@@ -5,45 +5,45 @@ import pl.uncertainflowshopsolver.algo.init.SolutionInitializer;
 import pl.uncertainflowshopsolver.flowshop.FlowShopWithUncertainty;
 
 public class SAConfigurationImplBuilder {
-    private int eliteSolutionsNumber;
-    private int beesPerEliteSolution;
-    private int bestSolutionsNumber;
-    private int beesPerBestSolution;
-    private int scoutBeesNumber;
-    private int maxIterationsWithoutImprovement;
+    private Double desiredInitialAcceptanceProbability;
+    private int epocheLength;
+    private Double decayRate;
+    private Double endTemperature;
+    private Double errorThreshold;
+    private int samplesCardinality;
     private int maxNumberOfIterations;
-    private int maxTimeOfExecuting;
-    private int minFitness;
+    private int maxIterationsWithoutImprovement;
+    private Double cutOffEnergyLevel;
     private Class<? extends SolutionInitializer> solutionInitializerClass;
-    private FlowShopWithUncertainty flowshop;
+    private FlowShopWithUncertainty uncertainFlowShop;
 
-    public SAConfigurationImplBuilder withEliteSolutionsNumber(int eliteSolutionsNumber) {
-        this.eliteSolutionsNumber = eliteSolutionsNumber;
+    public SAConfigurationImplBuilder withDesiredInitialAcceptanceProbability(Double desiredInitialAcceptanceProbability) {
+        this.desiredInitialAcceptanceProbability = desiredInitialAcceptanceProbability;
         return this;
     }
 
-    public SAConfigurationImplBuilder withBeesPerEliteSolution(int beesPerEliteSolution) {
-        this.beesPerEliteSolution = beesPerEliteSolution;
+    public SAConfigurationImplBuilder withEpocheLength(int epocheLength) {
+        this.epocheLength = epocheLength;
         return this;
     }
 
-    public SAConfigurationImplBuilder withBestSolutionsNumber(int bestSolutionsNumber) {
-        this.bestSolutionsNumber = bestSolutionsNumber;
+    public SAConfigurationImplBuilder withDecayRate(Double decayRate) {
+        this.decayRate = decayRate;
         return this;
     }
 
-    public SAConfigurationImplBuilder withBeesPerBestSolution(int beesPerBestSolution) {
-        this.beesPerBestSolution = beesPerBestSolution;
+    public SAConfigurationImplBuilder withEndTemperature(Double endTemperature) {
+        this.endTemperature = endTemperature;
         return this;
     }
 
-    public SAConfigurationImplBuilder withScoutBeesNumber(int scoutBeesNumber) {
-        this.scoutBeesNumber = scoutBeesNumber;
+    public SAConfigurationImplBuilder withErrorThreshold(Double errorThreshold) {
+        this.errorThreshold = errorThreshold;
         return this;
     }
 
-    public SAConfigurationImplBuilder withMaxIterationsWithoutImprovement(int maxIterationsWithoutImprovement) {
-        this.maxIterationsWithoutImprovement = maxIterationsWithoutImprovement;
+    public SAConfigurationImplBuilder withSamplesCardinality(int samplesCardinality) {
+        this.samplesCardinality = samplesCardinality;
         return this;
     }
 
@@ -52,13 +52,13 @@ public class SAConfigurationImplBuilder {
         return this;
     }
 
-    public SAConfigurationImplBuilder withMaxTimeOfExecuting(int maxTimeOfExecuting) {
-        this.maxTimeOfExecuting = maxTimeOfExecuting;
+    public SAConfigurationImplBuilder withMaxIterationsWithoutImprovement(int maxIterationsWithoutImprovement) {
+        this.maxIterationsWithoutImprovement = maxIterationsWithoutImprovement;
         return this;
     }
 
-    public SAConfigurationImplBuilder withMinFitness(int minFitness) {
-        this.minFitness = minFitness;
+    public SAConfigurationImplBuilder withCutOffEnergyLevel(Double cutOffEnergyLevel) {
+        this.cutOffEnergyLevel = cutOffEnergyLevel;
         return this;
     }
 
@@ -67,12 +67,24 @@ public class SAConfigurationImplBuilder {
         return this;
     }
 
-    public SAConfigurationImplBuilder withFlowshop(FlowShopWithUncertainty flowshop) {
-        this.flowshop = flowshop;
+    public SAConfigurationImplBuilder withUncertainFlowshop(FlowShopWithUncertainty uncertainFlowShop) {
+        this.uncertainFlowShop = uncertainFlowShop;
         return this;
     }
 
     public SAConfigurationImpl build() {
-        return new SAConfigurationImpl(eliteSolutionsNumber, beesPerEliteSolution, bestSolutionsNumber, beesPerBestSolution, scoutBeesNumber, maxNumberOfIterations, maxTimeOfExecuting, minFitness, solutionInitializerClass, flowshop, maxIterationsWithoutImprovement);
+        return new SAConfigurationImpl(
+                desiredInitialAcceptanceProbability,
+                epocheLength,
+                decayRate,
+                endTemperature,
+                errorThreshold,
+                samplesCardinality,
+                maxNumberOfIterations,
+                maxIterationsWithoutImprovement,
+                cutOffEnergyLevel,
+                solutionInitializerClass,
+                uncertainFlowShop
+                );
     }
 }

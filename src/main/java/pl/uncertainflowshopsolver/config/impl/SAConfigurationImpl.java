@@ -6,44 +6,80 @@ import pl.uncertainflowshopsolver.config.SAConfiguration;
 import pl.uncertainflowshopsolver.flowshop.FlowShopWithUncertainty;
 
 public class SAConfigurationImpl implements SAConfiguration {
-    private int eliteSolutionsNumber;
-    private int beesPerEliteSolution;
-    private int bestSolutionsNumber;
-    private int beesPerBestSolution;
-    private int scoutBeesNumber;
 
+    private Double desiredInitialAcceptanceProbability;
+    private int epocheLength;
+    private Double decayRate;
+    private Double endTemperature;
+    private Double errorThreshold;
+    private int samplesCardinality;
     private int maxNumberOfIterations;
     private int maxIterationsWithoutImprovement;
-    private int maxTimeOfExecuting;
-    private int minFitness;
-
+    private Double cutOffEnergyLevel;
     private Class<? extends SolutionInitializer> solutionInitializerClass;
-    private FlowShopWithUncertainty flowShop;
+    private FlowShopWithUncertainty uncertainFlowShop;
 
-    SAConfigurationImpl(int eliteSolutionsNumber, int beesPerEliteSolution, int bestSolutionsNumber, int beesPerBestSolution, int scoutBeesNumber, int maxNumberOfIterations, int maxTimeOfExecuting, int minFitness, Class<? extends SolutionInitializer> solutionInitializerClass, FlowShopWithUncertainty flowShop, int maxIterationsWithoutImprovement) {
-        this.eliteSolutionsNumber = eliteSolutionsNumber;
-        this.beesPerEliteSolution = beesPerEliteSolution;
-        this.bestSolutionsNumber = bestSolutionsNumber;
-        this.beesPerBestSolution = beesPerBestSolution;
-        this.scoutBeesNumber = scoutBeesNumber;
+    SAConfigurationImpl(Double desiredInitialAcceptanceProbability, int epocheLength, Double decayRate, Double endTemperature, Double errorThreshold, int samplesCardinality, int maxNumberOfIterations, int maxIterationsWithoutImprovement, Double cutOffEnergyLevel, Class<? extends SolutionInitializer> solutionInitializerClass, FlowShopWithUncertainty uncertainFlowShop) {
+        this.desiredInitialAcceptanceProbability = desiredInitialAcceptanceProbability;
+        this.epocheLength = epocheLength;
+        this.decayRate = decayRate;
+        this.endTemperature = endTemperature;
+        this.errorThreshold = errorThreshold;
+        this.samplesCardinality = samplesCardinality;
         this.maxNumberOfIterations = maxNumberOfIterations;
-        this.maxTimeOfExecuting = maxTimeOfExecuting;
-        this.minFitness = minFitness;
-        this.solutionInitializerClass = solutionInitializerClass;
-        this.flowShop = flowShop;
         this.maxIterationsWithoutImprovement = maxIterationsWithoutImprovement;
+        this.cutOffEnergyLevel = cutOffEnergyLevel;
+        this.solutionInitializerClass = solutionInitializerClass;
+        this.uncertainFlowShop = uncertainFlowShop;
     }
 
     public static SAConfigurationImplBuilder newBuilder() {
         return new SAConfigurationImplBuilder();
     }
 
-
-
+    @Override
+    public Double getDesiredInitialAcceptanceProbability() {
+        return desiredInitialAcceptanceProbability;
+    }
 
     @Override
-    public FlowShopWithUncertainty getFlowShop() {
-        return flowShop;
+    public int getEpocheLength() {
+        return epocheLength;
+    }
+
+    @Override
+    public Double getDecayRate() {
+        return decayRate;
+    }
+
+    @Override
+    public Double getEndTemperature() {
+        return endTemperature;
+    }
+
+    @Override
+    public Double getErrorThreshold() {
+        return errorThreshold;
+    }
+
+    @Override
+    public int getSamplesCardinality() {
+        return samplesCardinality;
+    }
+
+    @Override
+    public int getMaxNumberOfIterations() {
+        return maxNumberOfIterations;
+    }
+
+    @Override
+    public int getMaxIterationsWithoutImprovement() {
+        return maxIterationsWithoutImprovement;
+    }
+
+    @Override
+    public Double getCutOffEnergyLevel() {
+        return cutOffEnergyLevel;
     }
 
     @Override
@@ -52,18 +88,9 @@ public class SAConfigurationImpl implements SAConfiguration {
     }
 
     @Override
-    public int getMaxTimeOfExecuting() {
-        return 0;
+    public FlowShopWithUncertainty getUncertainFlowShop() {
+        return uncertainFlowShop;
     }
 
-    @Override
-    public int getMaxNumberOfIterations() {
-        return 0;
-    }
-
-    @Override
-    public int getMaxIterationsWithoutImprovement() {
-        return maxIterationsWithoutImprovement;
-    }
 
 }

@@ -26,9 +26,7 @@ public class SimulatedAnnealing {
     private volatile boolean running;   //volatile to avoid "visibility" problem, when the updates of one thread are not visible to other threads.
 
     private FlowShopWithUncertainty uncertainFlowShop;
-    private int L;  //epoche, equals to N -> see constructor
-    private final double P1 = 0.627;
-    private final double lambda = 0.908;
+
             //1.0 - Math.exp(-14.0);// 0.908;    //inaczej: alpha. Pempera: 0.995;
     private Random random = ThreadLocalRandom.current();
     //TODO PKU - 3. pomysł na pamiętanie 2óch ostatnich randomów random 1 i random2
@@ -36,11 +34,15 @@ public class SimulatedAnnealing {
 //    private static final double DECAY_RATE = 1.0 - Math.exp(-14.0);
 
     private double DESIRED_INITIAL_ACCEPTANCE_PROBABILITY = 0.925;
+    private int N;  //epoche, equals to N -> see constructor
+    private final double alpha = 0.908;
+    double endTemperature = 0.5;   //Double.MIN_NORMAL;
+    double initialTemperature = 1000;  //initial initialTemperature
 
     public SimulatedAnnealing(FlowShopWithUncertainty uncertainFlowShop)
     {
         this.uncertainFlowShop = uncertainFlowShop;
-        this.L = uncertainFlowShop.getTaskCount();
+        this.N = uncertainFlowShop.getTaskCount();
     }
 
     public SimulatedAnnealing(GUIController guiController) {
@@ -52,7 +54,7 @@ public class SimulatedAnnealing {
         prepareConfiguration();
         running = true;
         eventDispatcher.dispatchAlgorithmStarted();
-        solve();
+//        solve();
     }
 
     public void stop() {
@@ -64,7 +66,7 @@ public class SimulatedAnnealing {
         try {
             initializer = configuration.getSolutionInitializerClass().newInstance();
         } catch (InstantiationException | IllegalAccessException e) {
-            throw new RuntimeException("Cant create solution initializer", e);
+            throw new RuntimeException("Can't create solution initializer", e);
         }
     }
 
@@ -77,11 +79,10 @@ public class SimulatedAnnealing {
         int delta;
         double probability;
 
-        double endTemperature = 0.5;   //Double.MIN_NORMAL;
-        double temperature = 1000;  //initial temperature
 
-//        initializeSA(temperature, endTemperature);
-//        double temperature = getInitialTemperature(getTaskCount(), lambda, endTemperature);  //initial temperature
+
+//        initializeSA(initialTemperature, endTemperature);
+//        double initialTemperature = getInitialTemperature(getTaskCount(), alpha, endTemperature);  //initial initialTemperature
 
         int SACounter = 0;
 
@@ -173,11 +174,11 @@ public class SimulatedAnnealing {
          * dla każdego przypadku kryterium stopu to n! (n - liczba miast na trasie = way.length). Przyjmujemy tu jako kryterium stopu wartość
          * howManyTimesYouWant - tyle razy obliczamy (można tu wstawić n!) - i do tego dodajemy kryterium temperaturowe
          */
-//        while (temperature > endTemperature) {  //warunek końca algorytmu
+//        while (initialTemperature > endTemperature) {  //warunek końca algorytmu
         while (initialTemperature > endTemperature) {  //warunek końca algorytmu
             //TODO PKU - 2. dla małych instancji, np F3, |J|=3, nie ma sensu liczyć 1517 iteracji (poza tym czas jest wykonania algo jest ten sam). Może warto rozważyć zakończenie po jakiejś stałej określonej maksymalnej liczbie niepoprawiająych zmian?
 
-            for (int i = 0; i < L; i++) {
+            for (int i = 0; i < N; i++) {
                 //TODO PKU - 1. czy może zamiast swapować 2óch sąsiadów, lepiej Collections.shuffle(arrlist)? [Fisher–Yates shuffle]
 
                 swapRandomlyTwoTasks(uncertainFlowShop);
@@ -200,7 +201,7 @@ public class SimulatedAnnealing {
                     }
                 } else {
                     delta = currentValue - valueBefore;
-                    probability = Math.exp(-delta / temperature);
+                    probability = Math.exp(-delta / this.initialTemperature);
 
                     Random generator = new Random();
                     double zeroToOne = generator.nextInt(1001) / 1000.0;
@@ -219,8 +220,8 @@ public class SimulatedAnnealing {
                 }
             }
 
-//            temperature = lambda * temperature; //geometryczny schemat chłodzenia
-            initialTemperature = lambda * initialTemperature;
+//            initialTemperature = alpha * initialTemperature; //geometryczny schemat chłodzenia
+            initialTemperature = alpha * initialTemperature;
 
             //howManyTimesYouWant--;
 

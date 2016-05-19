@@ -20,7 +20,7 @@ public class AlgorithmEventDispatcher {
         this.eventListener = eventListener;
     }
 
-    public void dispatchIterationUpdated(final int iteration, final FlowShopWithUncertainty flowShop) {
+    public void dispatchIterationUpdated(final int iteration, final FlowShopWithUncertainty flowShop) {//TODO PKU change from FlowShop to SubA2
         iterationCache.put(iteration, flowShop);
 
         if (iterationCache.size() >= EVENT_BATCH_SIZE) {
