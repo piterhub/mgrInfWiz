@@ -9,7 +9,7 @@ import pl.uncertainflowshopsolver.algo.SimulatedAnnealing;
 import pl.uncertainflowshopsolver.gui.GUIController;
 
 public class Main extends Application {
-    public static final String GUI_FXML_PATH = "gui/view/view.fxml";
+    public static final String GUI_FXML_PATH = "/view.fxml";
     public static final String APPLICATION_NAME = "Solver of Flow Shop problem with tasks intervals uncertainty";
     public static final int GUI_WIDTH = 1200;
     public static final int GUI_HEIGHT = 600;

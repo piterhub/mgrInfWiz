@@ -138,7 +138,7 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
 
     @FXML
     public void onEditFlowshopManuallyButton(ActionEvent actionEvent) {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("view/edit_window.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/edit_window.fxml"));
         try {
             Parent root = (Parent) loader.load();
             EditWindowController editWindowController = loader.getController();

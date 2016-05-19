@@ -112,31 +112,31 @@
                                                 </VBox>
                                                 <VBox prefHeight="200.0" prefWidth="100.0">
                                                     <children>
-                                                        <Label text="Desired Initial Acceptance Probability" />
+                                                        <Label text="Desired Initial Acceptance Probability (]0,1])" wrapText="true"/>
                                                         <DoubleTextBox fx:id="desiredInitialAcceptanceProbabilityDoubleTextBox" />
                                                     </children>
                                                 </VBox>
                                                 <VBox prefHeight="200.0" prefWidth="100.0">
                                                     <children>
-                                                        <Label text="Best solutions" />
+                                                        <Label text="Epoche length (int)" />
                                                         <IntegerTextBox fx:id="epocheLengthIntegerTextBox" />
                                                     </children>
                                                 </VBox>
                                                 <VBox prefHeight="200.0" prefWidth="100.0">
                                                     <children>
-                                                        <Label text="Bees per elite solution" />
+                                                        <Label text="Decay rate / alpha (]0,1])" />
                                                         <DoubleTextBox fx:id="decayRateDoubleTextBox" />
                                                     </children>
                                                 </VBox>
                                                 <VBox prefHeight="200.0" prefWidth="100.0">
                                                     <children>
-                                                        <Label text="Bees per best solution" />
+                                                        <Label text="End temperature (double)" />
                                                         <DoubleTextBox fx:id="endTemperatureDoubleTextBox" />
                                                     </children>
                                                 </VBox>
                                                 <VBox prefHeight="200.0" prefWidth="100.0">
                                                     <children>
-                                                        <Label text="Scout bees" />
+                                                        <Label text="Error threshold (double)" />
                                                     <DoubleTextBox fx:id="errorThresholdDoubleTextBox" />
                                                     </children>
                                                 </VBox>
