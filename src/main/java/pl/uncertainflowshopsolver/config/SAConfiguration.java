@@ -38,7 +38,8 @@ public interface SAConfiguration {
     int getSamplesCardinality();
 
     int getMaxNumberOfIterations();
-    int getMaxIterationsWithoutImprovement();
+
+//    int getMaxIterationsWithoutImprovement();
 
     /**
      * @return E_min, when we reach it, then we stop the algorithm

@@ -33,7 +33,8 @@ public class Main extends Application {
     public void prepareAlgorithm() {
         SimulatedAnnealing algorithm = new SimulatedAnnealing(guiController);
 //        BeesAlgorithm algorithm = new BeesAlgorithm(guiController);
-        guiController.setSAAlgorithm(algorithm);
+        SimulatedAnnealing simulatedAnnealing = new SimulatedAnnealing(guiController);
+        guiController.setSAAlgorithm(simulatedAnnealing);
     }
 
     public static void main(String[] args) {

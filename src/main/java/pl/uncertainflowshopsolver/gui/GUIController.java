@@ -44,7 +44,7 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
     public IntegerTextBox samplesCardinalityIntegerTextBox;
     public IntegerTextBox maxNumberOfIterationsIntegerTextBox;
 //    public IntegerTextBox maxIterationsWithoutImprovementIntegerTextBox;
-    public DoubleTextBox cutOffEnergyLevelDoubleTextBox;
+//    public DoubleTextBox cutOffEnergyLevelDoubleTextBox;
     public Label totalBeesLabel;
     public Button importFlowShopFromFileButton;
     public Button editFlowshopManuallyButton;
@@ -108,9 +108,9 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
 
     @FXML
     public void onStartStopButton(ActionEvent actionEvent) {
-        if(maxNumberOfIterationsIntegerTextBox.getValue() == 0) {
-            maxNumberOfIterationsIntegerTextBox.setText("1000");
-        }
+//        if(maxNumberOfIterationsIntegerTextBox.getValue() == 0) {
+//            maxNumberOfIterationsIntegerTextBox.setText("1000");
+//        }
         activeSAConfiguration = getSAConfiguration();
         if (algorithmState == AlgorithmState.STOPPED) {
             if (flowShop != null) {
@@ -176,7 +176,7 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
                 .withErrorThreshold(errorThresholdDoubleTextBox.getValue())
                 .withSamplesCardinality(samplesCardinalityIntegerTextBox.getValue())
                 .withMaxNumberOfIterations(maxNumberOfIterationsIntegerTextBox.getValue())
-                .withCutOffEnergyLevel(cutOffEnergyLevelDoubleTextBox.getValue())
+//                .withCutOffEnergyLevel(cutOffEnergyLevelDoubleTextBox.getValue())
                 .withSolutionInitializerClass(solutionInitializerClass)
                 .withUncertainFlowshop(flowShop)
                 .build();
@@ -238,7 +238,7 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
                 logsTextArea.appendText("\nEnded: User cancelled.");
                 break;
             case WITHOUT_PROGRESS:
-                logsTextArea.appendText("\nEnded: " + activeSAConfiguration.getMaxIterationsWithoutImprovement() + " iterations without improvement");
+                logsTextArea.appendText("\nEnded: " + /**activeSAConfiguration.getMaxIterationsWithoutImprovement() +*/ " iterations without improvement");
                 break;
         }
     }
@@ -281,7 +281,7 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
         errorThresholdDoubleTextBox.setDisable(isEnabled);
         samplesCardinalityIntegerTextBox.setDisable(isEnabled);
         maxNumberOfIterationsIntegerTextBox.setDisable(isEnabled);
-        cutOffEnergyLevelDoubleTextBox.setDisable(isEnabled);
+//        cutOffEnergyLevelDoubleTextBox.setDisable(isEnabled);
         editFlowshopManuallyButton.setDisable(isEnabled);
         importFlowShopFromFileButton.setDisable(isEnabled);
         initializerChoiceBox.setDisable(isEnabled);

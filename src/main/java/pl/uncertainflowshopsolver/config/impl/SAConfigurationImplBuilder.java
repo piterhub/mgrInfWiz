@@ -12,7 +12,7 @@ public class SAConfigurationImplBuilder {
     private Double errorThreshold;
     private int samplesCardinality;
     private int maxNumberOfIterations;
-    private int maxIterationsWithoutImprovement;
+//    private int maxIterationsWithoutImprovement;
     private Double cutOffEnergyLevel;
     private Class<? extends SolutionInitializer> solutionInitializerClass;
     private FlowShopWithUncertainty uncertainFlowShop;
@@ -52,10 +52,10 @@ public class SAConfigurationImplBuilder {
         return this;
     }
 
-    public SAConfigurationImplBuilder withMaxIterationsWithoutImprovement(int maxIterationsWithoutImprovement) {
-        this.maxIterationsWithoutImprovement = maxIterationsWithoutImprovement;
-        return this;
-    }
+//    public SAConfigurationImplBuilder withMaxIterationsWithoutImprovement(int maxIterationsWithoutImprovement) {
+//        this.maxIterationsWithoutImprovement = maxIterationsWithoutImprovement;
+//        return this;
+//    }
 
     public SAConfigurationImplBuilder withCutOffEnergyLevel(Double cutOffEnergyLevel) {
         this.cutOffEnergyLevel = cutOffEnergyLevel;
@@ -81,7 +81,7 @@ public class SAConfigurationImplBuilder {
                 errorThreshold,
                 samplesCardinality,
                 maxNumberOfIterations,
-                maxIterationsWithoutImprovement,
+//                maxIterationsWithoutImprovement,
                 cutOffEnergyLevel,
                 solutionInitializerClass,
                 uncertainFlowShop

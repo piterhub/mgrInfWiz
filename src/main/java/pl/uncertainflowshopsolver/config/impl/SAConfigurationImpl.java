@@ -14,12 +14,12 @@ public class SAConfigurationImpl implements SAConfiguration {
     private Double errorThreshold;
     private int samplesCardinality;
     private int maxNumberOfIterations;
-    private int maxIterationsWithoutImprovement;
+//    private int maxIterationsWithoutImprovement;
     private Double cutOffEnergyLevel;
     private Class<? extends SolutionInitializer> solutionInitializerClass;
     private FlowShopWithUncertainty uncertainFlowShop;
 
-    SAConfigurationImpl(Double desiredInitialAcceptanceProbability, int epocheLength, Double decayRate, Double endTemperature, Double errorThreshold, int samplesCardinality, int maxNumberOfIterations, int maxIterationsWithoutImprovement, Double cutOffEnergyLevel, Class<? extends SolutionInitializer> solutionInitializerClass, FlowShopWithUncertainty uncertainFlowShop) {
+    SAConfigurationImpl(Double desiredInitialAcceptanceProbability, int epocheLength, Double decayRate, Double endTemperature, Double errorThreshold, int samplesCardinality, int maxNumberOfIterations, /**int maxIterationsWithoutImprovement,*/ Double cutOffEnergyLevel, Class<? extends SolutionInitializer> solutionInitializerClass, FlowShopWithUncertainty uncertainFlowShop) {
         this.desiredInitialAcceptanceProbability = desiredInitialAcceptanceProbability;
         this.epocheLength = epocheLength;
         this.decayRate = decayRate;
@@ -27,7 +27,7 @@ public class SAConfigurationImpl implements SAConfiguration {
         this.errorThreshold = errorThreshold;
         this.samplesCardinality = samplesCardinality;
         this.maxNumberOfIterations = maxNumberOfIterations;
-        this.maxIterationsWithoutImprovement = maxIterationsWithoutImprovement;
+//        this.maxIterationsWithoutImprovement = maxIterationsWithoutImprovement;
         this.cutOffEnergyLevel = cutOffEnergyLevel;
         this.solutionInitializerClass = solutionInitializerClass;
         this.uncertainFlowShop = uncertainFlowShop;
@@ -72,10 +72,11 @@ public class SAConfigurationImpl implements SAConfiguration {
         return maxNumberOfIterations;
     }
 
-    @Override
-    public int getMaxIterationsWithoutImprovement() {
-        return maxIterationsWithoutImprovement;
-    }
+//    @Override
+//    public int getMaxIterationsWithoutImprovement() {
+//        /**return maxIterationsWithoutImprovement;*/
+//        throw new UnsupportedOperationException("SAConfigurationImpl#getMaxIterationsWithoutImprovement");
+//    }
 
     @Override
     public Double getCutOffEnergyLevel() {

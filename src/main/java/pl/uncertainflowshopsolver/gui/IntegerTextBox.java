@@ -62,11 +62,37 @@ public class IntegerTextBox extends TextField {
             super.replaceSelection(text);
             integerProperty.setValue(Integer.parseInt(this.getText()));
         }
+        else if (text == "")
+        {
+            super.replaceSelection("0");
+            integerProperty.setValue(Integer.parseInt("0"));
+        }
     }
 
     @Override
     public void replaceText(int start, int end, String text) {
+//        if (intPattern.matcher(text).matches()) {
+//            super.replaceText(start, end, text);
+//            integerProperty.setValue(Integer.parseInt(this.getText()));
+//        }
+        String oldValue = getText();
         if (intPattern.matcher(text).matches()) {
+            super.replaceText(start, end, text);
+            String newText = super.getText();
+            if (!intPattern.matcher(newText).matches()) {
+                super.setText(oldValue);
+            }
+            else{
+                integerProperty.setValue(Integer.parseInt(this.getText()));
+            }
+        }
+        else if(text == "")
+        {
+            if(this.getText() == "")
+            {
+                super.insertText(0, "0");
+                integerProperty.setValue(Integer.parseInt("0"));
+            }
             super.replaceText(start, end, text);
             integerProperty.setValue(Integer.parseInt(this.getText()));
         }

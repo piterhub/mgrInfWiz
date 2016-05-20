@@ -91,6 +91,11 @@ public class DoubleTextBox extends TextField {
                 doubleProperty.setValue(Double.parseDouble(helper));
             }
         }
+        else if (text == "")
+        {
+            super.replaceSelection("0.0");
+            doubleProperty.setValue(Double.parseDouble("0.0"));
+        }
     }
 
     @Override
@@ -114,6 +119,26 @@ public class DoubleTextBox extends TextField {
                 }
                 doubleProperty.setValue(Double.parseDouble(helper));
             }
+        }
+        else if(text == "")
+        {
+            super.replaceText(start, end, text);
+            String helper = this.getText();
+            if(helper == "")
+            {
+                super.insertText(0, "0.0");
+                doubleProperty.setValue(Double.parseDouble("0.0"));
+                return;
+            }
+            if(secondDoublePattern.matcher(helper).matches())
+            {
+                helper = helper.replace(',', '.');
+            }
+            if(thirdDoublePattern.matcher(helper).matches())
+            {
+                helper = helper + "0";
+            }
+            doubleProperty.setValue(Double.parseDouble(helper));
         }
     }
 
