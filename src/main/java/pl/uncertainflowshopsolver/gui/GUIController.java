@@ -1,6 +1,5 @@
 package pl.uncertainflowshopsolver.gui;
 
-import javafx.beans.binding.Bindings;
 import javafx.beans.binding.NumberBinding;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -103,7 +102,16 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
         lineChart.getData().add(series);
         lineChart.setAnimated(false);
 
-        prepareTotalBeesBinding();
+//        prepareTotalBeesBinding();
+//
+//        desiredInitialAcceptanceProbabilityDoubleTextBox.doubleProperty().setValue(0.925);
+//        desiredInitialAcceptanceProbabilityDoubleTextBox.insertText(0, "0.925");
+//        epocheLengthIntegerTextBox.insertText(0, "10");
+//        decayRateDoubleTextBox.insertText(0, "0.995");
+//        endTemperatureDoubleTextBox.insertText(0, "0.5");
+//        errorThresholdDoubleTextBox.insertText(0, "0.0001");
+//        samplesCardinalityIntegerTextBox.insertText(0, "10000");
+//        maxNumberOfIterationsIntegerTextBox.insertText(0, "1000");
     }
 
     @FXML
@@ -193,20 +201,20 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
 
     @Override
     public void onIterationUpdated(int iteration, FlowShopWithUncertainty flowShop) {
-//        iterationFitnessMap.put(iteration, flowShop.makeSpan());
-//        iterationFitnessMap.put(iteration, flowShop.g);
-//        if (solutionIsBest(flowShop)) {
-//            bestSolutionIteration = iteration;
-//            bestSolution = flowShop;
-//
-//            bestSolutionTextArea.clear();
-//            bestSolutionTextArea.appendText("Iteration: " + bestSolutionIteration + ":\n");
-//            bestSolutionTextArea.appendText("Makespan: " + bestSolution.makeSpan() + "\n");
-//            bestSolutionTextArea.appendText(flowShop.toString() + "\n");
-//        }
-//        logsTextArea.appendText("Iteration " + iteration + ":\n");
-//        logsTextArea.appendText("Makespan: " + iterationFitnessMap.get(iteration) + "\n");
-//        logsTextArea.appendText(flowShop.toString() + "\n");
+        iterationFitnessMap.put(iteration, flowShop.getUpperBoundOfMinMaxRegretOptimalization());
+        if (solutionIsBest(flowShop)) {
+            bestSolutionIteration = iteration;
+            bestSolution = flowShop;
+
+            bestSolutionTextArea.clear();
+            bestSolutionTextArea.appendText("Iteration: " + bestSolutionIteration + ":\n");
+            bestSolutionTextArea.appendText("Makespan UB: " + bestSolution.getUpperBoundOfMinMaxRegretOptimalization() + "\n");
+            bestSolutionTextArea.appendText("Makespan LB: " + bestSolution.getLowerBoundOfMinMaxRegretOptimalization() + "\n");
+            bestSolutionTextArea.appendText(flowShop.toString() + "\n");
+        }
+        logsTextArea.appendText("Iteration " + iteration + ":\n");
+        logsTextArea.appendText("Makespan UB: " + iterationFitnessMap.get(iteration) + "\n");
+        logsTextArea.appendText(flowShop.toString() + "\n");
 
         updateChart(iteration);
         updateProgressBar(iteration);
@@ -298,7 +306,7 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
 
 
     private boolean solutionIsBest(FlowShopWithUncertainty flowShop) {
-        return bestSolutionIteration == -1 /**|| bestSolution.makeSpan() > flowShop.makeSpan()*/;
+        return bestSolutionIteration == -1 || bestSolution.getUpperBoundOfMinMaxRegretOptimalization() > flowShop.getUpperBoundOfMinMaxRegretOptimalization();
     }
 
     @FXML

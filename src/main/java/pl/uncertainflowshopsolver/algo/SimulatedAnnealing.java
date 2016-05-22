@@ -1,6 +1,7 @@
 package pl.uncertainflowshopsolver.algo;
 
 import pl.uncertainflowshopsolver.algo.init.SolutionInitializer;
+import pl.uncertainflowshopsolver.algo.util.SimulatedAnnealingConfigurationUtil;
 import pl.uncertainflowshopsolver.config.SAConfiguration;
 import pl.uncertainflowshopsolver.config.ConfigurationProvider;
 import pl.uncertainflowshopsolver.flowshop.FlowShopWithUncertainty;
@@ -9,14 +10,17 @@ import pl.uncertainflowshopsolver.gui.event.AlgorithmEventDispatcher;
 import pl.uncertainflowshopsolver.testdata.InstanceGenerator;
 
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
 
 import static pl.uncertainflowshopsolver.algo.util.SimulatedAnnealingConfigurationUtil.*;
+import static pl.uncertainflowshopsolver.flowshop.FlowShopWithUncertainty.swapRandomlyTwoTasks;
+import static pl.uncertainflowshopsolver.gui.event.AlgorithmEventDispatcher.*;
 
 /**
  * @author Piotr Kubicki, created on 24.04.2016.
  */
 public class SimulatedAnnealing {
+
+    private static final Random random = new Random();
 
     private AlgorithmEventDispatcher eventDispatcher;
     private ConfigurationProvider configurationProvider;
@@ -28,21 +32,24 @@ public class SimulatedAnnealing {
     private FlowShopWithUncertainty uncertainFlowShop;
 
             //1.0 - Math.exp(-14.0);// 0.908;    //inaczej: alpha. Pempera: 0.995;
-    private Random random = ThreadLocalRandom.current();
+
     //TODO PKU - 3. pomysł na pamiętanie 2óch ostatnich randomów random 1 i random2
 
 //    private static final double DECAY_RATE = 1.0 - Math.exp(-14.0);
 
-    private double DESIRED_INITIAL_ACCEPTANCE_PROBABILITY = 0.925;
-    private int N;  //epoche, equals to N -> see constructor
-    private final double alpha = 0.908;
-    double endTemperature = 0.5;   //Double.MIN_NORMAL;
-    double initialTemperature = 1000;  //initial initialTemperature
+//    private double desiredInitialAcceptanceProbability = 0.925;
+    private int L;  //epoche, equals to L -> see constructor
+//    private double alpha = 0.908;
+//    double endTemperature = 0.5;   //Double.MIN_NORMAL;
+//    double initialTemperature = 1000;  //initial initialTemperature
+//    double errorThreshold;
+//    int samplesCardinality;
+//    int maxNumberOfIterations;
 
     public SimulatedAnnealing(FlowShopWithUncertainty uncertainFlowShop)
     {
         this.uncertainFlowShop = uncertainFlowShop;
-        this.N = uncertainFlowShop.getTaskCount();
+        this.L = uncertainFlowShop.getTaskCount();
     }
 
     public SimulatedAnnealing(GUIController guiController) {
@@ -50,11 +57,15 @@ public class SimulatedAnnealing {
         this.eventDispatcher = new AlgorithmEventDispatcher(guiController);
     }
 
+    public SimulatedAnnealing()
+    {
+    }
+
     public void start() {
         prepareConfiguration();
         running = true;
         eventDispatcher.dispatchAlgorithmStarted();
-//        solve();
+        solve();
     }
 
     public void stop() {
@@ -63,11 +74,120 @@ public class SimulatedAnnealing {
 
     private void prepareConfiguration() {
         configuration = configurationProvider.getSAConfiguration();
-        try {
-            initializer = configuration.getSolutionInitializerClass().newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
-            throw new RuntimeException("Can't create solution initializer", e);
+        //TODO nie będzie inicjalizera, ale będzie sposób generowania sąsiedztwa
+//        try {
+//            initializer = configuration.getSolutionInitializerClass().newInstance();
+//        } catch (InstantiationException | IllegalAccessException e) {
+//            throw new RuntimeException("Can't create solution initializer", e);
+//        }
+    }
+
+    private void solve()
+    {
+        long startTime = System.currentTimeMillis();
+        uncertainFlowShop = configuration.getUncertainFlowShop();
+
+        final Object[] result = SubAlgorithm2.solveGreedy(uncertainFlowShop, null, false);
+//        SortedSet<SolutionNeighbourhood> neighbourhoods = new TreeSet<>();//TODO PKU last thing
+        int globalMinimum = (int) result[1];
+        int globalMinimumForLowerBound;
+        FlowShopWithUncertainty uncertainFlowShop_for_minimum = uncertainFlowShop.clone();
+        uncertainFlowShop_for_minimum.setUpperBoundOfMinMaxRegretOptimalization(globalMinimum);
+
+        int valueBefore = globalMinimum;
+        FlowShopWithUncertainty uncertainFlowShop_for_valueBefore = uncertainFlowShop.clone();
+
+        int iterations = 0;
+        int lastImprovementIteration = 0;
+
+        if (lastImprovementIteration % 10 == 0)
+            eventDispatcher.dispatchIterationUpdated(iterations, uncertainFlowShop_for_minimum);
+
+        /*************************/
+        ArrayList<FlowShopWithUncertainty> tempGenerationStates = new ArrayList<>();
+        while (tempGenerationStates.size() < configuration.getSamplesCardinality()) {
+            FlowShopWithUncertainty curState = uncertainFlowShop.getNeighbor(1.0);
+            final Object[] results = SubAlgorithm2.solveGreedy(curState, false, false);
+            curState.setUpperBoundOfMinMaxRegretOptimalization((int)results[0]);
+            tempGenerationStates.add(curState);
         }
+        double initialTemperature =
+                SimulatedAnnealingConfigurationUtil.calculateFromDesiredProbability(
+                        configuration.getDesiredInitialAcceptanceProbability(),
+                        tempGenerationStates,
+                        configuration.getErrorThreshold());
+        System.out.printf(
+                "Using init temp %.2f (target init acceptance prob %.3f)\n",
+                initialTemperature, configuration.getDesiredInitialAcceptanceProbability());
+        /*************************/
+
+        int SACounter = 0;
+        while (running/* && initialTemperature > configuration.getEndTemperature() && iterations < configuration.getMaxNumberOfIterations()*/){
+
+            if (lastImprovementIteration % 10 == 0)
+                eventDispatcher.dispatchIterationUpdated(iterations, uncertainFlowShop_for_minimum);
+
+            System.out.println(iterations);
+            System.out.println(uncertainFlowShop.getUpperBoundOfMinMaxRegretOptimalization());
+            System.out.println(uncertainFlowShop.toString());
+
+            iterations++;
+
+            for (int i = 0; i < L; i++) {
+
+                SACounter++;
+                final Object[] resultInside = SubAlgorithm2.solveGreedy(uncertainFlowShop.getNeighbor(1.0), null, false);
+                int currentValue = (int) resultInside[1];  //upper bound
+
+                if (valueBefore >= currentValue) {
+                    valueBefore = currentValue;
+                    uncertainFlowShop_for_valueBefore = uncertainFlowShop.clone();
+                    if (globalMinimum > currentValue) {
+                        globalMinimum = currentValue;
+                        uncertainFlowShop_for_minimum = uncertainFlowShop.clone();
+                        uncertainFlowShop_for_minimum.setUpperBoundOfMinMaxRegretOptimalization(globalMinimum);
+//                        globalMinimumForLowerBound = (int) resultInside[0]; //TODO 21.05 - dodać to i elapsedTime do FlowShop -> por. eventDispatcher.dispatchIterationUpdated & dispatchAlgorithmEnded
+                        uncertainFlowShop_for_minimum.setLowerBoundOfMinMaxRegretOptimalization((int) resultInside[0]); //TODO 21.05 - dodać to i elapsedTime do FlowShop -> por. eventDispatcher.dispatchIterationUpdated & dispatchAlgorithmEnded
+                    }
+                } else {
+                    int delta = currentValue - valueBefore;
+                    double probability = Math.exp(-delta / initialTemperature);
+                    double zeroToOne = random.nextInt(1001) / 1000.0;
+
+                    if (zeroToOne <= probability) {
+                        valueBefore = currentValue;
+                        uncertainFlowShop_for_valueBefore = uncertainFlowShop.clone();
+                    } else {
+                        uncertainFlowShop = uncertainFlowShop_for_valueBefore.clone();
+                    }
+                }
+            }
+            initialTemperature = configuration.getDecayRate() * initialTemperature;
+
+            // stop conditions
+            if (configuration.getMaxNumberOfIterations() != 0 && iterations > configuration.getMaxNumberOfIterations()) {
+                break;
+            }
+//            if (configuration.getMaxIterationsWithoutImprovement() != 0 &&
+//                    iterations - lastImprovementIteration > configuration.getMaxIterationsWithoutImprovement()) {
+//                break;
+//            }
+        }
+        long stopTime = System.currentTimeMillis();
+        double elapsedTime = (stopTime - startTime) / 1000d; //in seconds
+        uncertainFlowShop_for_minimum.setElapsedTime(elapsedTime);
+
+        // Last update
+        eventDispatcher.dispatchIterationUpdated(iterations, uncertainFlowShop_for_minimum);
+
+        if (iterations >= configuration.getMaxNumberOfIterations()) {
+            eventDispatcher.dispatchAlgorithmEnded(EndingReason.ALL_ITERATIONS, elapsedTime);
+        } else if (running) {
+            eventDispatcher.dispatchAlgorithmEnded(EndingReason.WITHOUT_PROGRESS, elapsedTime);
+        } else {
+            eventDispatcher.dispatchAlgorithmEnded(EndingReason.CANCELLED, elapsedTime);
+        }
+
     }
 
     public Object[] solveSA(boolean lowerBound, boolean printDebug) {
@@ -95,7 +215,7 @@ public class SimulatedAnnealing {
         FlowShopWithUncertainty uncertainFlowShop_for_minimum = uncertainFlowShop.clone();
 
         int currentValue = valueBefore;
-        int minimumForLowerBound=(int) resultInside3[0];;
+        int minimumForLowerBound=(int) resultInside3[0];
 
 
 
@@ -123,7 +243,7 @@ public class SimulatedAnnealing {
         while (positiveEnergyDeltasCounter < factorial && (isNotMaxIterationsReached(counter, number) || positiveEnergyDeltas.isEmpty()))   //TODO PKU 4.-Wstawić to jako rozbiegowe do głównej pętli
         {
             counter++;
-            swapRandomlyTwoTasks(uncertainFlowShop_temp);
+            swapRandomlyTwoTasks(uncertainFlowShop_temp, uncertainFlowShop_temp.getTaskCount());
 
             final Object[] resultInside2 = SubAlgorithm2.solveGreedy(uncertainFlowShop_temp, lowerBound, false);
             int smallCurrentValue =(int) resultInside2[0];
@@ -150,20 +270,20 @@ public class SimulatedAnnealing {
 
         double initialTemperature =
                 calculateInitialTemperatureFromDesiredProbability(
-                        DESIRED_INITIAL_ACCEPTANCE_PROBABILITY,
+                        configuration.getDesiredInitialAcceptanceProbability(),
                         pED,
-                        0.0001);
+                        configuration.getErrorThreshold());
         System.out.printf(
                 "Using init temp %.2f (target init acceptance prob %.3f)\n",
-                initialTemperature, DESIRED_INITIAL_ACCEPTANCE_PROBABILITY);
+                initialTemperature, configuration.getDesiredInitialAcceptanceProbability());
 
 
 //
-//        System.out.println("SACounter:" + SACounter);   //TODO PKU test debug
-////        System.out.println("SA current:" + currentValue);   //TODO PKU test debug
-//        System.out.println("SA before:" + valueBefore);   //TODO PKU test debug
-//        System.out.println("SA result:" + minimum + "\n");   //TODO PKU test debug
-//        System.out.println("*****************************" + "\n");   //TODO PKU test debug
+//        System.out.println("SACounter:" + SACounter);   //
+////        System.out.println("SA current:" + currentValue);   //
+//        System.out.println("SA before:" + valueBefore);   //
+//        System.out.println("SA result:" + minimum + "\n");   //
+//        System.out.println("*****************************" + "\n");   //
 
 
         /**
@@ -175,18 +295,16 @@ public class SimulatedAnnealing {
          * howManyTimesYouWant - tyle razy obliczamy (można tu wstawić n!) - i do tego dodajemy kryterium temperaturowe
          */
 //        while (initialTemperature > endTemperature) {  //warunek końca algorytmu
-        while (initialTemperature > endTemperature) {  //warunek końca algorytmu
+        while (initialTemperature > configuration.getEndTemperature()) {  //warunek końca algorytmu
             //TODO PKU - 2. dla małych instancji, np F3, |J|=3, nie ma sensu liczyć 1517 iteracji (poza tym czas jest wykonania algo jest ten sam). Może warto rozważyć zakończenie po jakiejś stałej określonej maksymalnej liczbie niepoprawiająych zmian?
 
-            for (int i = 0; i < N; i++) {
+            for (int i = 0; i < L; i++) {
                 //TODO PKU - 1. czy może zamiast swapować 2óch sąsiadów, lepiej Collections.shuffle(arrlist)? [Fisher–Yates shuffle]
 
-                swapRandomlyTwoTasks(uncertainFlowShop);
+                swapRandomlyTwoTasks(uncertainFlowShop, uncertainFlowShop.getTaskCount());
 
                 SACounter++;
-//                System.out.println("SACounter:" + SACounter);   //TODO PKU test debug
-
-                //TODO PKU - 1end.
+//                System.out.println("SACounter:" + SACounter);   //
 
                 final Object[] resultInside4 = SubAlgorithm2.solveGreedy(uncertainFlowShop, null, printDebug);
                 currentValue = (int) resultInside4[1];  //upper bound
@@ -201,35 +319,35 @@ public class SimulatedAnnealing {
                     }
                 } else {
                     delta = currentValue - valueBefore;
-                    probability = Math.exp(-delta / this.initialTemperature);
+                    probability = Math.exp(-delta / initialTemperature);
 
                     Random generator = new Random();
                     double zeroToOne = generator.nextInt(1001) / 1000.0;
 
-//                    System.out.println("probability: " + probability + ", zeroToOne: " + zeroToOne);   //TODO PKU test debug
+//                    System.out.println("probability: " + probability + ", zeroToOne: " + zeroToOne);   //
 
                     if (zeroToOne <= probability) {
                         valueBefore = currentValue;
                         uncertainFlowShop_for_valueBefore = uncertainFlowShop.clone();
-//                        System.out.println("zeroToOne <= probability. Zaakceptowane gorsze rozwiązanie ");   //TODO PKU test debug
+//                        System.out.println("zeroToOne <= probability. Zaakceptowane gorsze rozwiązanie ");   //
                     } else {
                         uncertainFlowShop = uncertainFlowShop_for_valueBefore.clone();
                         //pudło! policzony uncertainFlowShop ma większe z4, zostaje więc stary
-//                        System.out.println("zeroToOne > probability. Bez akceptacji");   //TODO PKU test debug
+//                        System.out.println("zeroToOne > probability. Bez akceptacji");   //
                     }
                 }
             }
 
 //            initialTemperature = alpha * initialTemperature; //geometryczny schemat chłodzenia
-            initialTemperature = alpha * initialTemperature;
+            initialTemperature = configuration.getDecayRate() * initialTemperature;
 
             //howManyTimesYouWant--;
 
 
-//            System.out.println("SA current:" + currentValue);   //TODO PKU test debug
-//            System.out.println("SA before:" + valueBefore);   //TODO PKU test debug
-//            System.out.println("SA result:" + minimum + "\n");   //TODO PKU test debug
-//            System.out.println("*****************************" + "\n");   //TODO PKU test debug
+//            System.out.println("SA current:" + currentValue);   //
+//            System.out.println("SA before:" + valueBefore);   //
+//            System.out.println("SA result:" + minimum + "\n");   //
+//            System.out.println("*****************************" + "\n");   //
         }
 
         long stopTime = System.currentTimeMillis();
@@ -250,14 +368,7 @@ public class SimulatedAnnealing {
         return counter < factorial;
     }
 
-    private void swapRandomlyTwoTasks(FlowShopWithUncertainty uncertainFlowShop) {
-        int random1 = random.nextInt(getTaskCount());
-        int random2 = random.nextInt(getTaskCount());
-        while (random2 == random1) {
-            random2 = random.nextInt(getTaskCount());
-        }
-        Collections.swap(uncertainFlowShop.getTasks(), random1, random2);
-    }
+
 
     private void initializeSA(double initialTemperature, double finalTemperature) {
 
@@ -305,5 +416,13 @@ public class SimulatedAnnealing {
         System.out.println("SA result: " + result2[1]);
 
         System.out.println(Arrays.equals((double[])result[3], (double[]) result2[3]));
+    }
+
+    public void setEventDispatcher(AlgorithmEventDispatcher eventDispatcher) {
+        this.eventDispatcher = eventDispatcher;
+    }
+
+    public void setConfigurationProvider(ConfigurationProvider configurationProvider) {
+        this.configurationProvider = configurationProvider;
     }
 }

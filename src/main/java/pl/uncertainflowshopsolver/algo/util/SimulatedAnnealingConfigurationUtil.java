@@ -1,5 +1,9 @@
 package pl.uncertainflowshopsolver.algo.util;
 
+import pl.uncertainflowshopsolver.flowshop.FlowShopWithUncertainty;
+
+import java.util.ArrayList;
+
 /**
  * @author Piotr Kubicki, created on 30.04.2016.
  */
@@ -69,6 +73,34 @@ public class SimulatedAnnealingConfigurationUtil {
             sumProbs += Math.min(1.0, Math.exp(-d / temperature));
         }
         return sumProbs / energyDeltas.length;
+    }
+
+    public static double calculateFromDesiredProbability (
+            double desiredProbability,
+            Iterable<FlowShopWithUncertainty> states,
+            double errorThreshold)
+    {
+        ArrayList<Double> energyDeltasList = new ArrayList<Double>();
+        for (FlowShopWithUncertainty state : states) {
+            double energyDelta = (state.getNeighbor(1.0).getUpperBoundOfMinMaxRegretOptimalization() -
+                    state.getUpperBoundOfMinMaxRegretOptimalization());
+            if (energyDelta > Double.MIN_NORMAL) {
+                energyDeltasList.add(energyDelta);
+            }
+        }
+        if (energyDeltasList.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "states must have at least one positive transition");
+        }
+
+        double[] energyDeltas = new double[energyDeltasList.size()];
+        for (int i = 0; i < energyDeltasList.size(); ++i) {
+            energyDeltas[i] = energyDeltasList.get(i);
+        }
+        return calculateInitialTemperatureFromDesiredProbability(
+                desiredProbability,
+                energyDeltas,
+                errorThreshold);
     }
 
     public static void main(String [] args)

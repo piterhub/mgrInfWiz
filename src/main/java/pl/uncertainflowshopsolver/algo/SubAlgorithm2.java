@@ -22,7 +22,8 @@ public class SubAlgorithm2 {
      * It doesn't  change uncertainFlowShop, i.e. given FlowShop permutation is constant (changes only inside NEH).
      *
      * @param uncertainFlowShop - the {@link FlowShopWithUncertainty}
-     * @param lowerBound - should calculate C_max,LB like described in "Evolutionary algo for min-max regret flow shop problem" (Cwik, Józefczyk - 2015)
+     * @param lowerBound - should calculate C_max,LB like described in "Evolutionary algo for min-max regret flow shop problem" (Cwik, Józefczyk - 2015).
+     *                   When null, then both will be calculated.
      * @param printDebug boolean, true if there should be matrix result on console
      * @return result of given above optimization problem
      */
@@ -44,7 +45,7 @@ public class SubAlgorithm2 {
             for (int m = 0; m < machineCount; m++) {
 
                 int sum = 0;
-                sum += uncertainTask.getUpperTimeList().get(m);      //TODO PKU do sumy dodajemy zawsze górne p_ij,
+                sum += uncertainTask.getUpperTimeList().get(m);      //do sumy dodajemy zawsze górne p_ij,
                                                             // na dolne zmieniamy poniżej, jak obecne przegra porównanie z dłuższym
                 if (t > 0) { // Rows 1..n-1
                     if (m == 0) {

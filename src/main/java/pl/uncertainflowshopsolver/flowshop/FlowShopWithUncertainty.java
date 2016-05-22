@@ -1,25 +1,29 @@
 package pl.uncertainflowshopsolver.flowshop;
 
+import pl.uncertainflowshopsolver.algo.SubAlgorithm2;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * @author Piotr Kubicki, created on 18.04.2016.
  */
 public class FlowShopWithUncertainty implements Cloneable {
 
-    public static final String PATH_TO_RESOURCES = "C:/Users/pkubicki/IdeaProjects/mgrInfWiz/resources";
+    public static final String PATH_TO_RESOURCES = "C:/Users/pkubicki/IdeaProjects/mgrInfWiz/resources";    //TODO ?cie?ka b?dzie brana tak jak j? sobie User wybierze guzikiem
+    private static final Random random = ThreadLocalRandom.current();
     private List<TaskWithUncertainty> taskWithUncertaintyList;
     private int m;
     private int n;
-    private Integer resultOfMinMaxRegretOptimalization;
+    private Integer upperBoundOfMinMaxRegretOptimalization;
+    private Integer lowerBoundOfMinMaxRegretOptimalization;
+    private double elapsedTime;
 
     public FlowShopWithUncertainty() {
         taskWithUncertaintyList = new ArrayList<>(Arrays.asList(
@@ -35,6 +39,39 @@ public class FlowShopWithUncertainty implements Cloneable {
         this.n = getTaskCount();
     }
 
+    public static void swapRandomlyTwoTasks(FlowShopWithUncertainty uncertainFlowShop, int taskCount) {
+        int random1 = random.nextInt(taskCount);
+        int random2 = random.nextInt(taskCount);
+        while (random2 == random1) {
+            random2 = random.nextInt(taskCount);
+        }
+        Collections.swap(uncertainFlowShop.getTasks(), random1, random2);
+    }
+
+    public double getElapsedTime() {
+        return elapsedTime;
+    }
+
+    public void setElapsedTime(double elapsedTime) {
+        this.elapsedTime = elapsedTime;
+    }
+
+    public Integer getUpperBoundOfMinMaxRegretOptimalization() {
+        return upperBoundOfMinMaxRegretOptimalization;
+    }
+
+    public void setUpperBoundOfMinMaxRegretOptimalization(Integer resultOfMinMaxRegretOptimalization) {
+        this.upperBoundOfMinMaxRegretOptimalization = resultOfMinMaxRegretOptimalization;
+    }
+
+    public Integer getLowerBoundOfMinMaxRegretOptimalization() {
+        return lowerBoundOfMinMaxRegretOptimalization;
+    }
+
+    public void setLowerBoundOfMinMaxRegretOptimalization(Integer lowerBoundOfMinMaxRegretOptimalization) {
+        this.lowerBoundOfMinMaxRegretOptimalization = lowerBoundOfMinMaxRegretOptimalization;
+    }
+
     public List<TaskWithUncertainty> getTaskWithUncertaintyList() {
         return taskWithUncertaintyList;
     }
@@ -45,14 +82,6 @@ public class FlowShopWithUncertainty implements Cloneable {
 
     public int getN() {
         return n;
-    }
-
-    public Integer getResultOfMinMaxRegretOptimalization() {
-        return resultOfMinMaxRegretOptimalization;
-    }
-
-    public void setResultOfMinMaxRegretOptimalization(Integer resultOfMinMaxRegretOptimalization) {
-        this.resultOfMinMaxRegretOptimalization = resultOfMinMaxRegretOptimalization;
     }
 
     public List<TaskWithUncertainty> getTasks() {
@@ -211,5 +240,12 @@ public class FlowShopWithUncertainty implements Cloneable {
     public FlowShopWithUncertainty clone() {
         List<TaskWithUncertainty> tasks = new ArrayList<>(taskWithUncertaintyList);
         return new FlowShopWithUncertainty(tasks);
+    }
+
+    public FlowShopWithUncertainty getNeighbor(double temperature) {
+        swapRandomlyTwoTasks(this, getTaskCount());
+        FlowShopWithUncertainty newFlowShop = new FlowShopWithUncertainty(this.getTasks());
+        newFlowShop.setUpperBoundOfMinMaxRegretOptimalization((int)SubAlgorithm2.solveGreedy(this, false, false)[0]);
+        return newFlowShop;
     }
 }

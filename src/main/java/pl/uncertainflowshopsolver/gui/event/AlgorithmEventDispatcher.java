@@ -36,7 +36,7 @@ public class AlgorithmEventDispatcher {
             });
 
             try {
-                doneLatch.await();
+                doneLatch.await();//TODO czy chcemy czeka?, a? si? sko?czy eventListener.onManyIterationBatchUpdated na w?tku JavaFX?
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -45,7 +45,7 @@ public class AlgorithmEventDispatcher {
         }
     }
 
-    public void dispatchAlgorithmEnded(final EndingReason reason) {
+    public void dispatchAlgorithmEnded(final EndingReason reason, double elapsedTime) {
         final SortedMap<Integer, FlowShopWithUncertainty> copiedMap = new TreeMap<>(iterationCache);
         Platform.runLater(new Runnable() {
             @Override
