@@ -4,7 +4,9 @@ import pl.uncertainflowshopsolver.flowshop.FlowShop;
 import pl.uncertainflowshopsolver.flowshop.FlowShopWithUncertainty;
 import pl.uncertainflowshopsolver.flowshop.Task;
 import pl.uncertainflowshopsolver.flowshop.TaskWithUncertainty;
+import pl.uncertainflowshopsolver.testdata.UncertainFlowShopParser;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -18,7 +20,7 @@ public class SubAlgorithm2 {
 //    }
 
     /**
-     * Solves max{p}(C_max(p,pi) - min{pi'}C_max(p,pi') with greedy approach, when uncertain version of Flow Shop is given.
+     * Solves z(pi) = max{p}(C_max(p,pi) - min{pi'}C_max(p,pi') with greedy approach, when uncertain version of Flow Shop is given.
      * It doesn't  change uncertainFlowShop, i.e. given FlowShop permutation is constant (changes only inside NEH).
      *
      * @param uncertainFlowShop - the {@link FlowShopWithUncertainty}
@@ -94,13 +96,16 @@ public class SubAlgorithm2 {
             System.out.println();
         }
 
+//        System.out.println();
+//        System.out.println(certainFlowShop.toString());
+
         final int max_po_p_Cmax = matrix[taskCount - 1][machineCount - 1];
 
         if(lowerBound == null)
         {
             Object[] result = new Object[2];
-            result[0] = max_po_p_Cmax - NehAlgorithm.solve(certainFlowShop, true);
-            result[1] = max_po_p_Cmax - SubAlgorithm1LowerBound.calculateLowerBoundOfCMax(certainFlowShop);
+            result[0] = max_po_p_Cmax - NehAlgorithm.solve(certainFlowShop, true);  //z_LB
+            result[1] = max_po_p_Cmax - SubAlgorithm1LowerBound.calculateLowerBoundOfCMax(certainFlowShop); //z_UB. z_UB > z_LB!
             return result;
         }
         else if(lowerBound) {
@@ -122,17 +127,38 @@ public class SubAlgorithm2 {
      */
     public static void main(String[] args)
     {
-        FlowShopWithUncertainty uncertainFlowShop = new FlowShopWithUncertainty();
-        final Object[] result = solveGreedy(uncertainFlowShop, true, true);
-        int x = (int) result[0];
-        System.out.println(x);
-        final Object[] result2 = solveGreedy(uncertainFlowShop, false, true);
-        int y = (int) result2[0];
-        System.out.println(y);
-        final Object[] result3 = solveGreedy(uncertainFlowShop, null, true);
-        x = (int) result3[0];
-        y = (int) result3[1];
-        System.out.println(x);
-        System.out.println(y);
+//        FlowShopWithUncertainty uncertainFlowShop = new FlowShopWithUncertainty();
+//        final Object[] result = solveGreedy(uncertainFlowShop, true, true);
+//        int x = (int) result[0];
+//        System.out.println(x);
+//        final Object[] result2 = solveGreedy(uncertainFlowShop, false, true);
+//        int y = (int) result2[0];
+//        System.out.println(y);
+//        final Object[] result3 = solveGreedy(uncertainFlowShop, null, true);
+//        x = (int) result3[0];
+//        y = (int) result3[1];
+//        System.out.println(x);
+//        System.out.println(y);
+
+        final String PATH = "resources/new_1.txt";
+
+        FlowShopWithUncertainty flowShopWithUncertainty = null;
+
+        try {
+            flowShopWithUncertainty = UncertainFlowShopParser.parseFileToFlowShopWithUncertainty(PATH);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println(flowShopWithUncertainty.toString());
+
+        if(flowShopWithUncertainty != null)
+        {
+            final Object[] result4 = solveGreedy(flowShopWithUncertainty, null, true);
+            int x = (int) result4[0];
+            int y = (int) result4[1];
+            System.out.println(x);
+            System.out.println(y);
+        }
     }
 }

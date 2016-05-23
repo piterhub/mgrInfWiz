@@ -2,6 +2,11 @@ package pl.uncertainflowshopsolver.algo;
 
 import pl.uncertainflowshopsolver.flowshop.FlowShop;
 import pl.uncertainflowshopsolver.flowshop.FlowShopConfig;
+import pl.uncertainflowshopsolver.testdata.FlowshopParser;
+
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 
 /**
  * Created by PKUBICKI on 17.04.2016.
@@ -96,7 +101,40 @@ public final class NehAlgorithm {
 
     // Tmp main
     public static void main(String[] args) {
-        solve(new FlowShopConfig());
+//        solve(new FlowShopConfig());
+
+        final String PATH = "resources/certainFlowShop_hinduskizjutuba.txt";
+        final String PATH2 = "resources/new_2_certainFlowShop.txt";
+        final String PATH3 = "resources/Marek Sobolewski_FlowShop.txt";
+
+        FlowShop flowShop = null;
+
+        try {
+            flowShop = FlowshopParser.parseFlowShop(new BufferedReader(new FileReader(PATH)));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        if(flowShop != null)
+            System.out.println(solve(flowShop, true));  //result should be the same for many runs
+
+        try {
+            flowShop = FlowshopParser.parseFlowShop(new BufferedReader(new FileReader(PATH2)));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        if(flowShop != null)
+            System.out.println(solve(flowShop, true));  //result should be the same for many runs
+
+        try {
+            flowShop = FlowshopParser.parseFlowShop(new BufferedReader(new FileReader(PATH3)));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        if(flowShop != null)
+            System.out.println(solve(flowShop, true));  //result should be the same for many runs - 54
     }
 
 }

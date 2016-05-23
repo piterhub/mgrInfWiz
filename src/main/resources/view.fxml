@@ -27,7 +27,7 @@
                             <content>
                                 <VBox prefHeight="200.0" prefWidth="100.0" spacing="5.0">
                                     <children>
-                                        <Label alignment="CENTER" maxWidth="1.7976931348623157E308" prefHeight="17.0" prefWidth="287.0" text="All solutions" />
+                                        <Label alignment="CENTER" maxWidth="1.7976931348623157E308" prefHeight="17.0" prefWidth="287.0" text="All temporary best solutions" />
                                         <TextArea fx:id="logsTextArea" editable="false" maxHeight="1.7976931348623157E308" prefHeight="396.0" prefWidth="341.0" VBox.vgrow="ALWAYS" />
                                         <Label alignment="CENTER" maxWidth="1.7976931348623157E308" prefHeight="17.0" prefWidth="287.0" text="Best solution" />
                                         <TextArea fx:id="bestSolutionTextArea" editable="false" minHeight="-Infinity" prefHeight="150.0" prefWidth="341.0" VBox.vgrow="NEVER" />

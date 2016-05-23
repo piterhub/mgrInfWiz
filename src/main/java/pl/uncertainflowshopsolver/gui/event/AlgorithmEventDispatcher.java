@@ -45,13 +45,13 @@ public class AlgorithmEventDispatcher {
         }
     }
 
-    public void dispatchAlgorithmEnded(final EndingReason reason, double elapsedTime) {
+    public void dispatchAlgorithmEnded(final EndingReason reason, final double elapsedTime) {
         final SortedMap<Integer, FlowShopWithUncertainty> copiedMap = new TreeMap<>(iterationCache);
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
                 eventListener.onManyIterationBatchUpdated(copiedMap);
-                eventListener.onAlgorithmEnded(reason);
+                eventListener.onAlgorithmEnded(reason, elapsedTime);
             }
         });
         iterationCache.clear();

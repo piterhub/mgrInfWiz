@@ -91,27 +91,33 @@ public class SimulatedAnnealing {
         final Object[] result = SubAlgorithm2.solveGreedy(uncertainFlowShop, null, false);
 //        SortedSet<SolutionNeighbourhood> neighbourhoods = new TreeSet<>();//TODO PKU last thing
         int globalMinimum = (int) result[1];
-        int globalMinimumForLowerBound;
+        int globalMinimumForLowerBound = (int) result[0];
         FlowShopWithUncertainty uncertainFlowShop_for_minimum = uncertainFlowShop.clone();
         uncertainFlowShop_for_minimum.setUpperBoundOfMinMaxRegretOptimalization(globalMinimum);
+        uncertainFlowShop_for_minimum.setLowerBoundOfMinMaxRegretOptimalization(globalMinimumForLowerBound);
         /*************************/
 
         int valueBefore = globalMinimum;
         FlowShopWithUncertainty uncertainFlowShop_for_valueBefore = uncertainFlowShop.clone();
+        uncertainFlowShop_for_valueBefore.setUpperBoundOfMinMaxRegretOptimalization(globalMinimum);     //TODO workaround. Może lepiej w clone dać kopiowanie tych fieldów
+        uncertainFlowShop_for_valueBefore.setLowerBoundOfMinMaxRegretOptimalization(globalMinimumForLowerBound);
 
         int iterations = 0;
         int lastImprovementIteration = 0;
 
-        if (lastImprovementIteration % 10 == 0)
-            eventDispatcher.dispatchIterationUpdated(iterations, uncertainFlowShop_for_minimum);
+//        if (lastImprovementIteration % 10 == 0)
+//            eventDispatcher.dispatchIterationUpdated(iterations, uncertainFlowShop_for_minimum);
 
         /*************************/
+        FlowShopWithUncertainty tempFlowShopForBenAmeurAlgoPurpose = uncertainFlowShop.clone(); //przepięcie
         ArrayList<FlowShopWithUncertainty> tempGenerationStates = new ArrayList<>();
         while (tempGenerationStates.size() < configuration.getSamplesCardinality()) {
-            FlowShopWithUncertainty curState = uncertainFlowShop.getNeighbour(1.0);
+//            FlowShopWithUncertainty curState = uncertainFlowShop.getNeighbour(1.0);   //przepięcie
+            FlowShopWithUncertainty curState = tempFlowShopForBenAmeurAlgoPurpose.getNeighbour(1.0);    //przepięcie
             final Object[] results = SubAlgorithm2.solveGreedy(curState, false, false);
             curState.setUpperBoundOfMinMaxRegretOptimalization((int)results[0]);
             tempGenerationStates.add(curState);
+            tempFlowShopForBenAmeurAlgoPurpose = curState.clone();  //przepięcie
         }
         double initialTemperature =
                 SimulatedAnnealingConfigurationUtil.calculateFromDesiredProbability(
@@ -123,7 +129,6 @@ public class SimulatedAnnealing {
                 initialTemperature, configuration.getDesiredInitialAcceptanceProbability());
         /*************************/
 
-        int SACounter = 0;
         while (running/* && initialTemperature > configuration.getEndTemperature() && iterations < configuration.getMaxNumberOfIterations()*/){
 
             if (lastImprovementIteration % 10 == 0)
@@ -131,23 +136,23 @@ public class SimulatedAnnealing {
 
             System.out.println(iterations);
             System.out.println(uncertainFlowShop.getUpperBoundOfMinMaxRegretOptimalization());
+            System.out.println(uncertainFlowShop.getLowerBoundOfMinMaxRegretOptimalization());
             System.out.println(uncertainFlowShop.toString());
 
             iterations++;
 
-            for (int i = 0; i < configuration.getMaxNumberOfIterations(); i++) {
+            for (int i = 0; i < configuration.getEpocheLength(); i++) {
 
-                SACounter++;
                 final FlowShopWithUncertainty neighbour = uncertainFlowShop.getNeighbour(1.0);
                 final Object[] resultInside = SubAlgorithm2.solveGreedy(neighbour, null, false);
                 int currentValue = (int) resultInside[1];  //upper bound
 
                 if (valueBefore >= currentValue) {
                     valueBefore = currentValue;
-                    uncertainFlowShop_for_valueBefore = neighbour;
+                    uncertainFlowShop_for_valueBefore = neighbour.clone();
                     if (globalMinimum > currentValue) {
                         globalMinimum = currentValue;
-                        uncertainFlowShop_for_minimum = neighbour;
+                        uncertainFlowShop_for_minimum = neighbour.clone();
                         uncertainFlowShop_for_minimum.setUpperBoundOfMinMaxRegretOptimalization(globalMinimum);
 //                        globalMinimumForLowerBound = (int) resultInside[0]; //TODO 21.05 - dodać to i elapsedTime do FlowShop -> por. eventDispatcher.dispatchIterationUpdated & dispatchAlgorithmEnded
                         uncertainFlowShop_for_minimum.setLowerBoundOfMinMaxRegretOptimalization((int) resultInside[0]); //TODO 21.05 - dodać to i elapsedTime do FlowShop -> por. eventDispatcher.dispatchIterationUpdated & dispatchAlgorithmEnded
@@ -159,7 +164,7 @@ public class SimulatedAnnealing {
 
                     if (zeroToOne <= probability) {
                         valueBefore = currentValue;
-                        uncertainFlowShop_for_valueBefore = neighbour;
+                        uncertainFlowShop_for_valueBefore = neighbour.clone();
                     } else {
                         uncertainFlowShop = uncertainFlowShop_for_valueBefore.clone();
                         uncertainFlowShop.setUpperBoundOfMinMaxRegretOptimalization(uncertainFlowShop_for_valueBefore.getUpperBoundOfMinMaxRegretOptimalization());

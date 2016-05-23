@@ -27,7 +27,7 @@ import pl.uncertainflowshopsolver.config.impl.SAConfigurationImpl;
 import pl.uncertainflowshopsolver.flowshop.FlowShopWithUncertainty;
 import pl.uncertainflowshopsolver.gui.event.AlgorithmEventDispatcher;
 import pl.uncertainflowshopsolver.gui.event.AlgorithmEventListener;
-import pl.uncertainflowshopsolver.testdata.FlowShopParser;
+import pl.uncertainflowshopsolver.testdata.UncertainFlowShopParser;
 
 import java.io.*;
 import java.net.URL;
@@ -144,7 +144,7 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
 
         if (file != null) {
             try {
-                flowShop = FlowShopParser.parseFileToFlowShopWithUncertainty(file.getAbsolutePath());
+                flowShop = UncertainFlowShopParser.parseFileToFlowShopWithUncertainty(file.getAbsolutePath());
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -233,14 +233,14 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
     }
 
     @Override
-    public void onAlgorithmEnded(AlgorithmEventDispatcher.EndingReason reason) {
+    public void onAlgorithmEnded(AlgorithmEventDispatcher.EndingReason reason, double elapsedTime) {
         algorithmState = AlgorithmState.STOPPED;
         startStopButton.setText("Start");
         enableEditingConfiguration();
 
         switch (reason) {
             case ALL_ITERATIONS:
-                logsTextArea.appendText("\nEnded: All iterations executed.");
+                logsTextArea.appendText("\nEnded: All iterations executed. Elapsed time: " + elapsedTime);
                 break;
             case CANCELLED:
                 logsTextArea.appendText("\nEnded: User cancelled.");
