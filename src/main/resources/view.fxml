@@ -223,7 +223,7 @@
                                                 <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Output" />
                                                 <HBox prefHeight="100.0" prefWidth="200.0" spacing="5.0" VBox.vgrow="ALWAYS">
                                                     <children>
-                                                        <Button fx:id="exportFlowShopToFileButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#saveToFileButton" prefHeight="25.0" prefWidth="95.0" text="Choose file to save" HBox.hgrow="ALWAYS" />
+                                                        <Button fx:id="exportFlowShopToFileButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#saveToFileButton" prefHeight="25.0" prefWidth="95.0" text="Choose folder to save results" HBox.hgrow="ALWAYS" />
                                                     </children>
                                                 </HBox>
                                             </children>

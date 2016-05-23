@@ -87,12 +87,14 @@ public class SimulatedAnnealing {
         long startTime = System.currentTimeMillis();
         uncertainFlowShop = configuration.getUncertainFlowShop();
 
+        /***********Global minimum**************/
         final Object[] result = SubAlgorithm2.solveGreedy(uncertainFlowShop, null, false);
 //        SortedSet<SolutionNeighbourhood> neighbourhoods = new TreeSet<>();//TODO PKU last thing
         int globalMinimum = (int) result[1];
         int globalMinimumForLowerBound;
         FlowShopWithUncertainty uncertainFlowShop_for_minimum = uncertainFlowShop.clone();
         uncertainFlowShop_for_minimum.setUpperBoundOfMinMaxRegretOptimalization(globalMinimum);
+        /*************************/
 
         int valueBefore = globalMinimum;
         FlowShopWithUncertainty uncertainFlowShop_for_valueBefore = uncertainFlowShop.clone();
@@ -106,7 +108,7 @@ public class SimulatedAnnealing {
         /*************************/
         ArrayList<FlowShopWithUncertainty> tempGenerationStates = new ArrayList<>();
         while (tempGenerationStates.size() < configuration.getSamplesCardinality()) {
-            FlowShopWithUncertainty curState = uncertainFlowShop.getNeighbor(1.0);
+            FlowShopWithUncertainty curState = uncertainFlowShop.getNeighbour(1.0);
             final Object[] results = SubAlgorithm2.solveGreedy(curState, false, false);
             curState.setUpperBoundOfMinMaxRegretOptimalization((int)results[0]);
             tempGenerationStates.add(curState);
@@ -133,18 +135,19 @@ public class SimulatedAnnealing {
 
             iterations++;
 
-            for (int i = 0; i < L; i++) {
+            for (int i = 0; i < configuration.getMaxNumberOfIterations(); i++) {
 
                 SACounter++;
-                final Object[] resultInside = SubAlgorithm2.solveGreedy(uncertainFlowShop.getNeighbor(1.0), null, false);
+                final FlowShopWithUncertainty neighbour = uncertainFlowShop.getNeighbour(1.0);
+                final Object[] resultInside = SubAlgorithm2.solveGreedy(neighbour, null, false);
                 int currentValue = (int) resultInside[1];  //upper bound
 
                 if (valueBefore >= currentValue) {
                     valueBefore = currentValue;
-                    uncertainFlowShop_for_valueBefore = uncertainFlowShop.clone();
+                    uncertainFlowShop_for_valueBefore = neighbour;
                     if (globalMinimum > currentValue) {
                         globalMinimum = currentValue;
-                        uncertainFlowShop_for_minimum = uncertainFlowShop.clone();
+                        uncertainFlowShop_for_minimum = neighbour;
                         uncertainFlowShop_for_minimum.setUpperBoundOfMinMaxRegretOptimalization(globalMinimum);
 //                        globalMinimumForLowerBound = (int) resultInside[0]; //TODO 21.05 - dodać to i elapsedTime do FlowShop -> por. eventDispatcher.dispatchIterationUpdated & dispatchAlgorithmEnded
                         uncertainFlowShop_for_minimum.setLowerBoundOfMinMaxRegretOptimalization((int) resultInside[0]); //TODO 21.05 - dodać to i elapsedTime do FlowShop -> por. eventDispatcher.dispatchIterationUpdated & dispatchAlgorithmEnded
@@ -156,9 +159,10 @@ public class SimulatedAnnealing {
 
                     if (zeroToOne <= probability) {
                         valueBefore = currentValue;
-                        uncertainFlowShop_for_valueBefore = uncertainFlowShop.clone();
+                        uncertainFlowShop_for_valueBefore = neighbour;
                     } else {
                         uncertainFlowShop = uncertainFlowShop_for_valueBefore.clone();
+                        uncertainFlowShop.setUpperBoundOfMinMaxRegretOptimalization(uncertainFlowShop_for_valueBefore.getUpperBoundOfMinMaxRegretOptimalization());
                     }
                 }
             }
@@ -222,7 +226,7 @@ public class SimulatedAnnealing {
 
 //        ArrayList<State> tempGenerationStates = new ArrayList<State>();
 //        while (tempGenerationStates.size() < 10000) {
-//            TSPState curState = initialState.getNeighbor(1.0);
+//            TSPState curState = initialState.getNeighbour(1.0);
 //            tempGenerationStates.add(curState);
 //        }
 

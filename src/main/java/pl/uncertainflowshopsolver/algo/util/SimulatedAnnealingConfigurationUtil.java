@@ -18,13 +18,13 @@ public class SimulatedAnnealingConfigurationUtil {
      *   (i.e. worse) transitions.
      * Either:
      *   states: set of random states. There must be at least one positive
-     *     transition (i.e. state where state.getNeighbor(1.0).getEnergyLevel() -
+     *     transition (i.e. state where state.getNeighbour(1.0).getEnergyLevel() -
      *     state.getEnergyLevel() is positive). States which do not meet this
      *     criteria may be included, but will not be used in calculating the
      *     initial temperature.
      *   OR
      *   positiveEnergyDeltas: an array of positive energy deltas
-     *     (i.e. state.getNeighbor(1.0).getEnergyLevel() -
+     *     (i.e. state.getNeighbour(1.0).getEnergyLevel() -
      *     state.getEnergyLevel()). Set by default to
      *     (0.01 * desiredProbability).
      * errorThreshold: how close within the desired probability we should get
@@ -82,7 +82,7 @@ public class SimulatedAnnealingConfigurationUtil {
     {
         ArrayList<Double> energyDeltasList = new ArrayList<Double>();
         for (FlowShopWithUncertainty state : states) {
-            double energyDelta = (state.getNeighbor(1.0).getUpperBoundOfMinMaxRegretOptimalization() -
+            double energyDelta = (state.getNeighbour(1.0).getUpperBoundOfMinMaxRegretOptimalization() -
                     state.getUpperBoundOfMinMaxRegretOptimalization());
             if (energyDelta > Double.MIN_NORMAL) {
                 energyDeltasList.add(energyDelta);

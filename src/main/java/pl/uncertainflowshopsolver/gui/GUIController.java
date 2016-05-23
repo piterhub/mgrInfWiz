@@ -300,8 +300,8 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
     }
 
     private void updateProgressBar(int iteration) {
-//        progressLabel.setText(String.valueOf(iteration) + "/" + activeSAConfiguration.getMaxNumberOfIterations());
-//        progressBar.setProgress((double) iteration / activeSAConfiguration.getMaxNumberOfIterations());
+        progressLabel.setText(String.valueOf(iteration) + "/" + activeSAConfiguration.getMaxNumberOfIterations());
+        progressBar.setProgress((double) iteration / activeSAConfiguration.getMaxNumberOfIterations());
     }
 
 
