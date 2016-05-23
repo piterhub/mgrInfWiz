@@ -12,7 +12,7 @@ import java.util.List;
  *
  * @author Piotr Kubicki, created on 03.05.2016.
  */
-public class FlowShopParser {
+public class UncertainFlowShopParser {
 
 //    public void readFile(String filePath) throws IOException {
 //        FileReader fileReader = new FileReader(filePath);
@@ -154,7 +154,7 @@ public class FlowShopParser {
                         "Task9: 91|131 38|50 7|39\n" +
                         "Task10: 0|15 74|122 29|35";
 
-        final FlowShopWithUncertainty flowShopWithUncertainty = FlowShopParser.parseTextToFlowShop(text);
+        final FlowShopWithUncertainty flowShopWithUncertainty = UncertainFlowShopParser.parseTextToFlowShop(text);
         System.out.println(flowShopWithUncertainty.toString());
     }
 }
