@@ -41,6 +41,9 @@ import java.beans.PropertyChangeSupport;
 import java.io.*;
 import java.net.URL;
 import java.nio.file.Paths;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -72,6 +75,8 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
     public IntegerTextBox K;
     public IntegerTextBox C;
     public ChoiceBox algorithmChoiceBox;
+    public TitledPane algorithmOptionsTitledPane;
+    public TitledPane chartTitledPane;
     private NumberBinding thirdProperty;
     private NumberBinding fourthProperty;
     private NumberBinding fifthProperty;
@@ -111,7 +116,6 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
         initializerNameClassMap.put("Swap", WayToGenerateNeighborhoodEnum.SWAP);
         initializerNameClassMap.put("Insert", WayToGenerateNeighborhoodEnum.INSERT);
         initializerNameClassMap.put("Fischer-Yates shuffle", WayToGenerateNeighborhoodEnum.FISCHER_YATES_SHUFFLE);
-
         initializerChoiceBox.setItems(FXCollections.observableArrayList(initializerNameClassMap.keySet()));
         initializerChoiceBox.getSelectionModel().select(0);
 
@@ -119,9 +123,29 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
         algorithmEnumMap.put("Simulated Annealing", WhichAlgorithmEnum.SIMULATED_ANNEALING);
         algorithmEnumMap.put("MIH", WhichAlgorithmEnum.MIH);
         algorithmEnumMap.put("Tabu Search", WhichAlgorithmEnum.TABU_SEARCH);
-
         algorithmChoiceBox.setItems(FXCollections.observableArrayList(algorithmEnumMap.keySet()));
         algorithmChoiceBox.getSelectionModel().select(0);
+        algorithmChoiceBox.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observableValue, Number number, Number number2) {
+                if(flowShop != null)
+                {
+                    if(algorithmChoiceBox.getItems().get((Integer) number2) == "MIH")
+                    {
+                        startStopButton.setDisable(false);
+                        algorithmOptionsTitledPane.setDisable(true);
+                        chartTitledPane.setDisable(true);
+                    }
+                    else if(algorithmChoiceBox.getItems().get((Integer) number2) == "Simulated Annealing")
+                    {
+                        startStopButton.setDisable(true);
+                        algorithmOptionsTitledPane.setDisable(false);
+                        chartTitledPane.setDisable(false);
+                    }
+                    //TODO Tabu Search
+                }
+            }
+        });
 
         maxNumberOfIterationsIntegerTextBox.integerProperty().addListener(new ChangeListener<Number>() {
             @Override
@@ -202,6 +226,7 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
                 String valueString = value+"";
                 int count = valueString.length();
                 desiredInitialAcceptanceProbabilityDoubleTextBox.replaceText(0, count, valueString);
+                defaultDirectory = file.getParentFile();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -299,13 +324,18 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
     }
 
     @Override
-    public void onAlgorithmEnded(AlgorithmEventDispatcher.EndingReason reason, double elapsedTime, FlowShopWithUncertainty flowShopWithUncertainty) {
+    public void onAlgorithmEnded(AlgorithmEventDispatcher.EndingReason reason, double elapsedTime, FlowShopWithUncertainty flowShopWithUncertainty, double initialTemperature) {
         algorithmState = AlgorithmState.STOPPED;
         startStopButton.setText("Start");
         enableEditingConfiguration();
 
         final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM.dd-HH.mm-ss.SSS");
         final String timestamp = simpleDateFormat.format(new Date());
+
+        DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols(Locale.GERMAN);
+        otherSymbols.setDecimalSeparator(',');
+        NumberFormat formatter = new DecimalFormat("#0.00");
+        formatter.setGroupingUsed(false);
 
         if(selectedDirectory != null)
         {
@@ -335,7 +365,7 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
                 sb.append(';');
                 sb.append("Calculation time: ");
                 sb.append(';');
-                sb.append(elapsedTime);
+                sb.append(formatter.format(elapsedTime));
                 sb.append('\n');
 
                 pw.write(sb.toString());
@@ -346,13 +376,13 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
 
         switch (reason) {
             case ALL_ITERATIONS:
-                logsTextArea.appendText("\nEnded: All iterations executed. Elapsed time: " + elapsedTime + "\n");
+                logsTextArea.appendText("The initial temperature was: " + formatter.format(initialTemperature) + "\nEnded: All iterations executed. Elapsed time: " + elapsedTime + "\n");
                 break;
             case CANCELLED:
-                logsTextArea.appendText("\nEnded: User cancelled." + "\n");
+                logsTextArea.appendText("The initial temperature was: " + formatter.format(initialTemperature) + "\nEnded: User cancelled." + "\n");
                 break;
             case WITHOUT_PROGRESS:
-                logsTextArea.appendText("\nEnded: " + /**activeSAConfiguration.getMaxIterationsWithoutImprovement() +*/ " iterations without improvement" + "\n");
+                logsTextArea.appendText("The initial temperature was: " + formatter.format(initialTemperature) + "\nEnded: " + /**activeSAConfiguration.getMaxIterationsWithoutImprovement() +*/ " iterations without improvement" + "\n");
                 break;
         }
     }
@@ -425,7 +455,7 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
         maxNumberOfIterationsIntegerTextBox.setDisable(isNotEnabled);
 //        cutOffEnergyLevelDoubleTextBox.setDisable(isNotEnabled);
         initializerChoiceBox.setDisable(isNotEnabled);
-
+        algorithmChoiceBox.setDisable(isNotEnabled);
     }
 
     private void setEditingSecondPartOfConfiguration(boolean isNotEnabled)

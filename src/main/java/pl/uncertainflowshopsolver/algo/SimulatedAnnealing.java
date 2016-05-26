@@ -39,6 +39,7 @@ public class SimulatedAnnealing {
 
 //    private double desiredInitialAcceptanceProbability = 0.925;
     private int L;  //epoche, equals to L -> see constructor
+    private double mInitialTemperature;
 //    private double alpha = 0.908;
 //    double endTemperature = 0.5;   //Double.MIN_NORMAL;
 //    double initialTemperature = 1000;  //initial initialTemperature
@@ -89,7 +90,6 @@ public class SimulatedAnnealing {
 
         /***********Global minimum**************/
         final Object[] result = SubAlgorithm2.solveGreedy(uncertainFlowShop, null, false);
-//        SortedSet<SolutionNeighbourhood> neighbourhoods = new TreeSet<>();//TODO PKU last thing
         int globalMinimum = (int) result[1];
         int globalMinimumForLowerBound = (int) result[0];
         FlowShopWithUncertainty uncertainFlowShop_for_minimum = uncertainFlowShop.clone();
@@ -128,6 +128,7 @@ public class SimulatedAnnealing {
                 "Using init temp %.2f (target init acceptance prob %.3f)\n",
                 initialTemperature, configuration.getDesiredInitialAcceptanceProbability());
         /*************************/
+        mInitialTemperature = initialTemperature;
 
         long midTime_2 = System.currentTimeMillis();
         double elapsedTime_delta1 = (midTime_2 - startTime);
@@ -144,16 +145,15 @@ public class SimulatedAnnealing {
                 elapsedTime_delta3 += elapsedTime_delta2;
             }
 
-            //TODO nie liczyć czasu podczas dispatch'a
             if (lastImprovementIteration % 10 == 0)
                 eventDispatcher.dispatchIterationUpdated(iterations, uncertainFlowShop_for_minimum);
 
             midTime_3= System.currentTimeMillis();
 
-            System.out.println(iterations);
-            System.out.println(uncertainFlowShop.getUpperBoundOfMinMaxRegretOptimalization());
-            System.out.println(uncertainFlowShop.getLowerBoundOfMinMaxRegretOptimalization());
-            System.out.println(uncertainFlowShop.toString());
+//            System.out.println(iterations);
+//            System.out.println(uncertainFlowShop.getUpperBoundOfMinMaxRegretOptimalization());
+//            System.out.println(uncertainFlowShop.getLowerBoundOfMinMaxRegretOptimalization());
+//            System.out.println(uncertainFlowShop.toString());
 
             iterations++;
 
@@ -207,11 +207,11 @@ public class SimulatedAnnealing {
         eventDispatcher.dispatchIterationUpdated(iterations, uncertainFlowShop_for_minimum);
 
         if (iterations >= configuration.getMaxNumberOfIterations()) {
-            eventDispatcher.dispatchAlgorithmEnded(EndingReason.ALL_ITERATIONS, elapsedTime, uncertainFlowShop_for_minimum);
+            eventDispatcher.dispatchAlgorithmEnded(EndingReason.ALL_ITERATIONS, elapsedTime, uncertainFlowShop_for_minimum, mInitialTemperature);
         } else if (running) {
-            eventDispatcher.dispatchAlgorithmEnded(EndingReason.WITHOUT_PROGRESS, elapsedTime, uncertainFlowShop_for_minimum);
+            eventDispatcher.dispatchAlgorithmEnded(EndingReason.WITHOUT_PROGRESS, elapsedTime, uncertainFlowShop_for_minimum, mInitialTemperature);
         } else {
-            eventDispatcher.dispatchAlgorithmEnded(EndingReason.CANCELLED, elapsedTime, uncertainFlowShop_for_minimum);
+            eventDispatcher.dispatchAlgorithmEnded(EndingReason.CANCELLED, elapsedTime, uncertainFlowShop_for_minimum, mInitialTemperature);
         }
 
     }

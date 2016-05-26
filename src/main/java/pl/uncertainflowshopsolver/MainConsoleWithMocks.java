@@ -69,7 +69,7 @@ public class MainConsoleWithMocks {
         }
 
         @Override
-        public void dispatchAlgorithmEnded(EndingReason reason, double elapsedTime, FlowShopWithUncertainty flowShopWithUncertainty) {
+        public void dispatchAlgorithmEnded(EndingReason reason, double elapsedTime, FlowShopWithUncertainty flowShopWithUncertainty, double initialTemperature) {
             Date date = new Date();
             System.out.println("Algorithm ended. Elapsed time " + elapsedTime + ". Now is " + date.toString());
         }
