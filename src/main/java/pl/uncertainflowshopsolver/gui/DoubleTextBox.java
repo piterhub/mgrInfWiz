@@ -17,6 +17,7 @@ public class DoubleTextBox extends TextField {
     private final Pattern secondDoublePattern = Pattern.compile("[0-9]+[\\,]([0-9]+)?");//Pattern.compile("[0-9]+");
     private final Pattern thirdDoublePattern = Pattern.compile("[0-9]+[\\.\\,]");//Pattern.compile("[0-9]+");
     private DoubleProperty doubleProperty;
+    //TODO akceptowa? tylko warto?ci < 1
 
     public DoubleTextBox() {
         doubleProperty = new SimpleDoubleProperty();

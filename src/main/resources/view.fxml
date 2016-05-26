@@ -188,29 +188,37 @@
                                     <children>
                                         <VBox>
                                             <children>
-
-
                                                 <VBox prefHeight="200.0" prefWidth="100.0">
                                                     <children>
-                                                        <Label text="n" />
-                                                        <IntegerTextBox fx:id="taskCount" />
+                                                        <Label prefHeight="17.0" prefWidth="199.0" text="Choose algorithm" />
+                                                        <ChoiceBox fx:id="algorithmChoiceBox" maxWidth="1.7976931348623157E308" prefWidth="150.0" />
                                                     </children>
                                                 </VBox>
+                                                <HBox prefHeight="200.0" prefWidth="200.0">
+                                                   <children>
+                                                                  <VBox prefHeight="200.0" prefWidth="99.0">
+                                                                      <children>
+                                                                          <Label text="n (jobs)" />
+                                                                          <IntegerTextBox fx:id="taskCount" />
+                                                                      </children>
+                                                                  </VBox>
+                                                                  <VBox prefHeight="200.0" prefWidth="100.0">
+                                                                      <children>
+                                                                          <Label text="m (machines)" />
+                                                                          <IntegerTextBox fx:id="machineCount" />
+                                                                      </children>
+                                                                  </VBox>
+                                                   </children>
+                                                </HBox>
                                                 <VBox prefHeight="200.0" prefWidth="100.0">
                                                     <children>
-                                                        <Label text="m" />
-                                                        <IntegerTextBox fx:id="machineCount" />
-                                                    </children>
-                                                </VBox>
-                                                <VBox prefHeight="200.0" prefWidth="100.0">
-                                                    <children>
-                                                        <Label text="K" />
+                                                        <Label text="K - upper bound of lower p_ij" />
                                                         <IntegerTextBox fx:id="K" />
                                                     </children>
                                                 </VBox>
                                                 <VBox prefHeight="200.0" prefWidth="100.0">
                                                     <children>
-                                                        <Label text="C" />
+                                                        <Label text="C - max width of uncertainty" />
                                                         <IntegerTextBox fx:id="C" />
                                                     </children>
                                                 </VBox>
@@ -218,12 +226,23 @@
                                         </VBox>
 
                                         <AnchorPane prefHeight="2.0" prefWidth="197.0" />
+
+                                        <VBox>
+                                            <children>
+                                                <HBox prefHeight="100.0" prefWidth="200.0" spacing="5.0" VBox.vgrow="ALWAYS">
+                                                    <children>
+                                                        <Button fx:id="generateFlowShopButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#generateUncertainFlowShopButton" prefHeight="25.0" prefWidth="95.0" text="Generate uncertain flow shop" HBox.hgrow="ALWAYS" />
+                                                    </children>
+                                                </HBox>
+                                            </children>
+                                        </VBox>
+
                                         <VBox>
                                             <children>
                                                 <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Output" />
                                                 <HBox prefHeight="100.0" prefWidth="200.0" spacing="5.0" VBox.vgrow="ALWAYS">
                                                     <children>
-                                                        <Button fx:id="exportFlowShopToFileButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#saveToFileButton" prefHeight="25.0" prefWidth="95.0" text="Choose folder to save results" HBox.hgrow="ALWAYS" />
+                                                        <Button fx:id="chooseFolderToSaveResultButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#chooseAFolderToSaveButton" prefHeight="25.0" prefWidth="95.0" text="Choose folder to save results" HBox.hgrow="ALWAYS" />
                                                     </children>
                                                 </HBox>
                                             </children>

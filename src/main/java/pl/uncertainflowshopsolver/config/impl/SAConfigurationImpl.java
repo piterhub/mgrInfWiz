@@ -1,7 +1,7 @@
 package pl.uncertainflowshopsolver.config.impl;
 
 
-import pl.uncertainflowshopsolver.algo.init.SolutionInitializer;
+import pl.uncertainflowshopsolver.algo.util.WayToGenerateNeighborhoodEnum;
 import pl.uncertainflowshopsolver.config.SAConfiguration;
 import pl.uncertainflowshopsolver.flowshop.FlowShopWithUncertainty;
 
@@ -16,10 +16,10 @@ public class SAConfigurationImpl implements SAConfiguration {
     private int maxNumberOfIterations;
 //    private int maxIterationsWithoutImprovement;
     private Double cutOffEnergyLevel;
-    private Class<? extends SolutionInitializer> solutionInitializerClass;
+    private WayToGenerateNeighborhoodEnum wayToGenerateNeighborhoodEnum;
     private FlowShopWithUncertainty uncertainFlowShop;
 
-    SAConfigurationImpl(Double desiredInitialAcceptanceProbability, int epocheLength, Double decayRate, Double endTemperature, Double errorThreshold, int samplesCardinality, int maxNumberOfIterations, /**int maxIterationsWithoutImprovement,*/ Double cutOffEnergyLevel, Class<? extends SolutionInitializer> solutionInitializerClass, FlowShopWithUncertainty uncertainFlowShop) {
+    SAConfigurationImpl(Double desiredInitialAcceptanceProbability, int epocheLength, Double decayRate, Double endTemperature, Double errorThreshold, int samplesCardinality, int maxNumberOfIterations, /**int maxIterationsWithoutImprovement,*/Double cutOffEnergyLevel, WayToGenerateNeighborhoodEnum wayToGenerateNeighborhoodEnum, FlowShopWithUncertainty uncertainFlowShop) {
         this.desiredInitialAcceptanceProbability = desiredInitialAcceptanceProbability;
         this.epocheLength = epocheLength;
         this.decayRate = decayRate;
@@ -29,7 +29,7 @@ public class SAConfigurationImpl implements SAConfiguration {
         this.maxNumberOfIterations = maxNumberOfIterations;
 //        this.maxIterationsWithoutImprovement = maxIterationsWithoutImprovement;
         this.cutOffEnergyLevel = cutOffEnergyLevel;
-        this.solutionInitializerClass = solutionInitializerClass;
+        this.wayToGenerateNeighborhoodEnum = wayToGenerateNeighborhoodEnum;
         this.uncertainFlowShop = uncertainFlowShop;
     }
 
@@ -83,9 +83,8 @@ public class SAConfigurationImpl implements SAConfiguration {
         return cutOffEnergyLevel;
     }
 
-    @Override
-    public Class<? extends SolutionInitializer> getSolutionInitializerClass() {
-        return solutionInitializerClass;
+    public WayToGenerateNeighborhoodEnum getWayToGenerateNeighborhoodEnum() {
+        return wayToGenerateNeighborhoodEnum;
     }
 
     @Override

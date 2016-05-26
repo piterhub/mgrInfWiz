@@ -55,7 +55,7 @@ public class MIH {
         //3. The result of evaluation + measured time we give back.
         Object[] result = new Object[3];
         result[0] = resultOfLowerBound;
-        result[1] = resultOfUpperBound;  //It will be in seconds
+        result[1] = resultOfUpperBound;
 
         DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols(Locale.GERMAN);
         otherSymbols.setDecimalSeparator(',');
@@ -104,5 +104,7 @@ public class MIH {
         final Object[] result = mih.solve(true, false);
         System.out.println("MIH solution: ");
         System.out.println(result[0].toString());
+        System.out.println(result[1].toString());
+        System.out.println(result[2].toString());
     }
 }

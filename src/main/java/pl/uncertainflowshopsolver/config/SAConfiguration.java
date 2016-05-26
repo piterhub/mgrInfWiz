@@ -1,6 +1,6 @@
 package pl.uncertainflowshopsolver.config;
 
-import pl.uncertainflowshopsolver.algo.init.SolutionInitializer;
+import pl.uncertainflowshopsolver.algo.util.WayToGenerateNeighborhoodEnum;
 import pl.uncertainflowshopsolver.flowshop.FlowShopWithUncertainty;
 
 public interface SAConfiguration {
@@ -46,6 +46,6 @@ public interface SAConfiguration {
      */
     Double getCutOffEnergyLevel();
 
-    Class<? extends SolutionInitializer> getSolutionInitializerClass();
+    WayToGenerateNeighborhoodEnum getWayToGenerateNeighborhoodEnum();
     FlowShopWithUncertainty getUncertainFlowShop();
 }

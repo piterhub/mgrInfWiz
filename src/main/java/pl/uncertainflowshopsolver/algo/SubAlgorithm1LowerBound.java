@@ -5,12 +5,11 @@ import pl.uncertainflowshopsolver.flowshop.Task;
 import pl.uncertainflowshopsolver.testdata.FlowshopParser;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 
 /**
- * Created by PKUBICKI on 18.04.2016.
+ * @author Piotr Kubicki, created on 18.04.2016.
  */
 public class SubAlgorithm1LowerBound {
 
@@ -18,7 +17,7 @@ public class SubAlgorithm1LowerBound {
      * Calculates lower bound for the deterministic Flow Shop
      * @param flowShop the {@link FlowShop} with certain task list
      */
-    public static Integer calculateLowerBoundOfCMax(FlowShop flowShop) {
+    static Integer calculateLowerBoundOfCMax(FlowShop flowShop) {
 
         //System.out.println(flowShop.toString());
 

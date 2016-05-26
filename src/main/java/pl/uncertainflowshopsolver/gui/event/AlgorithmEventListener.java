@@ -9,5 +9,5 @@ public interface AlgorithmEventListener {
     public void onManyIterationBatchUpdated(SortedMap<Integer, FlowShopWithUncertainty> iterations);
     public void onIterationUpdated(int iteration, FlowShopWithUncertainty bee);
     public void onAlgorithmStarted();
-    public void onAlgorithmEnded(AlgorithmEventDispatcher.EndingReason reason, double elapsedTime);
+    public void onAlgorithmEnded(AlgorithmEventDispatcher.EndingReason reason, double elapsedTime, FlowShopWithUncertainty flowShopWithUncertainty);
 }

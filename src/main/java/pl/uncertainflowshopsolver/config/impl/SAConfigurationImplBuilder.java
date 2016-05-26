@@ -1,7 +1,7 @@
 package pl.uncertainflowshopsolver.config.impl;
 
 
-import pl.uncertainflowshopsolver.algo.init.SolutionInitializer;
+import pl.uncertainflowshopsolver.algo.util.WayToGenerateNeighborhoodEnum;
 import pl.uncertainflowshopsolver.flowshop.FlowShopWithUncertainty;
 
 public class SAConfigurationImplBuilder {
@@ -14,7 +14,7 @@ public class SAConfigurationImplBuilder {
     private int maxNumberOfIterations;
 //    private int maxIterationsWithoutImprovement;
     private Double cutOffEnergyLevel;
-    private Class<? extends SolutionInitializer> solutionInitializerClass;
+    private WayToGenerateNeighborhoodEnum wayToGenerateNeighborhoodEnum;
     private FlowShopWithUncertainty uncertainFlowShop;
 
     public SAConfigurationImplBuilder withDesiredInitialAcceptanceProbability(Double desiredInitialAcceptanceProbability) {
@@ -62,8 +62,8 @@ public class SAConfigurationImplBuilder {
         return this;
     }
 
-    public SAConfigurationImplBuilder withSolutionInitializerClass(Class<? extends SolutionInitializer> solutionInitializerClass) {
-        this.solutionInitializerClass = solutionInitializerClass;
+    public SAConfigurationImplBuilder withWayToGenerateNeighborhood(WayToGenerateNeighborhoodEnum wayToGenerateNeighborhoodEnum) {
+        this.wayToGenerateNeighborhoodEnum = wayToGenerateNeighborhoodEnum;
         return this;
     }
 
@@ -83,7 +83,7 @@ public class SAConfigurationImplBuilder {
                 maxNumberOfIterations,
 //                maxIterationsWithoutImprovement,
                 cutOffEnergyLevel,
-                solutionInitializerClass,
+                wayToGenerateNeighborhoodEnum,
                 uncertainFlowShop
                 );
     }

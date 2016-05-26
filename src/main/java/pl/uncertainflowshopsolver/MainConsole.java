@@ -36,7 +36,7 @@ public class MainConsole {
             final FlowShopWithUncertainty uncertainFlowShopInstance = instanceGenerator.generateUncertainFlowShopInstance(0, 100, 50);
             System.out.println(uncertainFlowShopInstance.toString() + "\n");
 
-            uncertainFlowShopInstance.toFile(n + "_uncertainFlowShop_" + timestamp + ".txt");
+            uncertainFlowShopInstance.toFile(n + "_uncertainFlowShop_" + timestamp + ".txt", null);
 
             MIH mih = new MIH(uncertainFlowShopInstance);
             measureMIHLowerBound(mih, sb);

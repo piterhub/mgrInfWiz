@@ -76,7 +76,7 @@ public class SimulatedAnnealing {
         configuration = configurationProvider.getSAConfiguration();
         //TODO nie będzie inicjalizera, ale będzie sposób generowania sąsiedztwa
 //        try {
-//            initializer = configuration.getSolutionInitializerClass().newInstance();
+//            initializer = configuration.getWayToGenerateNeighborhoodEnum().newInstance();
 //        } catch (InstantiationException | IllegalAccessException e) {
 //            throw new RuntimeException("Can't create solution initializer", e);
 //        }
@@ -129,10 +129,26 @@ public class SimulatedAnnealing {
                 initialTemperature, configuration.getDesiredInitialAcceptanceProbability());
         /*************************/
 
+        long midTime_2 = System.currentTimeMillis();
+        double elapsedTime_delta1 = (midTime_2 - startTime);
+        long midTime_3 = 0L;
+        double elapsedTime_delta3 = 0d;
+
         while (running/* && initialTemperature > configuration.getEndTemperature() && iterations < configuration.getMaxNumberOfIterations()*/){
 
+            midTime_2 = System.currentTimeMillis(); //it is not bug! this line is important!
+
+            if(midTime_3 != 0L)
+            {
+                double elapsedTime_delta2 = midTime_2 - midTime_3;
+                elapsedTime_delta3 += elapsedTime_delta2;
+            }
+
+            //TODO nie liczyć czasu podczas dispatch'a
             if (lastImprovementIteration % 10 == 0)
                 eventDispatcher.dispatchIterationUpdated(iterations, uncertainFlowShop_for_minimum);
+
+            midTime_3= System.currentTimeMillis();
 
             System.out.println(iterations);
             System.out.println(uncertainFlowShop.getUpperBoundOfMinMaxRegretOptimalization());
@@ -154,8 +170,7 @@ public class SimulatedAnnealing {
                         globalMinimum = currentValue;
                         uncertainFlowShop_for_minimum = neighbour.clone();
                         uncertainFlowShop_for_minimum.setUpperBoundOfMinMaxRegretOptimalization(globalMinimum);
-//                        globalMinimumForLowerBound = (int) resultInside[0]; //TODO 21.05 - dodać to i elapsedTime do FlowShop -> por. eventDispatcher.dispatchIterationUpdated & dispatchAlgorithmEnded
-                        uncertainFlowShop_for_minimum.setLowerBoundOfMinMaxRegretOptimalization((int) resultInside[0]); //TODO 21.05 - dodać to i elapsedTime do FlowShop -> por. eventDispatcher.dispatchIterationUpdated & dispatchAlgorithmEnded
+                        uncertainFlowShop_for_minimum.setLowerBoundOfMinMaxRegretOptimalization((int) resultInside[0]);
                     }
                 } else {
                     int delta = currentValue - valueBefore;
@@ -183,18 +198,20 @@ public class SimulatedAnnealing {
 //            }
         }
         long stopTime = System.currentTimeMillis();
-        double elapsedTime = (stopTime - startTime) / 1000d; //in seconds
+        double elapsedLastPeriodOfTime = (stopTime - midTime_3) / 1000d; //in seconds
+        double elapsedTime_delta4 = elapsedTime_delta3 + elapsedTime_delta1;
+        double elapsedTime = (elapsedLastPeriodOfTime + elapsedTime_delta4) / 1000d; //in seconds
         uncertainFlowShop_for_minimum.setElapsedTime(elapsedTime);
 
         // Last update
         eventDispatcher.dispatchIterationUpdated(iterations, uncertainFlowShop_for_minimum);
 
         if (iterations >= configuration.getMaxNumberOfIterations()) {
-            eventDispatcher.dispatchAlgorithmEnded(EndingReason.ALL_ITERATIONS, elapsedTime);
+            eventDispatcher.dispatchAlgorithmEnded(EndingReason.ALL_ITERATIONS, elapsedTime, uncertainFlowShop_for_minimum);
         } else if (running) {
-            eventDispatcher.dispatchAlgorithmEnded(EndingReason.WITHOUT_PROGRESS, elapsedTime);
+            eventDispatcher.dispatchAlgorithmEnded(EndingReason.WITHOUT_PROGRESS, elapsedTime, uncertainFlowShop_for_minimum);
         } else {
-            eventDispatcher.dispatchAlgorithmEnded(EndingReason.CANCELLED, elapsedTime);
+            eventDispatcher.dispatchAlgorithmEnded(EndingReason.CANCELLED, elapsedTime, uncertainFlowShop_for_minimum);
         }
 
     }

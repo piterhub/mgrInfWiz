@@ -30,7 +30,7 @@ public class UncertainFlowShopParser {
 //        }
 //    }
 
-    public static FlowShopWithUncertainty parseTextToFlowShop(String text) {
+    public static FlowShopWithUncertainty parseTextToFlowShop(String text) throws NumberFormatException{
         if (validateText(text)) {
             String[] lines = text.split("\\r?\\n"); //Optional r (CR) due to windows usage of file. More [0]
 

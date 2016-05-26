@@ -145,8 +145,9 @@ public class FlowShopWithUncertainty implements Cloneable {
      * only when no file with the same name already exist (no override file).
      *
      * @param fileName - given file name.
+     * @param directoryPath
      */
-    public void toFile(String fileName) {
+    public void toFile(String fileName, Path directoryPath) {
         List<String> strings = new ArrayList<>();
 
         strings.add(String.valueOf(m));
@@ -161,13 +162,13 @@ public class FlowShopWithUncertainty implements Cloneable {
             }
             strings.add(output);
         }
+        if(directoryPath == null)
+            directoryPath = Paths.get(PATH_TO_RESOURCES);
 
-        createAndBufferedWrite(strings, fileName);
+        createAndBufferedWrite(strings, fileName, directoryPath);
     }
 
-    private void createAndBufferedWrite(List<String> content, String fileName) {
-
-        Path directoryPath = Paths.get(PATH_TO_RESOURCES);
+    private void createAndBufferedWrite(List<String> content, String fileName, Path directoryPath) {
 
         if (canCreateAFileInGivenDirectory(directoryPath)) {
             if (canWriteToGivenFile(directoryPath, fileName)) {

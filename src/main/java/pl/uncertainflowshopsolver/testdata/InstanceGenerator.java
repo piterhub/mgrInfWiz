@@ -61,7 +61,7 @@ public class InstanceGenerator {
         System.out.println(uncertainFlowShopInstance.toString());
 
         String fileName = "testFile.txt";
-        uncertainFlowShopInstance.toFile(fileName);
+        uncertainFlowShopInstance.toFile(fileName, null);
 //
 //        final int number = uncertainFlowShopInstance.getM() * uncertainFlowShopInstance.getN();
 //        final int factorial = partOfFactorial(number, Math.round((float)number / 1.005f));
