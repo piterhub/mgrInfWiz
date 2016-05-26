@@ -13,11 +13,11 @@ import javafx.scene.input.MouseEvent;
 import java.util.regex.Pattern;
 
 public class DoubleTextBox extends TextField {
-    private final Pattern doublePattern = Pattern.compile("[0-9]+|[\\.\\,]|[0-9]+[\\.\\,]([0-9]+)?");//Pattern.compile("[0-9]+");
-    private final Pattern secondDoublePattern = Pattern.compile("[0-9]+[\\,]([0-9]+)?");//Pattern.compile("[0-9]+");
-    private final Pattern thirdDoublePattern = Pattern.compile("[0-9]+[\\.\\,]");//Pattern.compile("[0-9]+");
+    private final Pattern doublePattern = Pattern.compile("[0-9]+|[\\.\\,]|[0-9]+[\\.\\,]([0-9]+)?");//general first
+    private final Pattern secondDoublePattern = Pattern.compile("[0-9]+[\\,]([0-9]+)?");//to replace , with .
+    private final Pattern thirdDoublePattern = Pattern.compile("[0-9]+[\\.\\,]");//to add "0" to x._ or x,_
+    private final Pattern fourthDoublePattern = Pattern.compile("[0]([\\.\\,])?([0-9]+)?");//to allow only values < 1
     private DoubleProperty doubleProperty;
-    //TODO akceptowa? tylko warto?ci < 1
 
     public DoubleTextBox() {
         doubleProperty = new SimpleDoubleProperty();
@@ -53,7 +53,7 @@ public class DoubleTextBox extends TextField {
 
     @Override
     public void insertText(int i, String text) {
-        if (doublePattern.matcher(text).matches()) {
+        if (fourthDoublePattern.matcher(text).matches()) {
             super.insertText(0, text);
             doubleProperty.setValue(Double.parseDouble(this.getText()));
         }
@@ -73,10 +73,10 @@ public class DoubleTextBox extends TextField {
     @Override
     public void replaceSelection(String text) {
         String oldValue = getText();
-        if (doublePattern.matcher(text).matches()) {
+        if (fourthDoublePattern.matcher(text).matches()) {
             super.replaceSelection(text);
             String newText = super.getText();
-            if (!doublePattern.matcher(newText).matches()) {
+            if (!fourthDoublePattern.matcher(newText).matches()) {
                 super.setText(oldValue);
             }
             else{
@@ -108,7 +108,8 @@ public class DoubleTextBox extends TextField {
             if (!doublePattern.matcher(newText).matches()) {
                 super.setText(oldValue);
             }
-            else{
+            else if(fourthDoublePattern.matcher(newText).matches())
+            {
                 String helper = this.getText();
                 if(secondDoublePattern.matcher(helper).matches())
                 {
@@ -119,6 +120,10 @@ public class DoubleTextBox extends TextField {
                     helper = helper + "0";
                 }
                 doubleProperty.setValue(Double.parseDouble(helper));
+//                doubleProperty.setValue(Double.parseDouble(this.getText()));
+            }
+            else{
+                super.setText(oldValue);
             }
         }
         else if(text == "")
