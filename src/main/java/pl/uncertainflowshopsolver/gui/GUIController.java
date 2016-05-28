@@ -296,12 +296,12 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
 
             bestSolutionTextArea.clear();
             bestSolutionTextArea.appendText("Iteration: " + bestSolutionIteration + ":\n");
-            bestSolutionTextArea.appendText("Makespan UB: " + bestSolution.getUpperBoundOfMinMaxRegretOptimalization() + "\n");
-            bestSolutionTextArea.appendText("Makespan LB: " + bestSolution.getLowerBoundOfMinMaxRegretOptimalization() + "\n");
+            bestSolutionTextArea.appendText("Result for UB: " + bestSolution.getUpperBoundOfMinMaxRegretOptimalization() + "\n");
+            bestSolutionTextArea.appendText("Result for LB: " + bestSolution.getLowerBoundOfMinMaxRegretOptimalization() + "\n");
             bestSolutionTextArea.appendText(flowShop.toString() + "\n");
         }
         logsTextArea.appendText("Iteration " + iteration + ":\n");
-        logsTextArea.appendText("Makespan UB: " + iterationFitnessMap.get(iteration) + "\n");
+        logsTextArea.appendText("Result for UB: " + iterationFitnessMap.get(iteration) + "\n");
         logsTextArea.appendText(flowShop.toString() + "\n");
 
         updateChart(iteration);
@@ -376,7 +376,9 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
 
         switch (reason) {
             case ALL_ITERATIONS:
-                logsTextArea.appendText("The initial temperature was: " + formatter.format(initialTemperature) + "\nEnded: All iterations executed. Elapsed time: " + elapsedTime + "\n");
+                logsTextArea.appendText("The initial temperature was: " + formatter.format(initialTemperature) + "\nEnded: All iterations executed. Elapsed time: " + formatter.format(elapsedTime) + " seconds\n");
+                final String bestSolutionTextAreaText = bestSolutionTextArea.getText();
+                bestSolutionTextArea.setText("The initial temperature was: " + formatter.format(initialTemperature) + "\nElapsed time: " + formatter.format(elapsedTime) + " seconds\n" + bestSolutionTextAreaText);
                 break;
             case CANCELLED:
                 logsTextArea.appendText("The initial temperature was: " + formatter.format(initialTemperature) + "\nEnded: User cancelled." + "\n");

@@ -2,23 +2,26 @@ package pl.uncertainflowshopsolver.algo;
 
 import pl.uncertainflowshopsolver.algo.init.SolutionInitializer;
 import pl.uncertainflowshopsolver.algo.util.SimulatedAnnealingConfigurationUtil;
-import pl.uncertainflowshopsolver.config.SAConfiguration;
 import pl.uncertainflowshopsolver.config.ConfigurationProvider;
+import pl.uncertainflowshopsolver.config.SAConfiguration;
 import pl.uncertainflowshopsolver.flowshop.FlowShopWithUncertainty;
 import pl.uncertainflowshopsolver.gui.GUIController;
 import pl.uncertainflowshopsolver.gui.event.AlgorithmEventDispatcher;
 import pl.uncertainflowshopsolver.testdata.InstanceGenerator;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
 
-import static pl.uncertainflowshopsolver.algo.util.SimulatedAnnealingConfigurationUtil.*;
+import static pl.uncertainflowshopsolver.algo.util.SimulatedAnnealingConfigurationUtil.calculateInitialTemperatureFromDesiredProbability;
 import static pl.uncertainflowshopsolver.flowshop.FlowShopWithUncertainty.swapRandomlyTwoTasks;
-import static pl.uncertainflowshopsolver.gui.event.AlgorithmEventDispatcher.*;
+import static pl.uncertainflowshopsolver.gui.event.AlgorithmEventDispatcher.EndingReason;
 
 /**
  * @author Piotr Kubicki, created on 24.04.2016.
  */
-public class SimulatedAnnealing {
+public class TabuSearch {
 
     private static final Random random = new Random();
 
@@ -31,24 +34,34 @@ public class SimulatedAnnealing {
 
     private FlowShopWithUncertainty uncertainFlowShop;
 
-//    private static final double DECAY_RATE = 1.0 - Math.exp(-14.0);  // 0.908;  //inaczej: alpha. Pempera: 0.995;
-    private int L;
+            //1.0 - Math.exp(-14.0);// 0.908;    //inaczej: alpha. Pempera: 0.995;
+
+    //TODO PKU - 3. pomysł na pamiętanie 2óch ostatnich randomów random 1 i random2
+
+//    private static final double DECAY_RATE = 1.0 - Math.exp(-14.0);
+
+//    private double desiredInitialAcceptanceProbability = 0.925;
+    private int L;  //epoche, equals to L -> see constructor
     private double mInitialTemperature;
+//    private double alpha = 0.908;
 //    double endTemperature = 0.5;   //Double.MIN_NORMAL;
 //    double initialTemperature = 1000;  //initial initialTemperature
+//    double errorThreshold;
+//    int samplesCardinality;
+//    int maxNumberOfIterations;
 
-    public SimulatedAnnealing(FlowShopWithUncertainty uncertainFlowShop)
+    public TabuSearch(FlowShopWithUncertainty uncertainFlowShop)
     {
         this.uncertainFlowShop = uncertainFlowShop;
         this.L = uncertainFlowShop.getTaskCount();
     }
 
-    public SimulatedAnnealing(GUIController guiController) {
+    public TabuSearch(GUIController guiController) {
         this.configurationProvider = guiController;
         this.eventDispatcher = new AlgorithmEventDispatcher(guiController);
     }
 
-    public SimulatedAnnealing()
+    public TabuSearch()
     {
     }
 
@@ -93,7 +106,10 @@ public class SimulatedAnnealing {
         uncertainFlowShop_for_valueBefore.setLowerBoundOfMinMaxRegretOptimalization(globalMinimumForLowerBound);
 
         int iterations = 0;
-        /*int lastImprovementIteration = 0;*/
+        int lastImprovementIteration = 0;
+
+//        if (lastImprovementIteration % 10 == 0)
+//            eventDispatcher.dispatchIterationUpdated(iterations, uncertainFlowShop_for_minimum);
 
         /*************************/
         FlowShopWithUncertainty tempFlowShopForBenAmeurAlgoPurpose = uncertainFlowShop.clone(); //przepięcie
@@ -132,7 +148,7 @@ public class SimulatedAnnealing {
                 elapsedTime_delta3 += elapsedTime_delta2;
             }
 
-            if (/*lastImprovementIteration*/iterations % 10 == 0)
+            if (lastImprovementIteration % 10 == 0)
                 eventDispatcher.dispatchIterationUpdated(iterations, uncertainFlowShop_for_minimum);
 
             midTime_3= System.currentTimeMillis();
@@ -415,14 +431,14 @@ public class SimulatedAnnealing {
         InstanceGenerator instanceGenerator = new InstanceGenerator(3, 6);
         final FlowShopWithUncertainty uncertainFlowShopInstance = instanceGenerator.generateUncertainFlowShopInstance(0, 100, 50);
 //        uncertainFlowShopInstance.toFile("qpa1.txt");
-        SimulatedAnnealing simulatedAnnealing = new SimulatedAnnealing(uncertainFlowShopInstance);
+        TabuSearch simulatedAnnealing = new TabuSearch(uncertainFlowShopInstance);
         Object[] result = simulatedAnnealing.solveSA(true, false);
         System.out.println("SA solution: ");
         System.out.println(result[0].toString());
         System.out.println("SA result: " + result[1]);
 
 
-        SimulatedAnnealing simulatedAnnealing2 = new SimulatedAnnealing(uncertainFlowShopInstance);
+        TabuSearch simulatedAnnealing2 = new TabuSearch(uncertainFlowShopInstance);
         Object[] result2 = simulatedAnnealing2.solveSA(true, false);
         System.out.println("SA solution: ");
         System.out.println(result2[0].toString());

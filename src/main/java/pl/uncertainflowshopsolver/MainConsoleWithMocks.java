@@ -24,6 +24,15 @@ public class MainConsoleWithMocks {
      * Change mocks to set configuration
      */
     public static void main(String[] args) {
+
+        int HOW_MANY_REPETITIONS_FOR_CONCRETE_INSTANCE = 10;
+        int DELTA_OF_TASK_COUNT_BETWEEN_EACH_TEST_INSTANCE = 5;
+        int MINIMUM_INSTANCE = 10;
+        int MAXIMUM_INSTANCE = 100;
+
+        for (int i = 0; i < HOW_MANY_REPETITIONS_FOR_CONCRETE_INSTANCE; i++) {
+
+        }
         SimulatedAnnealing SAAlgorithm = new SimulatedAnnealing();
         SAAlgorithm.setConfigurationProvider(new ConfigurationProviderMock());
         SAAlgorithm.setEventDispatcher(new EventDispatcherMock(null));
@@ -33,17 +42,27 @@ public class MainConsoleWithMocks {
 
     private static class ConfigurationProviderMock implements ConfigurationProvider {
 
+        private double desiredInitialAcceptanceProbability = 0.925;
+        private double decayRate = 0.995;
+        private int epocheLength = 10;
+        private int maxNumberOfIterations = 1000;   //to si? b?dzie stroi?o z GUI, bo tam wida? wykres
+
+        public void handleChangeOfDesiredInitialAcceptanceProbability(double newValue)
+        {
+            this.desiredInitialAcceptanceProbability = newValue;
+        }
+
         @Override
         public SAConfiguration getSAConfiguration() {
             try {
                 return SAConfigurationImpl.newBuilder()
-                        .withDesiredInitialAcceptanceProbability(0.925)
-                        .withEpocheLength(10)
-                        .withDecayRate(0.995)
+                        .withDesiredInitialAcceptanceProbability(desiredInitialAcceptanceProbability)
+                        .withEpocheLength(epocheLength)
+                        .withDecayRate(decayRate)
                         .withEndTemperature(0.5)
-                        .withErrorThreshold(0.01)
+                        .withErrorThreshold(0.0001)
                         .withSamplesCardinality(10000)
-                        .withMaxNumberOfIterations(1000)
+                        .withMaxNumberOfIterations(maxNumberOfIterations)
     //                .withCutOffEnergyLevel(cutOffEnergyLevelDoubleTextBox.getValue())
     //                    .withSolutionInitializerClass(solutionInitializerClass)
                         .withUncertainFlowshop(UncertainFlowShopParser.parseFileToFlowShopWithUncertainty(PATH))

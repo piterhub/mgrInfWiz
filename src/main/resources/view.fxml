@@ -46,10 +46,10 @@
                                             <children>
                                                 <LineChart fx:id="lineChart" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" title="Fitness in time" HBox.hgrow="ALWAYS">
                                                     <xAxis>
-                                                        <NumberAxis label="time" side="BOTTOM" />
+                                                        <NumberAxis label="time (no. of iteration)" side="BOTTOM" />
                                                     </xAxis>
                                                     <yAxis>
-                                                        <NumberAxis label="fitness" prefHeight="382.0" prefWidth="40.0" side="LEFT" />
+                                                        <NumberAxis label="fitness (min-max regret result)" prefHeight="382.0" prefWidth="40.0" side="LEFT" />
                                                     </yAxis>
                                                 </LineChart>
                                             </children>

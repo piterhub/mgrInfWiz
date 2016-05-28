@@ -5,7 +5,9 @@ import pl.uncertainflowshopsolver.flowshop.FlowShopWithUncertainty;
 import pl.uncertainflowshopsolver.flowshop.Task;
 import pl.uncertainflowshopsolver.flowshop.TaskWithUncertainty;
 import pl.uncertainflowshopsolver.testdata.InstanceGenerator;
+import pl.uncertainflowshopsolver.testdata.UncertainFlowShopParser;
 
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
@@ -97,14 +99,20 @@ public class MIH {
 
     public static void main(String[] args)
     {
-        InstanceGenerator instanceGenerator = new InstanceGenerator(3, 6);
-        final FlowShopWithUncertainty uncertainFlowShopInstance = instanceGenerator.generateUncertainFlowShopInstance(0, 100, 50);
+//        InstanceGenerator instanceGenerator = new InstanceGenerator(3, 6);
+//        final FlowShopWithUncertainty uncertainFlowShopInstance = instanceGenerator.generateUncertainFlowShopInstance(0, 100, 50);
 //        uncertainFlowShopInstance.toFile("qpa1.txt");
-        MIH mih = new MIH(uncertainFlowShopInstance);
-        final Object[] result = mih.solve(true, false);
-        System.out.println("MIH solution: ");
-        System.out.println(result[0].toString());
-        System.out.println(result[1].toString());
-        System.out.println(result[2].toString());
+        try {
+            final FlowShopWithUncertainty uncertainFlowShopInstance = UncertainFlowShopParser.parseFileToFlowShopWithUncertainty("resources/2_[n50, m3, K100, C50]_FlowShopWithUncertainty-Copy.txt");
+            MIH mih = new MIH(uncertainFlowShopInstance);
+            final Object[] result = mih.solve(true, false);
+            System.out.println("MIH solution: ");
+            System.out.println("LB " + result[0].toString());
+            System.out.println("UB " + result[1].toString());
+            System.out.println(result[2].toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 }
