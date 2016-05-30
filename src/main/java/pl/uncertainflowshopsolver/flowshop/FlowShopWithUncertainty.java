@@ -245,10 +245,21 @@ public class FlowShopWithUncertainty implements Cloneable {
         return new FlowShopWithUncertainty(tasks);
     }
 
-    public FlowShopWithUncertainty getNeighbour(double temperature) {
-        swapRandomlyTwoTasks(this, getTaskCount());
+    public FlowShopWithUncertainty getNeighbourAndEvaluateIt(double temperature) {
+//        swapRandomlyTwoTasks(this, getTaskCount());
         FlowShopWithUncertainty newFlowShop = new FlowShopWithUncertainty(this.getTasks());
-        newFlowShop.setUpperBoundOfMinMaxRegretOptimalization((int)SubAlgorithm2.solveGreedy(this, false, false)[0]);
+        swapRandomlyTwoTasks(newFlowShop, getTaskCount());
+        final Object[] objects = SubAlgorithm2.solveGreedy(this, null, false);
+        newFlowShop.setUpperBoundOfMinMaxRegretOptimalization((int) objects[1]);//todo it's absolutely unnecessary. Przecie? robisz to ju? w SA. EDIT: jest potrzebne do initialTempHelpera
+        newFlowShop.setLowerBoundOfMinMaxRegretOptimalization((int) objects[0]);
         return newFlowShop;
     }
+
+//    public FlowShopWithUncertainty getBestNeighbour(int probe) {
+//        FlowShopWithUncertainty minimumHelperFlowShop = this.clone();
+//        swapRandomlyTwoTasks(this, getTaskCount());
+//        FlowShopWithUncertainty newFlowShop = new FlowShopWithUncertainty(this.getTasks());
+//        newFlowShop.setUpperBoundOfMinMaxRegretOptimalization((int)SubAlgorithm2.solveGreedy(this, false, false)[0]);
+//        return newFlowShop;
+//    }
 }

@@ -24,7 +24,7 @@ public class MainConsoleWithMocks {
 //    private static final String PATH = "resources/11_uncertainFlowShop_05.10-14.38-13.858.txt";
 //    private static final String PATH = "resources/2_[n50, m3, K100, C50].txt";
 //    private static final String PATH = "resources/3_[n50, m3, K100, C50].txt";
-    private static final String PATH = "resources/2_[n50, m3, K100, C50].txt";
+    private static final String PATH = "resources/6_[n50, m3, K100, C50].txt";
 
     /**
      * Use this to run without GUI
@@ -50,9 +50,13 @@ public class MainConsoleWithMocks {
     private static class ConfigurationProviderMock implements ConfigurationProvider {
 
         private double desiredInitialAcceptanceProbability = 0.95;
-        private double decayRate = 0.997;
-        private int epocheLength = 10;
-        private int maxNumberOfIterations = 8000;
+        private double decayRate = 0.9995;
+        private int epocheLength = 1;
+        private int maxNumberOfIterations = 80000;
+        private int samplesCardinality = 5000;  //10000
+
+        //exp(-80/(1163*(0.9995)^10000)) = 0.00003637018534505723
+        //exp(-80/(1163*(0.99995)^80000)) = 0.023375839279601084
 
         public void handleChangeOfDesiredInitialAcceptanceProbability(double newValue)
         {
@@ -62,13 +66,14 @@ public class MainConsoleWithMocks {
         @Override
         public SAConfiguration getSAConfiguration() {
             try {
+                samplesCardinality = 10000;
                 return SAConfigurationImpl.newBuilder()
                         .withDesiredInitialAcceptanceProbability(desiredInitialAcceptanceProbability)
                         .withEpocheLength(epocheLength)
                         .withDecayRate(decayRate)
                         .withEndTemperature(0.5)
                         .withErrorThreshold(0.0001)
-                        .withSamplesCardinality(10000)
+                        .withSamplesCardinality(samplesCardinality)
                         .withMaxNumberOfIterations(maxNumberOfIterations)
     //                .withCutOffEnergyLevel(cutOffEnergyLevelDoubleTextBox.getValue())
     //                    .withSolutionInitializerClass(solutionInitializerClass)

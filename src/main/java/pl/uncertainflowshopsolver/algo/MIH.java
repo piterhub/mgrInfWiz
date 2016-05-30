@@ -106,7 +106,7 @@ public class MIH {
 //        uncertainFlowShopInstance.toFile("qpa1.txt");
         try {
 //            final FlowShopWithUncertainty uncertainFlowShopInstance = UncertainFlowShopParser.parseFileToFlowShopWithUncertainty("resources/1_[n50, m3, K100, C50].txt");
-            final FlowShopWithUncertainty uncertainFlowShopInstance = UncertainFlowShopParser.parseFileToFlowShopWithUncertainty("resources/10_[n50, m3, K100, C50].txt");
+            final FlowShopWithUncertainty uncertainFlowShopInstance = UncertainFlowShopParser.parseFileToFlowShopWithUncertainty("resources/2_[n50, m3, K100, C50].txt");
             MIH mih = new MIH(uncertainFlowShopInstance);
             final Object[] result = mih.solve(true, false);
             System.out.println("MIH solution: ");

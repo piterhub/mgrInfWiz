@@ -81,6 +81,7 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
     private NumberBinding fourthProperty;
     private NumberBinding fifthProperty;
     private File defaultDirectory;
+    private boolean isChartUpdateAllowed = true;
 
     public FlowShopWithUncertainty getFlowShop() {
         return flowShop;
@@ -152,10 +153,14 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
             public void changed(ObservableValue<? extends Number> observableValue, Number oldValue, Number newValue) {
                 progressLabel.setText("0/" + newValue.intValue());
                 progressBar.setProgress(0.0);
-                if(maxNumberOfIterationsIntegerTextBox.integerProperty().getValue() > 2000)
+                if(maxNumberOfIterationsIntegerTextBox.integerProperty().getValue() > 2000) {
                     lineChart.setDisable(true);
-                else
+                    isChartUpdateAllowed = false;
+                }
+                else {
                     lineChart.setDisable(false);
+                    isChartUpdateAllowed = true;
+                }
             }
         });
 
@@ -405,7 +410,8 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
     }
 
     private void updateChart(int iteration) {
-        series.getData().add(new XYChart.Data<>(iteration, iterationFitnessMap.get(iteration)));
+        if(isChartUpdateAllowed)
+            series.getData().add(new XYChart.Data<>(iteration, iterationFitnessMap.get(iteration)));
     }
 
     private void prepareTotalBeesBinding() {

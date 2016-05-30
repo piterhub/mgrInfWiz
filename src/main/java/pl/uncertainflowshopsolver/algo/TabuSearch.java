@@ -115,18 +115,14 @@ public class TabuSearch {
         FlowShopWithUncertainty tempFlowShopForBenAmeurAlgoPurpose = uncertainFlowShop.clone(); //przepięcie
         ArrayList<FlowShopWithUncertainty> tempGenerationStates = new ArrayList<>();
         while (tempGenerationStates.size() < configuration.getSamplesCardinality()) {
-//            FlowShopWithUncertainty curState = uncertainFlowShop.getNeighbour(1.0);   //przepięcie
-            FlowShopWithUncertainty curState = tempFlowShopForBenAmeurAlgoPurpose.getNeighbour(1.0);    //przepięcie
+//            FlowShopWithUncertainty curState = uncertainFlowShop.getNeighbourAndEvaluateIt(1.0);   //przepięcie
+            FlowShopWithUncertainty curState = tempFlowShopForBenAmeurAlgoPurpose.getNeighbourAndEvaluateIt(1.0);    //przepięcie
             final Object[] results = SubAlgorithm2.solveGreedy(curState, false, false);
             curState.setUpperBoundOfMinMaxRegretOptimalization((int)results[0]);
             tempGenerationStates.add(curState);
             tempFlowShopForBenAmeurAlgoPurpose = curState.clone();  //przepięcie
         }
-        double initialTemperature =
-                SimulatedAnnealingConfigurationUtil.calculateFromDesiredProbability(
-                        configuration.getDesiredInitialAcceptanceProbability(),
-                        tempGenerationStates,
-                        configuration.getErrorThreshold());
+        double initialTemperature = 1d;
         System.out.printf(
                 "Using init temp %.2f (target init acceptance prob %.3f)\n",
                 initialTemperature, configuration.getDesiredInitialAcceptanceProbability());
@@ -162,7 +158,7 @@ public class TabuSearch {
 
             for (int i = 0; i < configuration.getEpocheLength(); i++) {
 
-                final FlowShopWithUncertainty neighbour = uncertainFlowShop.getNeighbour(1.0);
+                final FlowShopWithUncertainty neighbour = uncertainFlowShop.getNeighbourAndEvaluateIt(1.0);
                 final Object[] resultInside = SubAlgorithm2.solveGreedy(neighbour, null, false);
                 int currentValue = (int) resultInside[1];  //upper bound
 
@@ -251,7 +247,7 @@ public class TabuSearch {
 
 //        ArrayList<State> tempGenerationStates = new ArrayList<State>();
 //        while (tempGenerationStates.size() < 10000) {
-//            TSPState curState = initialState.getNeighbour(1.0);
+//            TSPState curState = initialState.getNeighbourAndEvaluateIt(1.0);
 //            tempGenerationStates.add(curState);
 //        }
 

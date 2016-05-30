@@ -80,43 +80,60 @@ public class SimulatedAnnealing {
         long startTime = System.currentTimeMillis();
         uncertainFlowShop = configuration.getUncertainFlowShop();
 
-        /***********Global minimum**************/
-        final Object[] result = SubAlgorithm2.solveGreedy(uncertainFlowShop, null, false);
-        int globalMinimum = (int) result[1];
-        int globalMinimumForLowerBound = (int) result[0];
-        FlowShopWithUncertainty uncertainFlowShop_for_minimum = uncertainFlowShop.clone();
-        uncertainFlowShop_for_minimum.setUpperBoundOfMinMaxRegretOptimalization(globalMinimum);
-        uncertainFlowShop_for_minimum.setLowerBoundOfMinMaxRegretOptimalization(globalMinimumForLowerBound);
+        /***********Pomysł z greedy starterem - niech SA właściwe zacznie od lokalnego optimum z BenAmeur**************/
+        FlowShopWithUncertainty greedyStarter = uncertainFlowShop.clone();
+        greedyStarter.setUpperBoundOfMinMaxRegretOptimalization((int)SubAlgorithm2.solveGreedy(greedyStarter, false, false)[0]);
+        System.out.println("Result UB from greedyStarter before BenAmeur: " + greedyStarter.getUpperBoundOfMinMaxRegretOptimalization());
         /*************************/
 
-        int valueBefore = globalMinimum;
-        FlowShopWithUncertainty uncertainFlowShop_for_valueBefore = uncertainFlowShop.clone();
-        uncertainFlowShop_for_valueBefore.setUpperBoundOfMinMaxRegretOptimalization(globalMinimum);     //TODO workaround. Może lepiej w clone dać kopiowanie tych fieldów
-        uncertainFlowShop_for_valueBefore.setLowerBoundOfMinMaxRegretOptimalization(globalMinimumForLowerBound);
-
-        int iterations = 0;
-        int lastImprovementIteration = 0;
-
-        /*************************/
-        FlowShopWithUncertainty tempFlowShopForBenAmeurAlgoPurpose = uncertainFlowShop.clone(); //przepięcie
+        FlowShopWithUncertainty tempFlowShopForBenAmeurAlgoPurpose = uncertainFlowShop.clone();
         ArrayList<FlowShopWithUncertainty> tempGenerationStates = new ArrayList<>();
         while (tempGenerationStates.size() < configuration.getSamplesCardinality()) {
-//            FlowShopWithUncertainty curState = uncertainFlowShop.getNeighbour(1.0);   //przepięcie
-            FlowShopWithUncertainty curState = tempFlowShopForBenAmeurAlgoPurpose.getNeighbour(1.0);    //przepięcie
-            final Object[] results = SubAlgorithm2.solveGreedy(curState, false, false);
-            curState.setUpperBoundOfMinMaxRegretOptimalization((int)results[0]);
+            FlowShopWithUncertainty curState = tempFlowShopForBenAmeurAlgoPurpose.getNeighbourAndEvaluateIt(1.0);
+//            final Object[] results = SubAlgorithm2.solveGreedy(curState, false, false);
+//            curState.setUpperBoundOfMinMaxRegretOptimalization((int)results[0]);
             tempGenerationStates.add(curState);
-            tempFlowShopForBenAmeurAlgoPurpose = curState.clone();  //przepięcie
+            tempFlowShopForBenAmeurAlgoPurpose = curState.clone();
+            if(greedyStarter.getUpperBoundOfMinMaxRegretOptimalization() > curState.getUpperBoundOfMinMaxRegretOptimalization()) {
+                greedyStarter = curState.clone();
+                greedyStarter.setUpperBoundOfMinMaxRegretOptimalization(curState.getUpperBoundOfMinMaxRegretOptimalization());
+                greedyStarter.setLowerBoundOfMinMaxRegretOptimalization(curState.getLowerBoundOfMinMaxRegretOptimalization());
+            }
         }
         double initialTemperature =
                 SimulatedAnnealingConfigurationUtil.calculateFromDesiredProbability(
                         configuration.getDesiredInitialAcceptanceProbability(),
                         tempGenerationStates,
-                        configuration.getErrorThreshold());
+                        configuration.getErrorThreshold(), greedyStarter);
         System.out.printf(
                 "Using init temp %.2f (target init acceptance prob %.3f)\n",
                 initialTemperature, configuration.getDesiredInitialAcceptanceProbability());
         /*************************/
+
+        System.out.println("Result UB from greedyStarter after BenAmeur: " + greedyStarter.getUpperBoundOfMinMaxRegretOptimalization());
+
+        /***********Global minimum**************/
+//        final Object[] result = SubAlgorithm2.solveGreedy(uncertainFlowShop, null, false);
+//        int globalMinimum = (int) result[1];
+//        int globalMinimumForLowerBound = (int) result[0];
+//        FlowShopWithUncertainty uncertainFlowShop_for_minimum = uncertainFlowShop.clone();
+//        uncertainFlowShop_for_minimum.setUpperBoundOfMinMaxRegretOptimalization(globalMinimum);
+//        uncertainFlowShop_for_minimum.setLowerBoundOfMinMaxRegretOptimalization(globalMinimumForLowerBound);
+//        uncertainFlowShop.setUpperBoundOfMinMaxRegretOptimalization(globalMinimum);
+        int globalMinimum = greedyStarter.getUpperBoundOfMinMaxRegretOptimalization();
+        FlowShopWithUncertainty uncertainFlowShop_for_minimum = greedyStarter.clone();
+        uncertainFlowShop_for_minimum.setUpperBoundOfMinMaxRegretOptimalization(globalMinimum);
+        /*************************/
+
+        FlowShopWithUncertainty currentFlowShop = greedyStarter.clone();
+        currentFlowShop.setUpperBoundOfMinMaxRegretOptimalization(globalMinimum);     //TODO workaround. Może lepiej w clone dać kopiowanie tych fieldów
+//        currentFlowShop.setLowerBoundOfMinMaxRegretOptimalization(globalMinimumForLowerBound);
+
+        int iterations = 0;
+        int lastImprovementIteration = 0;
+
+        System.out.println("Result UB at the beginning: " + currentFlowShop.getUpperBoundOfMinMaxRegretOptimalization());
+
         mInitialTemperature = initialTemperature;
 
         long midTime_2 = System.currentTimeMillis();
@@ -145,78 +162,76 @@ public class SimulatedAnnealing {
 //            System.out.println(uncertainFlowShop.toString());
 
             iterations++;
-            if(iterations - lastImprovementIteration > 1000)
-            {
-                System.out.println("\nShuffle! \nWas :");
-                for (TaskWithUncertainty task : uncertainFlowShop.getTasks())
+
+
+                if(iterations - lastImprovementIteration > 10000)
                 {
-                    System.out.print(" " + task.getOriginalPosition() + " ");
-                }
-
-//
-//1                Collections.shuffle(uncertainFlowShop.getTasks());
-
-//2                FlowShopWithUncertainty newFlowShop = new FlowShopWithUncertainty(configuration.getUncertainFlowShop().getTasks());
-//                Collections.shuffle(newFlowShop.getTasks());
-//                uncertainFlowShop = newFlowShop.clone();
-
-                FlowShopWithUncertainty minimumHelperFlowShop = uncertainFlowShop.clone();
-                minimumHelperFlowShop.setUpperBoundOfMinMaxRegretOptimalization(uncertainFlowShop.getUpperBoundOfMinMaxRegretOptimalization());
-                for (int i = 0; i < 2*minimumHelperFlowShop.getTaskCount(); i++) {
-                    FlowShopWithUncertainty newFlowShop = minimumHelperFlowShop.clone();
-                    Collections.shuffle(newFlowShop.getTasks());
-                    final Object[] objects = SubAlgorithm2.solveGreedy(minimumHelperFlowShop, false, false);
-                    if((int)objects[0] < minimumHelperFlowShop.getUpperBoundOfMinMaxRegretOptimalization())
+                    System.out.println("\nShuffle! \nWas :");
+                    for (TaskWithUncertainty task : currentFlowShop.getTasks())
                     {
-                        minimumHelperFlowShop=newFlowShop.clone();
-                        minimumHelperFlowShop.setUpperBoundOfMinMaxRegretOptimalization((int) objects[0]);
-                        System.out.println("New UpperBoundOfMinMaxRegretOptimalization of minimumHelperFlowShop: " + minimumHelperFlowShop.getUpperBoundOfMinMaxRegretOptimalization());
+                        System.out.print(" " + task.getOriginalPosition() + " ");
                     }
-                }
-                uncertainFlowShop = minimumHelperFlowShop.clone();
-                uncertainFlowShop.setUpperBoundOfMinMaxRegretOptimalization(minimumHelperFlowShop.getUpperBoundOfMinMaxRegretOptimalization());
 
+                    FlowShopWithUncertainty minimumHelperFlowShop = currentFlowShop.clone();
+                    minimumHelperFlowShop.setUpperBoundOfMinMaxRegretOptimalization(currentFlowShop.getUpperBoundOfMinMaxRegretOptimalization());
+                    for (int i = 0; i < 2*minimumHelperFlowShop.getTaskCount(); i++) {
+                        FlowShopWithUncertainty newFlowShop = minimumHelperFlowShop.clone();
+                        Collections.shuffle(newFlowShop.getTasks());
+                        final Object[] objects = SubAlgorithm2.solveGreedy(newFlowShop, false, false);
+                        if((int)objects[0] < minimumHelperFlowShop.getUpperBoundOfMinMaxRegretOptimalization())
+                        {
+                            minimumHelperFlowShop=newFlowShop.clone();
+                            minimumHelperFlowShop.setUpperBoundOfMinMaxRegretOptimalization((int) objects[0]);
+                            System.out.println("New UpperBoundOfMinMaxRegretOptimalization of minimumHelperFlowShop: " + minimumHelperFlowShop.getUpperBoundOfMinMaxRegretOptimalization());
+                        }
+                    }
+                    currentFlowShop = minimumHelperFlowShop.clone();
+                    currentFlowShop.setUpperBoundOfMinMaxRegretOptimalization(minimumHelperFlowShop.getUpperBoundOfMinMaxRegretOptimalization());
 
-                System.out.println("\nIs :");
-                for (TaskWithUncertainty task : uncertainFlowShop.getTasks())
-                {
-                    System.out.print(" " + task.getOriginalPosition() + " ");
+                    System.out.println("\nIs :");
+                    for (TaskWithUncertainty task : currentFlowShop.getTasks())
+                    {
+                        System.out.print(" " + task.getOriginalPosition() + " ");
+                    }
+                    System.out.println();
+                    lastImprovementIteration = iterations;  //we want wait for next 1000 iterations, and not shuffle already every time :)
+                    System.out.println("initialTemperature was: " + initialTemperature);
+                    initialTemperature = mInitialTemperature;
+                    System.out.println("initialTemperature is: " + initialTemperature);
                 }
-                System.out.println();
-                lastImprovementIteration = iterations;  //we want wait for next 1000 iterations, and not shuffle already every time :)
-                System.out.println("initialTemperature was: " + initialTemperature);
-                initialTemperature = mInitialTemperature;
-                System.out.println("initialTemperature is: " + initialTemperature);
-            }
+
 
             for (int i = 0; i < configuration.getEpocheLength(); i++) {
 
-                final FlowShopWithUncertainty neighbour = uncertainFlowShop.getNeighbour(1.0);
-                final Object[] resultInside = SubAlgorithm2.solveGreedy(neighbour, null, false);
-                int currentValue = (int) resultInside[1];  //upper bound
+//                final FlowShopWithUncertainty neighbour = uncertainFlowShop.getNeighbourAndEvaluateIt(1.0);
+                final FlowShopWithUncertainty neighbour = currentFlowShop.getNeighbourAndEvaluateIt(1.0);
+//                final Object[] resultInside = SubAlgorithm2.solveGreedy(neighbour, null, false);
+//                neighbour.setUpperBoundOfMinMaxRegretOptimalization((int) resultInside[1]);
 
-                if (valueBefore >= currentValue) {
-                    valueBefore = currentValue;
-                    uncertainFlowShop_for_valueBefore = neighbour.clone();
-                    if (globalMinimum > currentValue) {
-                        globalMinimum = currentValue;
+                if (newFlowShopIsBetterThanCurrent(neighbour, currentFlowShop)) {
+                    currentFlowShop = neighbour.clone();
+                    final Integer newValue = neighbour.getUpperBoundOfMinMaxRegretOptimalization();
+                    currentFlowShop.setUpperBoundOfMinMaxRegretOptimalization(newValue);
+                    if (globalMinimum > newValue) {
+                        globalMinimum = newValue;
                         uncertainFlowShop_for_minimum = neighbour.clone();
-                        uncertainFlowShop_for_minimum.setUpperBoundOfMinMaxRegretOptimalization(globalMinimum);
-                        uncertainFlowShop_for_minimum.setLowerBoundOfMinMaxRegretOptimalization((int) resultInside[0]);
+                        uncertainFlowShop_for_minimum.setUpperBoundOfMinMaxRegretOptimalization(neighbour.getUpperBoundOfMinMaxRegretOptimalization());
+                        uncertainFlowShop_for_minimum.setLowerBoundOfMinMaxRegretOptimalization(neighbour.getLowerBoundOfMinMaxRegretOptimalization());
                         lastImprovementIteration = iterations;
                     }
                 } else {
-                    int delta = currentValue - valueBefore;
+                    int delta = neighbour.getUpperBoundOfMinMaxRegretOptimalization() - currentFlowShop.getUpperBoundOfMinMaxRegretOptimalization();
                     double probability = Math.exp(-delta / initialTemperature);
                     double zeroToOne = random.nextInt(1001) / 1000.0;
 
                     if (zeroToOne <= probability) {
-                        valueBefore = currentValue;
-                        uncertainFlowShop_for_valueBefore = neighbour.clone();
-                    } else {
-                        uncertainFlowShop = uncertainFlowShop_for_valueBefore.clone();
-                        uncertainFlowShop.setUpperBoundOfMinMaxRegretOptimalization(uncertainFlowShop_for_valueBefore.getUpperBoundOfMinMaxRegretOptimalization());
+                        currentFlowShop = neighbour.clone();
+                        currentFlowShop.setUpperBoundOfMinMaxRegretOptimalization(neighbour.getUpperBoundOfMinMaxRegretOptimalization());
                     }
+//                    else {
+//                        uncertainFlowShop = currentFlowShop.clone();
+//                        uncertainFlowShop.setUpperBoundOfMinMaxRegretOptimalization(currentFlowShop.getUpperBoundOfMinMaxRegretOptimalization());
+//                    }
                 }
             }
             initialTemperature = configuration.getDecayRate() * initialTemperature;
@@ -247,7 +262,12 @@ public class SimulatedAnnealing {
         } else {
             eventDispatcher.dispatchAlgorithmEnded(EndingReason.CANCELLED, elapsedTime, uncertainFlowShop_for_minimum, mInitialTemperature);
         }
+    }
 
+
+
+    private boolean newFlowShopIsBetterThanCurrent(FlowShopWithUncertainty newFlowShop, FlowShopWithUncertainty currentFlowShop) {
+        return currentFlowShop.getUpperBoundOfMinMaxRegretOptimalization() >= newFlowShop.getUpperBoundOfMinMaxRegretOptimalization();
     }
 
     public Object[] solveSA(boolean lowerBound, boolean printDebug) {
@@ -282,7 +302,7 @@ public class SimulatedAnnealing {
 
 //        ArrayList<State> tempGenerationStates = new ArrayList<State>();
 //        while (tempGenerationStates.size() < 10000) {
-//            TSPState curState = initialState.getNeighbour(1.0);
+//            TSPState curState = initialState.getNeighbourAndEvaluateIt(1.0);
 //            tempGenerationStates.add(curState);
 //        }
 

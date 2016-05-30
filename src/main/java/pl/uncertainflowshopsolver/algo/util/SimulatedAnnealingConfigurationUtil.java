@@ -18,13 +18,13 @@ public class SimulatedAnnealingConfigurationUtil {
      *   (i.e. worse) transitions.
      * Either:
      *   states: set of random states. There must be at least one positive
-     *     transition (i.e. state where state.getNeighbour(1.0).getEnergyLevel() -
+     *     transition (i.e. state where state.getNeighbourAndEvaluateIt(1.0).getEnergyLevel() -
      *     state.getEnergyLevel() is positive). States which do not meet this
      *     criteria may be included, but will not be used in calculating the
      *     initial temperature.
      *   OR
      *   positiveEnergyDeltas: an array of positive energy deltas
-     *     (i.e. state.getNeighbour(1.0).getEnergyLevel() -
+     *     (i.e. state.getNeighbourAndEvaluateIt(1.0).getEnergyLevel() -
      *     state.getEnergyLevel()). Set by default to
      *     (0.01 * desiredProbability).
      * errorThreshold: how close within the desired probability we should get
@@ -75,17 +75,22 @@ public class SimulatedAnnealingConfigurationUtil {
         return sumProbs / energyDeltas.length;
     }
 
-    public static double calculateFromDesiredProbability (
+    public static double calculateFromDesiredProbability(
             double desiredProbability,
             Iterable<FlowShopWithUncertainty> states,
-            double errorThreshold)
+            double errorThreshold, FlowShopWithUncertainty greedyStarter)
     {
-        ArrayList<Double> energyDeltasList = new ArrayList<Double>();
+        ArrayList<Double> energyDeltasList = new ArrayList<>();
         for (FlowShopWithUncertainty state : states) {
-            double energyDelta = (state.getNeighbour(1.0).getUpperBoundOfMinMaxRegretOptimalization() -
+            final FlowShopWithUncertainty neighbour = state.getNeighbourAndEvaluateIt(1.0);
+            double energyDelta = (neighbour.getUpperBoundOfMinMaxRegretOptimalization() -
                     state.getUpperBoundOfMinMaxRegretOptimalization());
             if (energyDelta > Double.MIN_NORMAL) {
                 energyDeltasList.add(energyDelta);
+            }
+            if(greedyStarter.getUpperBoundOfMinMaxRegretOptimalization() > neighbour.getUpperBoundOfMinMaxRegretOptimalization()) {
+                greedyStarter = neighbour.clone();
+                greedyStarter.setUpperBoundOfMinMaxRegretOptimalization(neighbour.getUpperBoundOfMinMaxRegretOptimalization());
             }
         }
         if (energyDeltasList.isEmpty()) {
