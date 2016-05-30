@@ -19,7 +19,7 @@ public class SubAlgorithm2Test {
     private SubAlgorithm2 mTestedObject;
     private FlowShopWithUncertainty uncertainFlowShop_PATH1;
 
-    private static final String PATH1 = "resources/2_[n50, m3, K100, C50]_FlowShopWithUncertainty.txt";
+    private static final String PATH1 = "resources/1_[n50, m3, K100, C50].txt";
     final int expectedUBResultForPath1 = 238;
     final int expectedLBResultForPath1 = 238;
 

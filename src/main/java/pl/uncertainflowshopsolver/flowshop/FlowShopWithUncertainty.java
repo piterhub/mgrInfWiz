@@ -171,16 +171,18 @@ public class FlowShopWithUncertainty implements Cloneable {
     private void createAndBufferedWrite(List<String> content, String fileName, Path directoryPath) {
 
         if (canCreateAFileInGivenDirectory(directoryPath)) {
-            if (canWriteToGivenFile(directoryPath, fileName)) {
-                Path pathToFile = Paths.get(directoryPath.toString(), fileName);
+            Path pathToFile = Paths.get(directoryPath.toString(), fileName);
+            if (canWriteToGivenFile(pathToFile)) {
                 bufferedWrite(content, pathToFile.toAbsolutePath().toString());
+            }
+            else
+            {
+                System.err.println("Cannot write to given file: " + pathToFile.toString());
             }
         }
     }
 
-    private boolean canWriteToGivenFile(Path directoryPath, String fileName) {
-        Path pathToFile = Paths.get(directoryPath.toString(), fileName);
-
+    private boolean canWriteToGivenFile(Path pathToFile) {
         if (!Files.exists(pathToFile)) {
             try {
                 Files.createFile(pathToFile);

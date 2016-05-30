@@ -5,6 +5,7 @@ import pl.uncertainflowshopsolver.algo.util.SimulatedAnnealingConfigurationUtil;
 import pl.uncertainflowshopsolver.config.SAConfiguration;
 import pl.uncertainflowshopsolver.config.ConfigurationProvider;
 import pl.uncertainflowshopsolver.flowshop.FlowShopWithUncertainty;
+import pl.uncertainflowshopsolver.flowshop.TaskWithUncertainty;
 import pl.uncertainflowshopsolver.gui.GUIController;
 import pl.uncertainflowshopsolver.gui.event.AlgorithmEventDispatcher;
 import pl.uncertainflowshopsolver.testdata.InstanceGenerator;
@@ -33,7 +34,8 @@ public class SimulatedAnnealing {
 
 //    private static final double DECAY_RATE = 1.0 - Math.exp(-14.0);  // 0.908;  //inaczej: alpha. Pempera: 0.995;
     private int L;
-    private double mInitialTemperature;
+    private double mInitialTemperature; //for notice purpose only!
+
 //    double endTemperature = 0.5;   //Double.MIN_NORMAL;
 //    double initialTemperature = 1000;  //initial initialTemperature
 
@@ -93,7 +95,7 @@ public class SimulatedAnnealing {
         uncertainFlowShop_for_valueBefore.setLowerBoundOfMinMaxRegretOptimalization(globalMinimumForLowerBound);
 
         int iterations = 0;
-        /*int lastImprovementIteration = 0;*/
+        int lastImprovementIteration = 0;
 
         /*************************/
         FlowShopWithUncertainty tempFlowShopForBenAmeurAlgoPurpose = uncertainFlowShop.clone(); //przepięcie
@@ -132,7 +134,7 @@ public class SimulatedAnnealing {
                 elapsedTime_delta3 += elapsedTime_delta2;
             }
 
-            if (/*lastImprovementIteration*/iterations % 10 == 0)
+//            if (/*lastImprovementIteration*/iterations % 10 == 0) TODO coś tu nie gra
                 eventDispatcher.dispatchIterationUpdated(iterations, uncertainFlowShop_for_minimum);
 
             midTime_3= System.currentTimeMillis();
@@ -143,6 +145,49 @@ public class SimulatedAnnealing {
 //            System.out.println(uncertainFlowShop.toString());
 
             iterations++;
+            if(iterations - lastImprovementIteration > 1000)
+            {
+                System.out.println("\nShuffle! \nWas :");
+                for (TaskWithUncertainty task : uncertainFlowShop.getTasks())
+                {
+                    System.out.print(" " + task.getOriginalPosition() + " ");
+                }
+
+//
+//1                Collections.shuffle(uncertainFlowShop.getTasks());
+
+//2                FlowShopWithUncertainty newFlowShop = new FlowShopWithUncertainty(configuration.getUncertainFlowShop().getTasks());
+//                Collections.shuffle(newFlowShop.getTasks());
+//                uncertainFlowShop = newFlowShop.clone();
+
+                FlowShopWithUncertainty minimumHelperFlowShop = uncertainFlowShop.clone();
+                minimumHelperFlowShop.setUpperBoundOfMinMaxRegretOptimalization(uncertainFlowShop.getUpperBoundOfMinMaxRegretOptimalization());
+                for (int i = 0; i < 2*minimumHelperFlowShop.getTaskCount(); i++) {
+                    FlowShopWithUncertainty newFlowShop = minimumHelperFlowShop.clone();
+                    Collections.shuffle(newFlowShop.getTasks());
+                    final Object[] objects = SubAlgorithm2.solveGreedy(minimumHelperFlowShop, false, false);
+                    if((int)objects[0] < minimumHelperFlowShop.getUpperBoundOfMinMaxRegretOptimalization())
+                    {
+                        minimumHelperFlowShop=newFlowShop.clone();
+                        minimumHelperFlowShop.setUpperBoundOfMinMaxRegretOptimalization((int) objects[0]);
+                        System.out.println("New UpperBoundOfMinMaxRegretOptimalization of minimumHelperFlowShop: " + minimumHelperFlowShop.getUpperBoundOfMinMaxRegretOptimalization());
+                    }
+                }
+                uncertainFlowShop = minimumHelperFlowShop.clone();
+                uncertainFlowShop.setUpperBoundOfMinMaxRegretOptimalization(minimumHelperFlowShop.getUpperBoundOfMinMaxRegretOptimalization());
+
+
+                System.out.println("\nIs :");
+                for (TaskWithUncertainty task : uncertainFlowShop.getTasks())
+                {
+                    System.out.print(" " + task.getOriginalPosition() + " ");
+                }
+                System.out.println();
+                lastImprovementIteration = iterations;  //we want wait for next 1000 iterations, and not shuffle already every time :)
+                System.out.println("initialTemperature was: " + initialTemperature);
+                initialTemperature = mInitialTemperature;
+                System.out.println("initialTemperature is: " + initialTemperature);
+            }
 
             for (int i = 0; i < configuration.getEpocheLength(); i++) {
 
@@ -158,6 +203,7 @@ public class SimulatedAnnealing {
                         uncertainFlowShop_for_minimum = neighbour.clone();
                         uncertainFlowShop_for_minimum.setUpperBoundOfMinMaxRegretOptimalization(globalMinimum);
                         uncertainFlowShop_for_minimum.setLowerBoundOfMinMaxRegretOptimalization((int) resultInside[0]);
+                        lastImprovementIteration = iterations;
                     }
                 } else {
                     int delta = currentValue - valueBefore;
@@ -177,6 +223,7 @@ public class SimulatedAnnealing {
 
             // stop conditions
             if (configuration.getMaxNumberOfIterations() != 0 && iterations > configuration.getMaxNumberOfIterations()) {
+                System.out.println("End temperature: " + initialTemperature);
                 break;
             }
 //            if (configuration.getMaxIterationsWithoutImprovement() != 0 &&

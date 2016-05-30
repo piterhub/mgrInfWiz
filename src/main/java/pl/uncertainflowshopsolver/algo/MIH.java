@@ -55,7 +55,7 @@ public class MIH {
         final int resultOfUpperBound = (int) resultsInside[1];
 
         //3. The result of evaluation + measured time we give back.
-        Object[] result = new Object[3];
+        Object[] result = new Object[4];
         result[0] = resultOfLowerBound;
         result[1] = resultOfUpperBound;
 
@@ -64,6 +64,8 @@ public class MIH {
         NumberFormat formatter = new DecimalFormat("#0.00");
         formatter.setGroupingUsed(false);
         result[2] = formatter.format(elapsedTime / 1000d);  //It will be in seconds
+
+        result[3] = uncertainFlowShop;
 
         return result;
     }
@@ -103,13 +105,15 @@ public class MIH {
 //        final FlowShopWithUncertainty uncertainFlowShopInstance = instanceGenerator.generateUncertainFlowShopInstance(0, 100, 50);
 //        uncertainFlowShopInstance.toFile("qpa1.txt");
         try {
-            final FlowShopWithUncertainty uncertainFlowShopInstance = UncertainFlowShopParser.parseFileToFlowShopWithUncertainty("resources/2_[n50, m3, K100, C50]_FlowShopWithUncertainty-Copy.txt");
+//            final FlowShopWithUncertainty uncertainFlowShopInstance = UncertainFlowShopParser.parseFileToFlowShopWithUncertainty("resources/1_[n50, m3, K100, C50].txt");
+            final FlowShopWithUncertainty uncertainFlowShopInstance = UncertainFlowShopParser.parseFileToFlowShopWithUncertainty("resources/10_[n50, m3, K100, C50].txt");
             MIH mih = new MIH(uncertainFlowShopInstance);
             final Object[] result = mih.solve(true, false);
             System.out.println("MIH solution: ");
             System.out.println("LB " + result[0].toString());
             System.out.println("UB " + result[1].toString());
-            System.out.println(result[2].toString());
+            System.out.println("Time: " + result[2].toString());
+//            System.out.println(result[3].toString());
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -10,14 +10,21 @@ import pl.uncertainflowshopsolver.config.impl.SAConfigurationImpl;
 import pl.uncertainflowshopsolver.testdata.UncertainFlowShopParser;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * @author Piotr Kubicki, created on 22.05.2016.
  */
 public class MainConsoleWithMocks {
 
-    private static final String PATH = "resources/11_uncertainFlowShop_05.10-14.38-13.858.txt";
+//    private static final String PATH = "resources/11_uncertainFlowShop_05.10-14.38-13.858.txt";
+//    private static final String PATH = "resources/2_[n50, m3, K100, C50].txt";
+//    private static final String PATH = "resources/3_[n50, m3, K100, C50].txt";
+    private static final String PATH = "resources/2_[n50, m3, K100, C50].txt";
 
     /**
      * Use this to run without GUI
@@ -25,14 +32,14 @@ public class MainConsoleWithMocks {
      */
     public static void main(String[] args) {
 
-        int HOW_MANY_REPETITIONS_FOR_CONCRETE_INSTANCE = 10;
-        int DELTA_OF_TASK_COUNT_BETWEEN_EACH_TEST_INSTANCE = 5;
-        int MINIMUM_INSTANCE = 10;
-        int MAXIMUM_INSTANCE = 100;
-
-        for (int i = 0; i < HOW_MANY_REPETITIONS_FOR_CONCRETE_INSTANCE; i++) {
-
-        }
+//        int HOW_MANY_REPETITIONS_FOR_CONCRETE_INSTANCE = 10;
+//        int DELTA_OF_TASK_COUNT_BETWEEN_EACH_TEST_INSTANCE = 5;
+//        int MINIMUM_INSTANCE = 10;
+//        int MAXIMUM_INSTANCE = 100;
+//
+//        for (int i = 0; i < HOW_MANY_REPETITIONS_FOR_CONCRETE_INSTANCE; i++) {
+//
+//        }
         SimulatedAnnealing SAAlgorithm = new SimulatedAnnealing();
         SAAlgorithm.setConfigurationProvider(new ConfigurationProviderMock());
         SAAlgorithm.setEventDispatcher(new EventDispatcherMock(null));
@@ -42,10 +49,10 @@ public class MainConsoleWithMocks {
 
     private static class ConfigurationProviderMock implements ConfigurationProvider {
 
-        private double desiredInitialAcceptanceProbability = 0.925;
-        private double decayRate = 0.995;
+        private double desiredInitialAcceptanceProbability = 0.95;
+        private double decayRate = 0.997;
         private int epocheLength = 10;
-        private int maxNumberOfIterations = 1000;   //to si? b?dzie stroi?o z GUI, bo tam wida? wykres
+        private int maxNumberOfIterations = 8000;
 
         public void handleChangeOfDesiredInitialAcceptanceProbability(double newValue)
         {
@@ -76,21 +83,45 @@ public class MainConsoleWithMocks {
 
     private static class EventDispatcherMock extends AlgorithmEventDispatcher {
 
+        private int bestSolutionIteration = -1;
+        private FlowShopWithUncertainty bestSolution;
+
+        private boolean solutionIsBest(FlowShopWithUncertainty flowShop) {
+            return bestSolutionIteration == -1 || bestSolution.getUpperBoundOfMinMaxRegretOptimalization() > flowShop.getUpperBoundOfMinMaxRegretOptimalization();
+        }
+
         public EventDispatcherMock(AlgorithmEventListener eventListener) {
             super(eventListener);
         }
 
         @Override
         public void dispatchIterationUpdated(int iteration, FlowShopWithUncertainty flowShop) {
-            System.out.println("Iteration updated: " + iteration +
-                    " \nUpperBound Of MinMaxRegret Optimalization: " + flowShop.getUpperBoundOfMinMaxRegretOptimalization() +
-                    " \nLowerBound Of MinMaxRegret Optimalization: " + flowShop.getLowerBoundOfMinMaxRegretOptimalization());
+
+            if (solutionIsBest(flowShop)) {
+                bestSolutionIteration = iteration;
+                bestSolution = flowShop;
+
+//                System.out.println("\n\nBest solution updated: ");
+                System.out.println("Iteration: " + iteration +
+                        " \nLowerBound Of MinMaxRegret Optimalization: " + flowShop.getLowerBoundOfMinMaxRegretOptimalization() +
+                        " \nUpperBound Of MinMaxRegret Optimalization: " + flowShop.getUpperBoundOfMinMaxRegretOptimalization());
+
+            }
         }
 
         @Override
         public void dispatchAlgorithmEnded(EndingReason reason, double elapsedTime, FlowShopWithUncertainty flowShopWithUncertainty, double initialTemperature) {
-            Date date = new Date();
-            System.out.println("Algorithm ended. Elapsed time " + elapsedTime + ". Now is " + date.toString());
+//            Date date = new Date();
+//            System.out.println("Algorithm ended." /*Elapsed time " + elapsedTime + ". Now is " + date.toString()*/);
+
+            DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols(Locale.GERMAN);
+            otherSymbols.setDecimalSeparator(',');
+            NumberFormat formatter = new DecimalFormat("#0.00");
+            formatter.setGroupingUsed(false);
+            System.out.println("The initial temperature was: " + formatter.format(initialTemperature) + "\nElapsed time: " + formatter.format(elapsedTime) + " seconds");
+            System.out.println("Result for LB:" + flowShopWithUncertainty.getLowerBoundOfMinMaxRegretOptimalization() + "");
+            System.out.println("Result for UB:" + flowShopWithUncertainty.getUpperBoundOfMinMaxRegretOptimalization() + "");
+            flowShopWithUncertainty.toString();
         }
 
         @Override

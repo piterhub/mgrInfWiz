@@ -14,7 +14,7 @@ public class InstanceGenerator {
 
     private static int m;
     private static int n;
-    Random r;
+    public static final Random random = new Random();
 
     /**
      * Constructor for generating the {@link FlowShopWithUncertainty}
@@ -25,7 +25,6 @@ public class InstanceGenerator {
     {
         this.m = m;
         this.n = n;
-        r = new Random();
     }
 
     public FlowShopWithUncertainty generateUncertainFlowShopInstance (int lowerBoundOfLowerInterval, int upperBoundOfLowerInterval, int widthOfUncertaintyInterval)
@@ -41,10 +40,10 @@ public class InstanceGenerator {
             List<Integer> upperTimeList = new ArrayList<>();
 
             for (int j = 0; j < m; j++) {
-                final int lower_p_ij = r.nextInt((upperBoundOfLowerInterval - lowerBoundOfLowerInterval) + 1) + lowerBoundOfLowerInterval;
+                final int lower_p_ij = getLowerP_ij(lowerBoundOfLowerInterval, upperBoundOfLowerInterval);
                 lowerTimeList.add(lower_p_ij);
 
-                final int upper_p_ij = r.nextInt(widthOfUncertaintyInterval+ 1) + lower_p_ij;
+                final int upper_p_ij = getUpperP_ij(widthOfUncertaintyInterval, lower_p_ij);
                 upperTimeList.add(upper_p_ij);
             }
             TaskWithUncertainty uncertainTask = new TaskWithUncertainty(lowerTimeList, upperTimeList, i);
@@ -54,14 +53,33 @@ public class InstanceGenerator {
         return new FlowShopWithUncertainty(taskWithUncertaintyList);
     }
 
+    private int getUpperP_ij(int widthOfUncertaintyInterval, int lower_p_ij) {
+        int randomResult;
+        while((randomResult = random.nextInt(widthOfUncertaintyInterval+ 1) + lower_p_ij) == 0){}
+        return randomResult;
+    }
+
+    private int getLowerP_ij(int lowerBoundOfLowerInterval, int upperBoundOfLowerInterval) {
+        int randomResult;
+        while((randomResult = random.nextInt((upperBoundOfLowerInterval - lowerBoundOfLowerInterval) + 1) + lowerBoundOfLowerInterval) == 0){}
+        return randomResult;
+    }
+
     public static void main(String[] args)
     {
-        InstanceGenerator generator = new InstanceGenerator(3,90);
-        final FlowShopWithUncertainty uncertainFlowShopInstance = generator.generateUncertainFlowShopInstance(0, 100, 50);
-        System.out.println(uncertainFlowShopInstance.toString());
+        InstanceGenerator generator = new InstanceGenerator(3,50);
 
-        String fileName = "testFile.txt";
-        uncertainFlowShopInstance.toFile(fileName, null);
+        for (int i = 3; i < 11; i++) {
+            FlowShopWithUncertainty uncertainFlowShopInstance = generator.generateUncertainFlowShopInstance(0, 100, 50);
+            String fileName = i + "_[n50, m3, K100, C50].txt";
+            uncertainFlowShopInstance.toFile(fileName, null);
+        }
+
+//        final FlowShopWithUncertainty uncertainFlowShopInstance2 = generator.generateUncertainFlowShopInstance(0, 100, 50);
+//        System.out.println(uncertainFlowShopInstance2.toString());
+
+//        String fileName2 = "testFile2.txt";
+//        uncertainFlowShopInstance2.toFile(fileName2, null);
 //
 //        final int number = uncertainFlowShopInstance.getM() * uncertainFlowShopInstance.getN();
 //        final int factorial = partOfFactorial(number, Math.round((float)number / 1.005f));
