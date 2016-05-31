@@ -255,6 +255,14 @@ public class FlowShopWithUncertainty implements Cloneable {
         return newFlowShop;
     }
 
+    public FlowShopWithUncertainty getNeighbour(double temperature) {
+        swapRandomlyTwoTasks(this, getTaskCount());
+        FlowShopWithUncertainty newFlowShop = new FlowShopWithUncertainty(this.getTasks());
+        newFlowShop.setUpperBoundOfMinMaxRegretOptimalization((int)SubAlgorithm2.solveGreedy(this, false, false)[0]);
+        return newFlowShop;
+    }
+
+
 //    public FlowShopWithUncertainty getBestNeighbour(int probe) {
 //        FlowShopWithUncertainty minimumHelperFlowShop = this.clone();
 //        swapRandomlyTwoTasks(this, getTaskCount());
