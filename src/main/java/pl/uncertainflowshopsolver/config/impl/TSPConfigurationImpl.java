@@ -12,18 +12,11 @@ public class TSPConfigurationImpl implements TSPConfiguration{
     private int iterationsWithoutImprovementAsAdditionalAspirationCriterion;
     private int maxIterationsWithoutImprovementForDiversificationPurpose;
     private int maxIterationsAsStopCriterion;
+    private int maxIterationsWithoutImprovementAsStopCriterion;
+
+
     private WayToGenerateNeighborhoodEnum wayToGenerateNeighborhoodEnum;
     private FlowShopWithUncertainty uncertainFlowShop;
-
-    private TSPConfigurationImpl(int sizeOfNeighborhood, int lengthOfTabuList, int iterationsWithoutImprovementAsAdditionalAspirationCriterion, int maxIterationsWithoutImprovementForDiversificationPurpose, int maxIterationsAsStopCriterion, WayToGenerateNeighborhoodEnum wayToGenerateNeighborhoodEnum, FlowShopWithUncertainty uncertainFlowShop) {
-        this.sizeOfNeighborhood = sizeOfNeighborhood;
-        this.lengthOfTabuList = lengthOfTabuList;
-        this.iterationsWithoutImprovementAsAdditionalAspirationCriterion = iterationsWithoutImprovementAsAdditionalAspirationCriterion;
-        this.maxIterationsWithoutImprovementForDiversificationPurpose = maxIterationsWithoutImprovementForDiversificationPurpose;
-        this.maxIterationsAsStopCriterion = maxIterationsAsStopCriterion;
-        this.wayToGenerateNeighborhoodEnum = wayToGenerateNeighborhoodEnum;
-        this.uncertainFlowShop = uncertainFlowShop;
-    }
 
     private TSPConfigurationImpl(){}
 
@@ -58,6 +51,11 @@ public class TSPConfigurationImpl implements TSPConfiguration{
 
     public WayToGenerateNeighborhoodEnum getWayToGenerateNeighborhoodEnum() {
         return wayToGenerateNeighborhoodEnum;
+    }
+
+    @Override
+    public int getMaxIterationsWithoutImprovementAsStopCriterion() {
+        return maxIterationsWithoutImprovementAsStopCriterion;
     }
 
     @Override
@@ -99,6 +97,11 @@ public class TSPConfigurationImpl implements TSPConfiguration{
             return this;
         }
 
+        public TSPConfigurationImplBuilder withMaxIterationsWithoutImprovementAsStopCriterion(int pMaxIterationsWithoutImprovementAsStopCriterion) {
+            mTSPConfigurationImpl.maxIterationsWithoutImprovementAsStopCriterion = pMaxIterationsWithoutImprovementAsStopCriterion;
+            return this;
+        }
+
         public TSPConfigurationImplBuilder withWayToGenerateNeighborhood(WayToGenerateNeighborhoodEnum wayToGenerateNeighborhoodEnum) {
             mTSPConfigurationImpl.wayToGenerateNeighborhoodEnum = wayToGenerateNeighborhoodEnum;
             return this;
@@ -110,8 +113,7 @@ public class TSPConfigurationImpl implements TSPConfiguration{
         }
 
         public TSPConfigurationImpl build() {
-            return new TSPConfigurationImpl(
-            );
+            return mTSPConfigurationImpl;
         }
     }
 }

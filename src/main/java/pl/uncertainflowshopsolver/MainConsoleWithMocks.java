@@ -1,8 +1,11 @@
 package pl.uncertainflowshopsolver;
 
 import pl.uncertainflowshopsolver.algo.SimulatedAnnealing;
+import pl.uncertainflowshopsolver.algo.TabuSearch;
+import pl.uncertainflowshopsolver.algo.util.WayToGenerateNeighborhoodEnum;
 import pl.uncertainflowshopsolver.config.ConfigurationProvider;
 import pl.uncertainflowshopsolver.config.TSPConfiguration;
+import pl.uncertainflowshopsolver.config.impl.TSPConfigurationImpl;
 import pl.uncertainflowshopsolver.flowshop.FlowShopWithUncertainty;
 import pl.uncertainflowshopsolver.gui.event.AlgorithmEventDispatcher;
 import pl.uncertainflowshopsolver.gui.event.AlgorithmEventListener;
@@ -25,7 +28,7 @@ public class MainConsoleWithMocks {
 //    private static final String PATH = "resources/11_uncertainFlowShop_05.10-14.38-13.858.txt";
 //    private static final String PATH = "resources/2_[n50, m3, K100, C50].txt";
 //    private static final String PATH = "resources/3_[n50, m3, K100, C50].txt";
-    private static final String PATH = "resources/5_[n50, m3, K100, C50].txt";
+    private static final String PATH = "resources/9_[n50, m3, K100, C50].txt";
 
     /**
      * Use this to run without GUI
@@ -41,10 +44,15 @@ public class MainConsoleWithMocks {
 //        for (int i = 0; i < HOW_MANY_REPETITIONS_FOR_CONCRETE_INSTANCE; i++) {
 //
 //        }
-        SimulatedAnnealing SAAlgorithm = new SimulatedAnnealing();
-        SAAlgorithm.setConfigurationProvider(new ConfigurationProviderMock());
-        SAAlgorithm.setEventDispatcher(new EventDispatcherMock(null));
-        SAAlgorithm.start();
+//        SimulatedAnnealing SAAlgorithm = new SimulatedAnnealing();
+//        SAAlgorithm.setConfigurationProvider(new ConfigurationProviderMock());
+//        SAAlgorithm.setEventDispatcher(new EventDispatcherMock(null));
+//        SAAlgorithm.start();
+
+        TabuSearch TSAlgorithm = new TabuSearch();
+        TSAlgorithm.setConfigurationProvider(new ConfigurationProviderMock());
+        TSAlgorithm.setEventDispatcher(new EventDispatcherMock(null));
+        TSAlgorithm.start();
     }
 
 
@@ -58,11 +66,6 @@ public class MainConsoleWithMocks {
 
         //exp(-80/(1163*(0.9995)^10000)) = 0.00003637018534505723
         //exp(-80/(1163*(0.99995)^80000)) = 0.023375839279601084
-
-        public void handleChangeOfDesiredInitialAcceptanceProbability(double newValue)
-        {
-            this.desiredInitialAcceptanceProbability = newValue;
-        }
 
         @Override
         public SAConfiguration getSAConfiguration() {
@@ -88,8 +91,30 @@ public class MainConsoleWithMocks {
 
         @Override
         public TSPConfiguration getTSPConfiguration() {
+//            final WayToGenerateNeighborhoodEnum wayToGenerateNeighborhoodEnum = initializerNameClassMap.get(initializerChoiceBox.getValue());
+            try {
+                return TSPConfigurationImpl.newBuilder()
+                        .withSizeOfNeighborhood(1225)
+                        .withLengthOfTabuList(10)
+                        .withIterationsWithoutImprovementAsAdditionalAspirationCriterion(7)
+                        .withMaxIterationsWithoutImprovementForDiversificationPurpose(250)
+                        .withMaxIterationsAsStopCriterion(15000)
+                        .withMaxIterationsWithoutImprovementAsStopCriterion(1000)
+    //                    .withWayToGenerateNeighborhood(wayToGenerateNeighborhoodEnum)
+                        .withUncertainFlowshop(UncertainFlowShopParser.parseFileToFlowShopWithUncertainty(PATH))
+                        .build();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             return null;
         }
+
+
+        public void handleChangeOfDesiredInitialAcceptanceProbability(double newValue)
+        {
+            this.desiredInitialAcceptanceProbability = newValue;
+        }
+
     }
 
     private static class EventDispatcherMock extends AlgorithmEventDispatcher {
@@ -132,6 +157,14 @@ public class MainConsoleWithMocks {
             System.out.println("The initial temperature was: " + formatter.format(initialTemperature) + "\nElapsed time: " + formatter.format(elapsedTime) + " seconds");
             System.out.println("Result for LB:" + flowShopWithUncertainty.getLowerBoundOfMinMaxRegretOptimalization() + "");
             System.out.println("Result for UB:" + flowShopWithUncertainty.getUpperBoundOfMinMaxRegretOptimalization() + "");
+            flowShopWithUncertainty.toString();
+        }
+
+        @Override
+        public void dispatchAlgorithmEnded(final EndingReason reason, final double elapsedTime, final FlowShopWithUncertainty flowShopWithUncertainty) {
+            System.out.println("Result for LB:" + flowShopWithUncertainty.getLowerBoundOfMinMaxRegretOptimalization() + "");
+            System.out.println("Result for UB:" + flowShopWithUncertainty.getUpperBoundOfMinMaxRegretOptimalization() + "");
+            System.out.println("Elapsed time[s]:" + elapsedTime);
             flowShopWithUncertainty.toString();
         }
 

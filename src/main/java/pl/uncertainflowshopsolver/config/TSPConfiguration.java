@@ -31,5 +31,8 @@ public interface TSPConfiguration {
     int getMaxIterationsAsStopCriterion();
 
     WayToGenerateNeighborhoodEnum getWayToGenerateNeighborhoodEnum();
+
+    int getMaxIterationsWithoutImprovementAsStopCriterion();
+
     FlowShopWithUncertainty getUncertainFlowShop();
 }

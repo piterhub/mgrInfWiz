@@ -9,7 +9,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 
 /**
- * Created by PKUBICKI on 17.04.2016.
+ * @author Piotr Kubicki, created on 17.04.2016.
  */
 public final class NehAlgorithm {
 
