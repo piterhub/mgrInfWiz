@@ -28,7 +28,9 @@ import pl.uncertainflowshopsolver.algo.util.WayToGenerateNeighborhoodEnum;
 import pl.uncertainflowshopsolver.algo.util.WhichAlgorithmEnum;
 import pl.uncertainflowshopsolver.config.SAConfiguration;
 import pl.uncertainflowshopsolver.config.ConfigurationProvider;
+import pl.uncertainflowshopsolver.config.TSPConfiguration;
 import pl.uncertainflowshopsolver.config.impl.SAConfigurationImpl;
+import pl.uncertainflowshopsolver.config.impl.TSPConfigurationImpl;
 import pl.uncertainflowshopsolver.flowshop.FlowShopWithUncertainty;
 import pl.uncertainflowshopsolver.gui.event.AlgorithmEventDispatcher;
 import pl.uncertainflowshopsolver.gui.event.AlgorithmEventListener;
@@ -49,15 +51,15 @@ import java.util.*;
 
 public class GUIController implements ConfigurationProvider, AlgorithmEventListener, Initializable {
     public ChoiceBox<String> initializerChoiceBox;
-    public DoubleTextBox desiredInitialAcceptanceProbabilityDoubleTextBox;
+    public DoubleTextBox0To1 desiredInitialAcceptanceProbabilityDoubleTextBox0To1;
     public IntegerTextBox epocheLengthIntegerTextBox;
-    public DoubleTextBox decayRateDoubleTextBox;
-    public DoubleTextBox endTemperatureDoubleTextBox;
-    public DoubleTextBox errorThresholdDoubleTextBox;
+    public DoubleTextBox0To1 decayRateDoubleTextBox0To1;
+    public DoubleTextBox0To1 endTemperatureDoubleTextBox0To1;
+    public DoubleTextBox0To1 errorThresholdDoubleTextBox0To1;
     public IntegerTextBox samplesCardinalityIntegerTextBox;
     public IntegerTextBox maxNumberOfIterationsIntegerTextBox;
 //    public IntegerTextBox maxIterationsWithoutImprovementIntegerTextBox;
-//    public DoubleTextBox cutOffEnergyLevelDoubleTextBox;
+//    public DoubleTextBox0To1 cutOffEnergyLevelDoubleTextBox;
     public Label totalBeesLabel;
     public ProgressBar progressBar;
     public Label progressLabel;
@@ -75,8 +77,15 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
     public IntegerTextBox K;
     public IntegerTextBox C;
     public ChoiceBox algorithmChoiceBox;
-    public TitledPane algorithmOptionsTitledPane;
+    public TitledPane saOptionsTitledPane;
     public TitledPane chartTitledPane;
+    public TitledPane tsOptionsTitledPane;
+    public ChoiceBox initializerTSChoiceBox;
+    public IntegerTextBox sizeOfNeighborhoodIntegerTextBox;
+    public IntegerTextBox lengthOfTabuListIntegerTextBox;
+    public IntegerTextBox maxIterWithoutImprovementAspirationIntegerTextBox;
+    public IntegerTextBox maxIterWithoutImprovementDiversificationIntegerTextBox;
+    public IntegerTextBox maxNumberOfIterationsAsStopTabuSearchIntegerTextBox;
     private NumberBinding thirdProperty;
     private NumberBinding fourthProperty;
     private NumberBinding fifthProperty;
@@ -96,6 +105,7 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
     private XYChart.Series<Integer, Integer> series = new XYChart.Series<Integer, Integer>();
 
     private SAConfiguration activeSAConfiguration;
+    private TSPConfiguration activeTSPConfiguration;
     private SimulatedAnnealing algorithm;
 
     private AlgorithmState algorithmState = AlgorithmState.STOPPED;
@@ -128,22 +138,30 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
         algorithmChoiceBox.getSelectionModel().select(0);
         algorithmChoiceBox.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
             @Override
-            public void changed(ObservableValue<? extends Number> observableValue, Number number, Number number2) {
+            public void changed(ObservableValue<? extends Number> observableValue, Number number, Number newValue) {
                 if(flowShop != null)
                 {
-                    if(algorithmChoiceBox.getItems().get((Integer) number2) == "MIH")
+                    if(algorithmChoiceBox.getItems().get((Integer) newValue) == "MIH")
                     {
                         startStopButton.setDisable(false);
-                        algorithmOptionsTitledPane.setDisable(true);
+                        saOptionsTitledPane.setDisable(true);
+                        tsOptionsTitledPane.setDisable(true);
                         chartTitledPane.setDisable(true);
                     }
-                    else if(algorithmChoiceBox.getItems().get((Integer) number2) == "Simulated Annealing")
+                    else if(algorithmChoiceBox.getItems().get((Integer) newValue) == "Simulated Annealing")
                     {
                         startStopButton.setDisable(true);
-                        algorithmOptionsTitledPane.setDisable(false);
+                        saOptionsTitledPane.setDisable(false);
+                        tsOptionsTitledPane.setDisable(true);
                         chartTitledPane.setDisable(false);
                     }
-                    //TODO Tabu Search
+                    else if(algorithmChoiceBox.getItems().get((Integer) newValue) == "Tabu Search")
+                    {
+                        startStopButton.setDisable(true);
+                        saOptionsTitledPane.setDisable(true);
+                        tsOptionsTitledPane.setDisable(false);
+                        chartTitledPane.setDisable(false);
+                    }
                 }
             }
         });
@@ -182,11 +200,11 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
             }
         });
 //
-//        desiredInitialAcceptanceProbabilityDoubleTextBox.doubleProperty().set(0.925);
+//        desiredInitialAcceptanceProbabilityDoubleTextBox0To1.doubleProperty().set(0.925);
 //        epocheLengthIntegerTextBox.insertText(0, "10");
-//        decayRateDoubleTextBox.insertText(0, "0.995");
-//        endTemperatureDoubleTextBox.insertText(0, "0.5");
-//        errorThresholdDoubleTextBox.insertText(0, "0.0001");
+//        decayRateDoubleTextBox0To1.insertText(0, "0.995");
+//        endTemperatureDoubleTextBox0To1.insertText(0, "0.5");
+//        errorThresholdDoubleTextBox0To1.insertText(0, "0.0001");
 //        samplesCardinalityIntegerTextBox.insertText(0, "10000");
 //        maxNumberOfIterationsIntegerTextBox.insertText(0, "1000");
     }
@@ -227,10 +245,10 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
         if (file != null) {
             try {
                 setFlowShop(UncertainFlowShopParser.parseFileToFlowShopWithUncertainty(file.getAbsolutePath()));
-                final Double value = desiredInitialAcceptanceProbabilityDoubleTextBox.doubleProperty().getValue();
+                final Double value = desiredInitialAcceptanceProbabilityDoubleTextBox0To1.doubleProperty().getValue();
                 String valueString = value+"";
                 int count = valueString.length();
-                desiredInitialAcceptanceProbabilityDoubleTextBox.replaceText(0, count, valueString);
+                desiredInitialAcceptanceProbabilityDoubleTextBox0To1.replaceText(0, count, valueString);
                 defaultDirectory = file.getParentFile();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -259,10 +277,10 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
     public void setFlowShop(FlowShopWithUncertainty flowShop) {
         FlowShopWithUncertainty oldFlowShop = this.flowShop;
         this.flowShop = flowShop;
-        final Double value = desiredInitialAcceptanceProbabilityDoubleTextBox.doubleProperty().getValue();
+        final Double value = desiredInitialAcceptanceProbabilityDoubleTextBox0To1.doubleProperty().getValue();
         String valueString = value+"";
         int count = valueString.length();
-        desiredInitialAcceptanceProbabilityDoubleTextBox.replaceText(0, count, valueString);
+        desiredInitialAcceptanceProbabilityDoubleTextBox0To1.replaceText(0, count, valueString);
         propertyChangeSupport.firePropertyChange("FlowShopChosen",oldFlowShop, flowShop);
     }
 
@@ -270,11 +288,11 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
     public SAConfiguration getSAConfiguration() {
         final WayToGenerateNeighborhoodEnum wayToGenerateNeighborhoodEnum = initializerNameClassMap.get(initializerChoiceBox.getValue());
         this.activeSAConfiguration = SAConfigurationImpl.newBuilder()
-                .withDesiredInitialAcceptanceProbability(desiredInitialAcceptanceProbabilityDoubleTextBox.getValue())
+                .withDesiredInitialAcceptanceProbability(desiredInitialAcceptanceProbabilityDoubleTextBox0To1.getValue())
                 .withEpocheLength(epocheLengthIntegerTextBox.getValue())
-                .withDecayRate(decayRateDoubleTextBox.getValue())
-                .withEndTemperature(endTemperatureDoubleTextBox.getValue())
-                .withErrorThreshold(errorThresholdDoubleTextBox.getValue())
+                .withDecayRate(decayRateDoubleTextBox0To1.getValue())
+                .withEndTemperature(endTemperatureDoubleTextBox0To1.getValue())
+                .withErrorThreshold(errorThresholdDoubleTextBox0To1.getValue())
                 .withSamplesCardinality(samplesCardinalityIntegerTextBox.getValue())
                 .withMaxNumberOfIterations(maxNumberOfIterationsIntegerTextBox.getValue())
 //                .withCutOffEnergyLevel(cutOffEnergyLevelDoubleTextBox.getValue())
@@ -283,6 +301,21 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
                 .build();
 
         return activeSAConfiguration;
+    }
+
+    @Override
+    public TSPConfiguration getTSPConfiguration() {
+        final WayToGenerateNeighborhoodEnum wayToGenerateNeighborhoodEnum = initializerNameClassMap.get(initializerChoiceBox.getValue());
+        this.activeTSPConfiguration = TSPConfigurationImpl.newBuilder()
+                .withSizeOfNeighborhood(sizeOfNeighborhoodIntegerTextBox.getValue())
+                .withLengthOfTabuList(lengthOfTabuListIntegerTextBox.getValue())
+                .withIterationsWithoutImprovementAsAdditionalAspirationCriterion(maxIterWithoutImprovementAspirationIntegerTextBox.getValue())
+                .withMaxIterationsWithoutImprovementForDiversificationPurpose(maxIterWithoutImprovementDiversificationIntegerTextBox.getValue())
+                .withMaxIterationsAsStopCriterion(maxNumberOfIterationsAsStopTabuSearchIntegerTextBox.getValue())
+                .withWayToGenerateNeighborhood(wayToGenerateNeighborhoodEnum)
+                .build();
+
+        return activeTSPConfiguration;
     }
 
     @Override
@@ -394,6 +427,72 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
         }
     }
 
+    @Override
+    public void onAlgorithmEnded(AlgorithmEventDispatcher.EndingReason reason, double elapsedTime, FlowShopWithUncertainty flowShopWithUncertainty) {
+        algorithmState = AlgorithmState.STOPPED;
+        startStopButton.setText("Start");
+        enableEditingConfiguration();
+
+        final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM.dd-HH.mm-ss.SSS");
+        final String timestamp = simpleDateFormat.format(new Date());
+
+        DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols(Locale.GERMAN);
+        otherSymbols.setDecimalSeparator(',');
+        NumberFormat formatter = new DecimalFormat("#0.00");
+        formatter.setGroupingUsed(false);
+
+        if(selectedDirectory != null)
+        {
+            final String absolutePath = selectedDirectory.getAbsolutePath();
+            PrintWriter pw = null;
+            try {
+                pw = new PrintWriter(new File(absolutePath + "/" +
+                        "n" + flowShopWithUncertainty.getN() +
+                        " m" + flowShopWithUncertainty.getM() +
+                        "_research_" + timestamp +".csv"));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                showExceptionPopup();
+            }
+
+            if(pw != null)
+            {
+                StringBuilder sb = new StringBuilder();
+
+                sb.append("TS solution lower bound: ");
+                sb.append(';');
+                sb.append(flowShopWithUncertainty.getLowerBoundOfMinMaxRegretOptimalization());
+                sb.append(';');
+                sb.append("TS solution upper bound: ");
+                sb.append(';');
+                sb.append(flowShopWithUncertainty.getUpperBoundOfMinMaxRegretOptimalization());
+                sb.append(';');
+                sb.append("Calculation time: ");
+                sb.append(';');
+                sb.append(formatter.format(elapsedTime));
+                sb.append('\n');
+
+                pw.write(sb.toString());
+                pw.close();
+                System.out.println("done!");
+            }
+        }
+
+        switch (reason) {
+            case ALL_ITERATIONS:
+//                logsTextArea.appendText("The initial temperature was: " + formatter.format(initialTemperature) + "\nEnded: All iterations executed. Elapsed time: " + formatter.format(elapsedTime) + " seconds\n");
+//                final String bestSolutionTextAreaText = bestSolutionTextArea.getText();
+//                bestSolutionTextArea.setText("The initial temperature was: " + formatter.format(initialTemperature) + "\nElapsed time: " + formatter.format(elapsedTime) + " seconds\n" + bestSolutionTextAreaText);
+                break;
+            case CANCELLED:
+//                logsTextArea.appendText("The initial temperature was: " + formatter.format(initialTemperature) + "\nEnded: User cancelled." + "\n");
+                break;
+            case WITHOUT_PROGRESS:
+//                logsTextArea.appendText("The initial temperature was: " + formatter.format(initialTemperature) + "\nEnded: " + /**activeSAConfiguration.getMaxIterationsWithoutImprovement() +*/ " iterations without improvement" + "\n");
+                break;
+        }
+    }
+
     private void showExceptionPopup() {
         Stage dialogStage = new Stage();
         dialogStage.initModality(Modality.WINDOW_MODAL);
@@ -415,12 +514,11 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
     }
 
     private void prepareTotalBeesBinding() {
-        firstProperty = Bindings.multiply(desiredInitialAcceptanceProbabilityDoubleTextBox.doubleProperty(), decayRateDoubleTextBox.doubleProperty());
-        secondProperty = Bindings.multiply(epocheLengthIntegerTextBox.integerProperty(), errorThresholdDoubleTextBox.doubleProperty());
+        firstProperty = Bindings.multiply(desiredInitialAcceptanceProbabilityDoubleTextBox0To1.doubleProperty(), decayRateDoubleTextBox0To1.doubleProperty());
+        secondProperty = Bindings.multiply(epocheLengthIntegerTextBox.integerProperty(), errorThresholdDoubleTextBox0To1.doubleProperty());
         thirdProperty = Bindings.multiply(samplesCardinalityIntegerTextBox.integerProperty(), maxNumberOfIterationsIntegerTextBox.integerProperty());
         fourthProperty = Bindings.multiply(firstProperty, secondProperty);
         fifthProperty = Bindings.multiply(fourthProperty, thirdProperty);
-        //TODO jak maxNumberOfIterationsIntegerTextBox.integerProperty() > 2000 to wy??cza? chart'a!
         fifthProperty.addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observableValue, Number oldValue, Number newValue) {
@@ -454,16 +552,22 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
     }
 
     private void setEditingPartOfConfiguration(boolean isNotEnabled) {
-        desiredInitialAcceptanceProbabilityDoubleTextBox.setDisable(isNotEnabled);
+        desiredInitialAcceptanceProbabilityDoubleTextBox0To1.setDisable(isNotEnabled);
         epocheLengthIntegerTextBox.setDisable(isNotEnabled);
-        decayRateDoubleTextBox.setDisable(isNotEnabled);
-        endTemperatureDoubleTextBox.setDisable(isNotEnabled);
-        errorThresholdDoubleTextBox.setDisable(isNotEnabled);
+        decayRateDoubleTextBox0To1.setDisable(isNotEnabled);
+        endTemperatureDoubleTextBox0To1.setDisable(isNotEnabled);
+        errorThresholdDoubleTextBox0To1.setDisable(isNotEnabled);
         samplesCardinalityIntegerTextBox.setDisable(isNotEnabled);
         maxNumberOfIterationsIntegerTextBox.setDisable(isNotEnabled);
 //        cutOffEnergyLevelDoubleTextBox.setDisable(isNotEnabled);
         initializerChoiceBox.setDisable(isNotEnabled);
         algorithmChoiceBox.setDisable(isNotEnabled);
+        initializerTSChoiceBox.setDisable(isNotEnabled);
+        sizeOfNeighborhoodIntegerTextBox.setDisable(isNotEnabled);
+        lengthOfTabuListIntegerTextBox.setDisable(isNotEnabled);
+        maxIterWithoutImprovementAspirationIntegerTextBox.setDisable(isNotEnabled);
+        maxIterWithoutImprovementDiversificationIntegerTextBox.setDisable(isNotEnabled);
+        maxNumberOfIterationsAsStopTabuSearchIntegerTextBox.setDisable(isNotEnabled);
     }
 
     private void setEditingSecondPartOfConfiguration(boolean isNotEnabled)

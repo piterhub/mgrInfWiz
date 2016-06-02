@@ -2,6 +2,7 @@ package pl.uncertainflowshopsolver;
 
 import pl.uncertainflowshopsolver.algo.SimulatedAnnealing;
 import pl.uncertainflowshopsolver.config.ConfigurationProvider;
+import pl.uncertainflowshopsolver.config.TSPConfiguration;
 import pl.uncertainflowshopsolver.flowshop.FlowShopWithUncertainty;
 import pl.uncertainflowshopsolver.gui.event.AlgorithmEventDispatcher;
 import pl.uncertainflowshopsolver.gui.event.AlgorithmEventListener;
@@ -82,6 +83,11 @@ public class MainConsoleWithMocks {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            return null;
+        }
+
+        @Override
+        public TSPConfiguration getTSPConfiguration() {
             return null;
         }
     }

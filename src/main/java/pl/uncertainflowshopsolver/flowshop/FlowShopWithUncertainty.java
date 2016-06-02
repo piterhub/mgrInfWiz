@@ -48,6 +48,16 @@ public class FlowShopWithUncertainty implements Cloneable {
         Collections.swap(uncertainFlowShop.getTasks(), random1, random2);
     }
 
+    public static FlowShopWithUncertainty swapTwoTasksGivingNewFlowShopWithUncertainty(FlowShopWithUncertainty uncertainFlowShop, int indexOfTask1InCurrentOrder, int indexOfTask2InCurrentOrder) {
+        if( indexOfTask1InCurrentOrder == indexOfTask2InCurrentOrder)
+        {
+            throw new IllegalArgumentException("Can't swap two tasks, when both given index's are equal! indexOfTask1InCurrentOrder: " + indexOfTask1InCurrentOrder + " indexOfTask2InCurrentOrder: " + indexOfTask2InCurrentOrder);
+        }
+        List<TaskWithUncertainty> tasks = new ArrayList<>(uncertainFlowShop.getTasks());
+        Collections.swap(tasks, indexOfTask1InCurrentOrder, indexOfTask2InCurrentOrder);
+        return new FlowShopWithUncertainty(tasks);
+    }
+
     public double getElapsedTime() {
         return elapsedTime;
     }
@@ -70,10 +80,6 @@ public class FlowShopWithUncertainty implements Cloneable {
 
     public void setLowerBoundOfMinMaxRegretOptimalization(Integer lowerBoundOfMinMaxRegretOptimalization) {
         this.lowerBoundOfMinMaxRegretOptimalization = lowerBoundOfMinMaxRegretOptimalization;
-    }
-
-    public List<TaskWithUncertainty> getTaskWithUncertaintyList() {
-        return taskWithUncertaintyList;
     }
 
     public int getM() {

@@ -10,4 +10,5 @@ public interface AlgorithmEventListener {
     public void onIterationUpdated(int iteration, FlowShopWithUncertainty bee);
     public void onAlgorithmStarted();
     public void onAlgorithmEnded(AlgorithmEventDispatcher.EndingReason reason, double elapsedTime, FlowShopWithUncertainty flowShopWithUncertainty, double initialTemperature);
+    public void onAlgorithmEnded(AlgorithmEventDispatcher.EndingReason reason, double elapsedTime, FlowShopWithUncertainty flowShopWithUncertainty);
 }

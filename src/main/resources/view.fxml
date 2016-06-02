@@ -18,7 +18,7 @@
 <?import javafx.scene.text.Font?>
 <?import pl.uncertainflowshopsolver.gui.*?>
 
-<HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="700.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.uncertainflowshopsolver.gui.GUIController">
+<HBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="700.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/null" xmlns:fx="http://javafx.com/fxml/1" fx:controller="pl.uncertainflowshopsolver.gui.GUIController">
     <children>
         <VBox maxHeight="1.7976931348623157E308" HBox.hgrow="ALWAYS">
             <children>
@@ -188,12 +188,11 @@
                            <children>
                               <Accordion prefHeight="376.0" AnchorPane.bottomAnchor="0.0">
                                 <panes>
-                                    <TitledPane fx:id="algorithmOptionsTitledPane" animated="false" maxHeight="1.7976931348623157E308" prefWidth="210.0" text="Simulated annealing options" HBox.hgrow="ALWAYS">
+                                    <TitledPane fx:id="saOptionsTitledPane" animated="false" maxHeight="1.7976931348623157E308" prefWidth="210.0" text="Simulated annealing options" HBox.hgrow="ALWAYS">
                                         <content>
                                             <VBox alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="447.0" spacing="5.0">
                                                 <children>
-            
-                                                          <VBox prefWidth="198.0">
+                                                    <VBox prefWidth="198.0">
                                                         <children>
                                                             <VBox prefHeight="200.0" prefWidth="100.0">
                                                                 <children>
@@ -204,7 +203,7 @@
                                                             <VBox prefHeight="200.0" prefWidth="100.0">
                                                                 <children>
                                                                     <Label text="Initial Acceptance Probability (]0,1])" wrapText="true" />
-                                                                    <DoubleTextBox fx:id="desiredInitialAcceptanceProbabilityDoubleTextBox" />
+                                                                    <DoubleTextBox0To1 fx:id="desiredInitialAcceptanceProbabilityDoubleTextBox0To1" />
                                                                 </children>
                                                             </VBox>
                                                             <VBox prefHeight="200.0" prefWidth="100.0">
@@ -216,19 +215,19 @@
                                                             <VBox prefHeight="200.0" prefWidth="100.0">
                                                                 <children>
                                                                     <Label text="Decay rate / alpha (]0,1])" />
-                                                                    <DoubleTextBox fx:id="decayRateDoubleTextBox" />
+                                                                    <DoubleTextBox0To1 fx:id="decayRateDoubleTextBox0To1" />
                                                                 </children>
                                                             </VBox>
                                                             <VBox prefHeight="200.0" prefWidth="100.0">
                                                                 <children>
                                                                     <Label text="End temperature (double)" />
-                                                                    <DoubleTextBox fx:id="endTemperatureDoubleTextBox" />
+                                                                    <DoubleTextBox0To1 fx:id="endTemperatureDoubleTextBox0To1" />
                                                                 </children>
                                                             </VBox>
                                                             <VBox prefHeight="200.0" prefWidth="100.0">
                                                                 <children>
                                                                     <Label text="Error threshold (double)" />
-                                                                    <DoubleTextBox fx:id="errorThresholdDoubleTextBox" />
+                                                                    <DoubleTextBox0To1 fx:id="errorThresholdDoubleTextBox0To1" />
                                                                 </children>
                                                             </VBox>
                                                             <VBox prefHeight="200.0" prefWidth="100.0">
@@ -243,8 +242,6 @@
                                                                     <IntegerTextBox fx:id="maxNumberOfIterationsIntegerTextBox" />
                                                                 </children>
                                                             </VBox>
-                                                            <VBox prefHeight="2.0" prefWidth="198.0">
-                                          </VBox>
                                                         </children>
                                                     </VBox>
                                                 </children>
@@ -254,9 +251,55 @@
                                             </VBox>
                                         </content>
                                     </TitledPane>
-                                  <TitledPane animated="false" text="Tabu search options">
+                                  <TitledPane fx:id="tsOptionsTitledPane" animated="false" text="Tabu search options">
                                     <content>
-                                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" />
+                                        <VBox alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="447.0" spacing="5.0">
+                                            <children>
+                                                <VBox prefWidth="198.0">
+                                                    <children>
+                                                        <VBox prefHeight="200.0" prefWidth="100.0">
+                                                            <children>
+                                                                <Label prefHeight="17.0" prefWidth="199.0" text="Way to generate neighborhood" />
+                                                                <ChoiceBox fx:id="initializerTSChoiceBox" maxWidth="1.7976931348623157E308" prefWidth="150.0" />
+                                                            </children>
+                                                        </VBox>
+                                                        <VBox prefHeight="200.0" prefWidth="100.0">
+                                                            <children>
+                                                                <Label text="Size of neighborhood - max n(n-1)/2" wrapText="true" />
+                                                                <IntegerTextBox fx:id="sizeOfNeighborhoodIntegerTextBox" />
+                                                            </children>
+                                                        </VBox>
+                                                        <VBox prefHeight="200.0" prefWidth="100.0">
+                                                            <children>
+                                                                <Label text="Length of tabu list" />
+                                                                <IntegerTextBox fx:id="lengthOfTabuListIntegerTextBox" />
+                                                            </children>
+                                                        </VBox>
+                                                        <VBox prefHeight="200.0" prefWidth="100.0">
+                                                            <children>
+                                                                <Label text="Max iter. without improvement (aspiration)" wrapText="true"/>
+                                                                <IntegerTextBox fx:id="maxIterWithoutImprovementAspirationIntegerTextBox" />
+                                                            </children>
+                                                        </VBox>
+                                                        <VBox prefHeight="200.0" prefWidth="100.0">
+                                                            <children>
+                                                                <Label text="Max iter. without improvement (diversification)" wrapText="true"/>
+                                                                <IntegerTextBox fx:id="maxIterWithoutImprovementDiversificationIntegerTextBox" />
+                                                            </children>
+                                                        </VBox>
+                                                        <VBox prefHeight="200.0" prefWidth="198.0">
+                                                            <children>
+                                                                <Label text="Maximum iterations as stop criterion" wrapText="true"/>
+                                                                <IntegerTextBox fx:id="maxNumberOfIterationsAsStopTabuSearchIntegerTextBox" />
+                                                            </children>
+                                                        </VBox>
+                                                    </children>
+                                                </VBox>
+                                            </children>
+                                            <padding>
+                                                <Insets left="5.0" right="5.0" top="5.0" />
+                                            </padding>
+                                        </VBox>
                                     </content>
                                   </TitledPane>
                                 </panes>

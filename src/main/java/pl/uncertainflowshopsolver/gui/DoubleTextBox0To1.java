@@ -12,14 +12,14 @@ import javafx.scene.input.MouseEvent;
 
 import java.util.regex.Pattern;
 
-public class DoubleTextBox extends TextField {
+public class DoubleTextBox0To1 extends TextField {
     private final Pattern doublePattern = Pattern.compile("[0-9]+|[\\.\\,]|[0-9]+[\\.\\,]([0-9]+)?");//general first
     private final Pattern secondDoublePattern = Pattern.compile("[0-9]+[\\,]([0-9]+)?");//to replace , with .
     private final Pattern thirdDoublePattern = Pattern.compile("[0-9]+[\\.\\,]");//to add "0" to x._ or x,_
     private final Pattern fourthDoublePattern = Pattern.compile("[0]([\\.\\,])?([0-9]+)?");//to allow only values < 1
     private DoubleProperty doubleProperty;
 
-    public DoubleTextBox() {
+    public DoubleTextBox0To1() {
         doubleProperty = new SimpleDoubleProperty();
         doubleProperty.setValue(0.0);
         this.insertText(0, "0.0");
@@ -43,7 +43,7 @@ public class DoubleTextBox extends TextField {
         });
     }
 
-    public DoubleTextBox(String s) {
+    public DoubleTextBox0To1(String s) {
         super(s);
     }
 
