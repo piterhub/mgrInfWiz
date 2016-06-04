@@ -14,12 +14,14 @@ public class SAConfigurationImpl implements SAConfiguration {
     private Double errorThreshold;
     private int samplesCardinality;
     private int maxNumberOfIterations;
+    private int maxIterationsWithoutImprovementForDiversificationPurpose;
 //    private int maxIterationsWithoutImprovement;
     private Double cutOffEnergyLevel;
     private WayToGenerateNeighborhoodEnum wayToGenerateNeighborhoodEnum;
     private FlowShopWithUncertainty uncertainFlowShop;
+    private int maxIterationsWithoutImprovementAsStopCriterion;
 
-    SAConfigurationImpl(Double desiredInitialAcceptanceProbability, int epocheLength, Double decayRate, Double endTemperature, Double errorThreshold, int samplesCardinality, int maxNumberOfIterations, /**int maxIterationsWithoutImprovement,*/Double cutOffEnergyLevel, WayToGenerateNeighborhoodEnum wayToGenerateNeighborhoodEnum, FlowShopWithUncertainty uncertainFlowShop) {
+    SAConfigurationImpl(Double desiredInitialAcceptanceProbability, int epocheLength, Double decayRate, Double endTemperature, Double errorThreshold, int samplesCardinality, int maxNumberOfIterations, /**int maxIterationsWithoutImprovement,*/Double cutOffEnergyLevel, WayToGenerateNeighborhoodEnum wayToGenerateNeighborhoodEnum, FlowShopWithUncertainty uncertainFlowShop, int maxIterationsWithoutImprovementForDiversificationPurpose, int maxIterationsWithoutImprovementAsStopCriterion) {
         this.desiredInitialAcceptanceProbability = desiredInitialAcceptanceProbability;
         this.epocheLength = epocheLength;
         this.decayRate = decayRate;
@@ -31,6 +33,8 @@ public class SAConfigurationImpl implements SAConfiguration {
         this.cutOffEnergyLevel = cutOffEnergyLevel;
         this.wayToGenerateNeighborhoodEnum = wayToGenerateNeighborhoodEnum;
         this.uncertainFlowShop = uncertainFlowShop;
+        this.maxIterationsWithoutImprovementForDiversificationPurpose = maxIterationsWithoutImprovementForDiversificationPurpose;
+        this.maxIterationsWithoutImprovementAsStopCriterion = maxIterationsWithoutImprovementAsStopCriterion;
     }
 
     public static SAConfigurationImplBuilder newBuilder() {
@@ -92,5 +96,14 @@ public class SAConfigurationImpl implements SAConfiguration {
         return uncertainFlowShop;
     }
 
+    @Override
+    public int getMaxIterationsWithoutImprovementForDiversificationPurpose()
+    {
+        return maxIterationsWithoutImprovementForDiversificationPurpose;
+    }
 
+    @Override
+    public int getMaxIterationsWithoutImprovementAsStopCriterion() {
+        return maxIterationsWithoutImprovementAsStopCriterion;
+    }
 }

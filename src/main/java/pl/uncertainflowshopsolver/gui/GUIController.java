@@ -24,6 +24,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import pl.uncertainflowshopsolver.algo.SimulatedAnnealing;
+import pl.uncertainflowshopsolver.algo.TabuSearch;
 import pl.uncertainflowshopsolver.algo.util.WayToGenerateNeighborhoodEnum;
 import pl.uncertainflowshopsolver.algo.util.WhichAlgorithmEnum;
 import pl.uncertainflowshopsolver.config.SAConfiguration;
@@ -106,7 +107,8 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
 
     private SAConfiguration activeSAConfiguration;
     private TSPConfiguration activeTSPConfiguration;
-    private SimulatedAnnealing algorithm;
+    private SimulatedAnnealing algorithmSA;
+    private TabuSearch algorithmTS;
 
     private AlgorithmState algorithmState = AlgorithmState.STOPPED;
     private Thread algorithmThread;
@@ -215,22 +217,33 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
 
     @FXML
     public void onStartStopButton(ActionEvent actionEvent) {
-        activeSAConfiguration = getSAConfiguration();
-        if (algorithmState == AlgorithmState.STOPPED) {
-            if (flowShop != null) {
-                algorithmThread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        algorithm.start();
-                    }
-                });
-                algorithmThread.setDaemon(true);
-                algorithmThread.start();
-            }
-        } else {
-            algorithm.stop();
-        }
 
+        if(algorithmChoiceBox.getSelectionModel().getSelectedItem() == "MIH")
+        {
+            System.out.println("mih dupa");
+        }
+        else if(algorithmChoiceBox.getSelectionModel().getSelectedItem() == "Simulated Annealing")
+        {
+            activeSAConfiguration = getSAConfiguration();
+            if (algorithmState == AlgorithmState.STOPPED) {
+                if (flowShop != null) {
+                    algorithmThread = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            algorithmSA.start();
+                        }
+                    });
+                    algorithmThread.setDaemon(true);
+                    algorithmThread.start();
+                }
+            } else {
+                algorithmSA.stop();
+            }
+        }
+        else if(algorithmChoiceBox.getSelectionModel().getSelectedItem() == "Tabu Search")
+        {
+            System.out.println("ts dupa");
+        }
     }
 
     @FXML
@@ -583,7 +596,7 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
     }
 
     public void setSAAlgorithm(SimulatedAnnealing algorithm) {
-        this.algorithm = algorithm;
+        this.algorithmSA = algorithm;
     }
 
     private void updateProgressBar(int iteration) {

@@ -84,10 +84,10 @@ public class TabuSearch {
         {
             result = result2;
         }
-        /*************************/
+        /**************************************/
 
         /***********Global minimum**************/
-        int globalMinimum = (int) result[1];
+        globalMinimum = (int) result[1];
         int globalMinimumForLowerBound = (int) result[0];
         FlowShopWithUncertainty uncertainFlowShop_for_minimum = uncertainFlowShop.clone();
         uncertainFlowShop_for_minimum.setUpperBoundOfMinMaxRegretOptimalization(globalMinimum);
@@ -278,11 +278,6 @@ public class TabuSearch {
     private int getMaxSizeOfNeighborhoodForGivenFlowShop() {
         final Integer taskCount = configuration.getUncertainFlowShop().getTaskCount();
         return taskCount * (taskCount - 1) / 2;
-    }
-
-
-    private Integer getTaskCount() {
-        return uncertainFlowShop.getTaskCount();
     }
 
     public void setEventDispatcher(AlgorithmEventDispatcher eventDispatcher) {

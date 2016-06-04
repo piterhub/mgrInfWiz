@@ -28,27 +28,20 @@ public class MIH {
         //1. The main part -> determinization of uncertain flow shop and solve it with NEH. That's because we measure it's time.
         long startTime = System.currentTimeMillis();
         final FlowShop determinedFlowShop = getDeterminedFlowShop();
+        System.out.println("\n" + determinedFlowShop + "\n");
         final FlowShop flowShop = NehAlgorithm.solve(determinedFlowShop);
+        final Integer resultForDeterminizedFlowShop = NehAlgorithm.solve(determinedFlowShop, true);
+        System.out.println("\n" + flowShop + "\n");
+        System.out.println("resultForDeterminizedFlowShop: " + resultForDeterminizedFlowShop + "\n");
         long stopTime = System.currentTimeMillis();
         long elapsedTime = stopTime - startTime;
 
         //2. The evaluation part. We are getting quality of solution due to min-max regret function of cost. It's not the essential part of MIH, so we don't measure time here.
-        final List<Integer> taskOrder = flowShop.getTaskOrder();
-
-        HashMap<Integer, TaskWithUncertainty> lookupHashMap = new HashMap<>();
-        for (TaskWithUncertainty uncertainTask: uncertainFlowShop.getTasks()) {
-            lookupHashMap.put(uncertainTask.getOriginalPosition(),uncertainTask);
-        }
-
-        TaskWithUncertainty dummyHelperTask = new TaskWithUncertainty(Collections.<Integer>emptyList(), Collections.<Integer>emptyList(), 0);
-        List<TaskWithUncertainty> newUncertainTasks = createPrefilledList(uncertainFlowShop.getTaskCount(), dummyHelperTask);
-        int index = 0;
-        for (Integer i : taskOrder) {
-            newUncertainTasks.set(index, lookupHashMap.get(i));
-            index++;
-        }
+        List<TaskWithUncertainty> newUncertainTasks = getListOfUncertainTasksOrderedDueToNeh(flowShop);
 
         uncertainFlowShop = new FlowShopWithUncertainty(newUncertainTasks);
+
+        System.out.println(uncertainFlowShop.toString());
 
         final Object[] resultsInside = SubAlgorithm2.solveGreedy(uncertainFlowShop, null, printDebug);
         final int resultOfLowerBound = (int) resultsInside[0];
@@ -68,6 +61,31 @@ public class MIH {
         result[3] = uncertainFlowShop;
 
         return result;
+    }
+
+    /**
+     * When we get determined flow shop as neh solution, it is some schedule, due which we organize now the uncertain flow shop,
+     * which we become at the beginning.
+     *
+     * @param flowShop - determined flow shop getting from neh
+     * @return - new order for uncertain tasks from uncertain flow shop
+     */
+    private List<TaskWithUncertainty> getListOfUncertainTasksOrderedDueToNeh(FlowShop flowShop) {
+        final List<Integer> taskOrder = flowShop.getTaskOrder();
+
+        HashMap<Integer, TaskWithUncertainty> lookupHashMap = new HashMap<>();
+        for (TaskWithUncertainty uncertainTask: uncertainFlowShop.getTasks()) {
+            lookupHashMap.put(uncertainTask.getOriginalPosition(),uncertainTask);
+        }
+
+        TaskWithUncertainty dummyHelperTask = new TaskWithUncertainty(Collections.<Integer>emptyList(), Collections.<Integer>emptyList(), 0);
+        List<TaskWithUncertainty> newUncertainTasks = createPrefilledList(uncertainFlowShop.getTaskCount(), dummyHelperTask);
+        int index = 0;
+        for (Integer i : taskOrder) {
+            newUncertainTasks.set(index, lookupHashMap.get(i));
+            index++;
+        }
+        return newUncertainTasks;
     }
 
     /**

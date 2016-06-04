@@ -12,6 +12,8 @@ public class SAConfigurationImplBuilder {
     private Double errorThreshold;
     private int samplesCardinality;
     private int maxNumberOfIterations;
+    private int maxIterationsWithoutImprovementForDiversificationPurpose;
+    private int maxIterationsWithoutImprovementAsStopCriterion;
 //    private int maxIterationsWithoutImprovement;
     private Double cutOffEnergyLevel;
     private WayToGenerateNeighborhoodEnum wayToGenerateNeighborhoodEnum;
@@ -72,6 +74,16 @@ public class SAConfigurationImplBuilder {
         return this;
     }
 
+    public SAConfigurationImplBuilder withMaxIterationsWithoutImprovementForDiversificationPurpose(int pMaxIterationsWithoutImprovementForDiversificationPurpose) {
+        this.maxIterationsWithoutImprovementForDiversificationPurpose = pMaxIterationsWithoutImprovementForDiversificationPurpose;
+        return this;
+    }
+
+    public SAConfigurationImplBuilder withMaxIterationsWithoutImprovementAsStopCriterion(int pMaxIterationsWithoutImprovementAsStopCriterion) {
+        this.maxIterationsWithoutImprovementAsStopCriterion = pMaxIterationsWithoutImprovementAsStopCriterion;
+        return this;
+    }
+
     public SAConfigurationImpl build() {
         return new SAConfigurationImpl(
                 desiredInitialAcceptanceProbability,
@@ -84,7 +96,9 @@ public class SAConfigurationImplBuilder {
 //                maxIterationsWithoutImprovement,
                 cutOffEnergyLevel,
                 wayToGenerateNeighborhoodEnum,
-                uncertainFlowShop
+                uncertainFlowShop,
+                maxIterationsWithoutImprovementForDiversificationPurpose,
+                maxIterationsWithoutImprovementAsStopCriterion
                 );
     }
 }

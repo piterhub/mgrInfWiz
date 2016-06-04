@@ -44,24 +44,26 @@ public class MainConsoleWithMocks {
 //        for (int i = 0; i < HOW_MANY_REPETITIONS_FOR_CONCRETE_INSTANCE; i++) {
 //
 //        }
-//        SimulatedAnnealing SAAlgorithm = new SimulatedAnnealing();
-//        SAAlgorithm.setConfigurationProvider(new ConfigurationProviderMock());
-//        SAAlgorithm.setEventDispatcher(new EventDispatcherMock(null));
-//        SAAlgorithm.start();
-
-        TabuSearch TSAlgorithm = new TabuSearch();
-        TSAlgorithm.setConfigurationProvider(new ConfigurationProviderMock());
-        TSAlgorithm.setEventDispatcher(new EventDispatcherMock(null));
-        TSAlgorithm.start();
+        SimulatedAnnealing SAAlgorithm = new SimulatedAnnealing();
+        SAAlgorithm.setConfigurationProvider(new ConfigurationProviderMock());
+        SAAlgorithm.setEventDispatcher(new EventDispatcherMock(null));
+        SAAlgorithm.start();
+//
+//        TabuSearch TSAlgorithm = new TabuSearch();
+//        TSAlgorithm.setConfigurationProvider(new ConfigurationProviderMock());
+//        TSAlgorithm.setEventDispatcher(new EventDispatcherMock(null));
+//        TSAlgorithm.start();
     }
 
 
     private static class ConfigurationProviderMock implements ConfigurationProvider {
 
         private double desiredInitialAcceptanceProbability = 0.95;
-        private double decayRate = 0.9995;
-        private int epocheLength = 5;
+        private double decayRate = 0.998;//0.9995;
         private int maxNumberOfIterations = 10000;
+        private int maxIterationsWithoutImprovementForDiversificationPurpose = 2000;
+        private int maxIterationsWithoutImprovementAsStopCriterion = 4000;
+        private int epocheLength = 5;
         private int samplesCardinality = 5000;  //10000
 
         //exp(-80/(1163*(0.9995)^10000)) = 0.00003637018534505723
@@ -70,7 +72,6 @@ public class MainConsoleWithMocks {
         @Override
         public SAConfiguration getSAConfiguration() {
             try {
-                samplesCardinality = 10000;
                 return SAConfigurationImpl.newBuilder()
                         .withDesiredInitialAcceptanceProbability(desiredInitialAcceptanceProbability)
                         .withEpocheLength(epocheLength)
@@ -82,6 +83,8 @@ public class MainConsoleWithMocks {
     //                .withCutOffEnergyLevel(cutOffEnergyLevelDoubleTextBox.getValue())
     //                    .withSolutionInitializerClass(solutionInitializerClass)
                         .withUncertainFlowshop(UncertainFlowShopParser.parseFileToFlowShopWithUncertainty(PATH))
+                        .withMaxIterationsWithoutImprovementForDiversificationPurpose(maxIterationsWithoutImprovementForDiversificationPurpose)
+                        .withMaxIterationsWithoutImprovementAsStopCriterion(maxIterationsWithoutImprovementAsStopCriterion)
                         .build();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -95,8 +98,8 @@ public class MainConsoleWithMocks {
             try {
                 return TSPConfigurationImpl.newBuilder()
                         .withSizeOfNeighborhood(1225)
-                        .withLengthOfTabuList(10)
-                        .withIterationsWithoutImprovementAsAdditionalAspirationCriterion(7)
+                        .withLengthOfTabuList(50)
+                        .withIterationsWithoutImprovementAsAdditionalAspirationCriterion(10)
                         .withMaxIterationsWithoutImprovementForDiversificationPurpose(250)
                         .withMaxIterationsAsStopCriterion(15000)
                         .withMaxIterationsWithoutImprovementAsStopCriterion(1000)

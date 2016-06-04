@@ -48,4 +48,8 @@ public interface SAConfiguration {
 
     WayToGenerateNeighborhoodEnum getWayToGenerateNeighborhoodEnum();
     FlowShopWithUncertainty getUncertainFlowShop();
+
+    int getMaxIterationsWithoutImprovementForDiversificationPurpose();
+
+    int getMaxIterationsWithoutImprovementAsStopCriterion();
 }
