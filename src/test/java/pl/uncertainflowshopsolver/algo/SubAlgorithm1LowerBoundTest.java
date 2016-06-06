@@ -17,16 +17,20 @@ public class SubAlgorithm1LowerBoundTest {
     private SubAlgorithm1LowerBound mTestedObject;
     private FlowShop flowShop_PATH3;
     private FlowShop flowShop_PATH4;
+    private FlowShop flowShop_PATH5;
 
     private static final String PATH = "resources/taillard's instances/ta_1-20x5";
     final String PATH1 = "resources/certainFlowShop_hinduskizjutuba.txt";
     final String PATH2 = "resources/new_2_certainFlowShop.txt";
 
     final String PATH3 = "resources/Marek Sobolewski_FlowShop.txt";
-    final int expectedResultForPath3 = 54; //http://www.ioz.pwr.wroc.pl/pracownicy/kuchta/Marek%20Sobolewski_FlowShop.pdf
+    final double expectedResultForPath3 = 54; //http://www.ioz.pwr.wroc.pl/pracownicy/kuchta/Marek%20Sobolewski_FlowShop.pdf
 
     final String PATH4 = "resources/taillard's instances/ta_1-20x5.txt";
-    final int expectedResultForPath4 = 1232; //http://www.sciencedirect.com/science/article/pii/S027861251400140X
+    final double expectedResultForPath4 = 1232; //http://www.sciencedirect.com/science/article/pii/S027861251400140X
+
+    final String PATH5 = "resources/special_CFlowShop_for_LowerBound.txt";
+    final double expectedResultForPath5 = 320;
 
     @Before
     public void setUp() throws Exception
@@ -34,15 +38,19 @@ public class SubAlgorithm1LowerBoundTest {
         mTestedObject = new SubAlgorithm1LowerBound();
         flowShop_PATH3 = FlowshopParser.parseFlowShop(new BufferedReader(new FileReader(PATH3)));
         flowShop_PATH4 = FlowshopParser.parseFlowShop(new BufferedReader(new FileReader(PATH4)));
+        flowShop_PATH5 = FlowshopParser.parseFlowShop(new BufferedReader(new FileReader(PATH5)));
     }
 
     @Test
     public void testSolve() throws Exception {
-//        Integer result = mTestedObject.solve(flowShop_PATH3, true);
+//        double result = mTestedObject.calculateLowerBoundOfCMax(flowShop_PATH3);
 //        Assertions.assertThat(result).isEqualTo(expectedResultForPath3);
 
-        final Integer result = mTestedObject.calculateLowerBoundOfCMax(flowShop_PATH4);
-        Assertions.assertThat(result).isEqualTo(expectedResultForPath4);
+//        double result = mTestedObject.calculateLowerBoundOfCMax(flowShop_PATH4);
+//        Assertions.assertThat(result).isEqualTo(expectedResultForPath4);
+
+        double result = mTestedObject.calculateLowerBoundOfCMax(flowShop_PATH5);
+        Assertions.assertThat(result).isEqualTo(expectedResultForPath5);
     }
 
 }
