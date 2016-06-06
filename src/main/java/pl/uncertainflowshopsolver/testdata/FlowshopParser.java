@@ -34,22 +34,22 @@ public class FlowshopParser {
 
     public static FlowShop parseFlowShop(BufferedReader input) {
         try {
-            Map<Integer, List<Integer>> taskMap = new HashMap<Integer, List<Integer>>();
+            Map<Integer, List<Double>> taskMap = new HashMap<>();
             String[] firstLine = input.readLine().split("\\s+");
             int numberOfJobs = Integer.parseInt(firstLine[1]);
             int numberOfMachines = Integer.parseInt(firstLine[0]);
 
             for (int i = 0; i<numberOfJobs; i++) {
-                taskMap.put(i, new ArrayList<Integer>());
+                taskMap.put(i, new ArrayList<Double>());
             }
 
             String line = null;
             int counter =0;
             while ((line = input.readLine()) != null) {
                 String[] taskOnMachine = line.split(" ");
-                List<Integer> timeList = new ArrayList<>();
+                List<Double> timeList = new ArrayList<>();
                 for (int i = 1; i<taskOnMachine.length; i++) {
-                    timeList.add(Integer.parseInt(taskOnMachine[i]));
+                    timeList.add(Double.parseDouble(taskOnMachine[i]));
                 }
                 taskMap.put(counter, timeList);
                 counter++;
@@ -73,12 +73,12 @@ public class FlowshopParser {
         return true;
     }
 
-    private static List<Integer> parseLine(String line) {
+    private static List<Double> parseLine(String line) {
         String[] times = line.split("\\s+");
 
-        List<Integer> integerTimes = new ArrayList<Integer>();
+        List<Double> integerTimes = new ArrayList<>();
         for (String time : times) {
-            integerTimes.add(Integer.valueOf(time));
+            integerTimes.add(Double.valueOf(time));
         }
 
         return integerTimes;

@@ -30,7 +30,7 @@ public class MIH {
         final FlowShop determinedFlowShop = getDeterminedFlowShop();
         System.out.println("\n" + determinedFlowShop + "\n");
         final FlowShop flowShop = NehAlgorithm.solve(determinedFlowShop);
-        final Integer resultForDeterminizedFlowShop = NehAlgorithm.solve(determinedFlowShop, true);
+        final double resultForDeterminizedFlowShop = NehAlgorithm.solve(determinedFlowShop, true);
         System.out.println("\n" + flowShop + "\n");
         System.out.println("resultForDeterminizedFlowShop: " + resultForDeterminizedFlowShop + "\n");
         long stopTime = System.currentTimeMillis();
@@ -97,11 +97,11 @@ public class MIH {
         final List<TaskWithUncertainty> uncertainFlowShopTasks = uncertainFlowShop.getTasks();
         List<Task> taskList = new ArrayList<>();
         for (int i = 0; i < uncertainFlowShopTasks.size(); i++) {
-            List<Integer> certainTimeList = new ArrayList<>();
+            List<Double> certainTimeList = new ArrayList<>();
             final List<Integer> uncertainTaskUpperTimeList = uncertainFlowShopTasks.get(i).getUpperTimeList();
             final List<Integer> uncertainTaskLowerTimeList = uncertainFlowShopTasks.get(i).getLowerTimeList();
             for (int j = 0; j < uncertainTaskLowerTimeList.size(); j++) {
-                certainTimeList.add((uncertainTaskUpperTimeList.get(j) + uncertainTaskLowerTimeList.get(j)) / 2);
+                certainTimeList.add((double)(uncertainTaskUpperTimeList.get(j) + uncertainTaskLowerTimeList.get(j)) / 2);
             }
             Task certainTask = new Task(certainTimeList, i);
             taskList.add(certainTask);
@@ -124,7 +124,7 @@ public class MIH {
 //        uncertainFlowShopInstance.toFile("qpa1.txt");
         try {
 //            final FlowShopWithUncertainty uncertainFlowShopInstance = UncertainFlowShopParser.parseFileToFlowShopWithUncertainty("resources/1_[n50, m3, K100, C50].txt");
-            final FlowShopWithUncertainty uncertainFlowShopInstance = UncertainFlowShopParser.parseFileToFlowShopWithUncertainty("resources/2_[n50, m3, K100, C50].txt");
+            final FlowShopWithUncertainty uncertainFlowShopInstance = UncertainFlowShopParser.parseFileToFlowShopWithUncertainty("resources/4_[n50, m3, K100, C50].txt");
             MIH mih = new MIH(uncertainFlowShopInstance);
             final Object[] result = mih.solve(true, false);
             System.out.println("MIH solution: ");

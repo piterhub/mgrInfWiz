@@ -19,10 +19,10 @@ public class FlowShop implements Cloneable{
     public FlowShop()
     {
         taskList = new ArrayList<>(Arrays.asList(
-                new Task(Arrays.asList(77,11,82),1),
-                new Task(Arrays.asList(34,92, 8),2),
-                new Task(Arrays.asList(88,36,30),3),
-                new Task(Arrays.asList( 1,98, 9),4)
+                new Task(Arrays.asList(77d,11d,82d),1),
+                new Task(Arrays.asList(34d,92d, 8d),2),
+                new Task(Arrays.asList(88d,36d,30d),3),
+                new Task(Arrays.asList( 1d,98d, 9d),4)
         ));
     }
 
@@ -68,7 +68,7 @@ public class FlowShop implements Cloneable{
         Collections.sort(listToSort, new Comparator<Task>() {
             @Override
             public int compare(Task o1, Task o2) {
-                int sum1 = 0, sum2 = 0;
+                double sum1 = 0, sum2 = 0;
                 for (int i = 0; i<o1.getTimeList().size(); i++) {
                     sum1 += o1.getTimeList().get(i);
                     sum2 += o2.getTimeList().get(i);
@@ -114,7 +114,7 @@ public class FlowShop implements Cloneable{
      * Returns end time of all tasks
      * @return time that passes between start and end of all tasks
      */
-    public Integer makeSpan() {
+    public Double makeSpan() {
         return makeSpan(taskList.size()-1, false);
     }
 
@@ -123,7 +123,7 @@ public class FlowShop implements Cloneable{
      * @param taskNr int, returns time between start and task with this number
      * @return time that passes between start and end of defined task
      */
-    public Integer makeSpan(int taskNr) {
+    public Double makeSpan(int taskNr) {
         return makeSpan(taskNr, false);
     }
 
@@ -133,15 +133,15 @@ public class FlowShop implements Cloneable{
      * @param taskNr int, returns time between start and task with this number
      * @return time that passes between start and end of defined task
      */
-    public Integer makeSpan(int taskNr, boolean printDebug) {
+    public Double makeSpan(int taskNr, boolean printDebug) {
         int taskCount = taskNr+1;
         int machineCount = getMachineCount();
-        int[][] matrix = new int[taskCount][machineCount];
+        double[][] matrix = new double[taskCount][machineCount];
 
         for (int t = 0; t<taskCount; t++) {
             Task task = taskList.get(t);
             for (int m=0; m<machineCount; m++) {
-                int sum = 0;
+                double sum = 0;
                 sum += task.getTimeList().get(m);
                 if (t>0) { // Rows 1..n-1
                     if (m==0) {
@@ -176,7 +176,7 @@ public class FlowShop implements Cloneable{
         String output = "";
         for (Task task : taskList) {
             output+=("Task" + task.getOriginalPosition() + ":");
-            for (Integer operation : task.getTimeList()) {
+            for (Double operation : task.getTimeList()) {
                 output+=(" " + operation);
             }
             output+="\n";

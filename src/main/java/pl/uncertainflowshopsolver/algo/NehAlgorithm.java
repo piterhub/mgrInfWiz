@@ -13,19 +13,19 @@ import java.io.FileReader;
  */
 public final class NehAlgorithm {
 
-    /**
-     * Solves Flow Shop problem with NEH algo.
-     * It should always print the same result.
-     * @param config FlowShop problem config
-     */
-    public static void solve(FlowShopConfig config) {
-
-        System.out.println(config.getState().toString());
-
-        // Sort task by sum of it's time on each machine
-        FlowShop result = config.getState().sortDescending();
-        solve(result);
-    }
+//    /**
+//     * Solves Flow Shop problem with NEH algo.
+//     * It should always print the same result.
+//     * @param config FlowShop problem config
+//     */
+//    public static void solve(FlowShopConfig config) {
+//
+//        System.out.println(config.getState().toString());
+//
+//        // Sort task by sum of it's time on each machine
+//        FlowShop result = config.getState().sortDescending();
+//        solve(result);
+//    }
 
     /**
      * Solves Flow Shop problem with NEH algo.
@@ -41,7 +41,8 @@ public final class NehAlgorithm {
         // Try to find best place for each next task.
         // If the time for current task is better - swap it.
         for (int i=1; i<result.getTaskCount();i++) {
-            int bestIndex = i, minSpan = result.makeSpan(i);
+            int bestIndex = i;
+            double minSpan = result.makeSpan(i);
             for (int j=0; j<i; j++) {
                 FlowShop swapped = result.move(i,j);
                 // Remember better solution
@@ -62,7 +63,7 @@ public final class NehAlgorithm {
         return result;
     }
 
-    public static Integer solve(FlowShop flowShop, boolean isResultAsMakespanNecessary) {
+    public static Double solve(FlowShop flowShop, boolean isResultAsMakespanNecessary) {
 
         if(!isResultAsMakespanNecessary)
             throw new UnsupportedOperationException();
@@ -76,7 +77,8 @@ public final class NehAlgorithm {
         // Try to find best place for each next task.
         // If the time for current task is better - swap it.
         for (int i=1; i<currentFlowShop.getTaskCount();i++) {
-            int bestIndex = i, minSpan = currentFlowShop.makeSpan(i);
+            int bestIndex = i;
+            double minSpan = currentFlowShop.makeSpan(i);
             for (int j=0; j<i; j++) {
                 FlowShop swapped = currentFlowShop.move(i,j);
                 // Remember better solution
@@ -93,7 +95,7 @@ public final class NehAlgorithm {
 
 //        System.out.println("NEH - solution FlowShop:");
 //        System.out.println(currentFlowShop.toString());
-        final Integer result = currentFlowShop.makeSpan();
+        final Double result = currentFlowShop.makeSpan();
 //        System.out.println("Makespan calculated for Neh solution: " + result + "\n");
 
         return result;

@@ -23,10 +23,10 @@ public class NehAlgorithmTest {
     final String PATH2 = "resources/new_2_certainFlowShop.txt";
 
     final String PATH3 = "resources/Marek Sobolewski_FlowShop.txt";
-    final int expectedResultForPath3 = 54; //http://www.ioz.pwr.wroc.pl/pracownicy/kuchta/Marek%20Sobolewski_FlowShop.pdf
+    final double expectedResultForPath3 = 54d; //http://www.ioz.pwr.wroc.pl/pracownicy/kuchta/Marek%20Sobolewski_FlowShop.pdf
 
     final String PATH4 = "resources/taillard's instances/ta_1-20x5.txt";
-    final int expectedResultForPath4 = 1286; //http://www.sciencedirect.com/science/article/pii/S027861251400140X
+    final double expectedResultForPath4 = 1286d; //http://www.sciencedirect.com/science/article/pii/S027861251400140X
 
     @Before
     public void setUp() throws Exception
@@ -38,7 +38,7 @@ public class NehAlgorithmTest {
 
     @Test
     public void testSolve() throws Exception {
-        Integer result = mTestedObject.solve(flowShop_PATH3, true);
+        double result = mTestedObject.solve(flowShop_PATH3, true);
         Assertions.assertThat(result).isEqualTo(expectedResultForPath3);
 
         result = mTestedObject.solve(flowShop_PATH4, true);
