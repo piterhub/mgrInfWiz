@@ -21,8 +21,8 @@ public class FlowShopWithUncertainty implements Cloneable {
     private List<TaskWithUncertainty> taskWithUncertaintyList;
     private int m;
     private int n;
-    private Integer upperBoundOfMinMaxRegretOptimalization;
-    private Integer lowerBoundOfMinMaxRegretOptimalization;
+    private Double upperBoundOfMinMaxRegretOptimalization;
+    private Double lowerBoundOfMinMaxRegretOptimalization;
     private double elapsedTime;
 
     public FlowShopWithUncertainty() {
@@ -66,19 +66,19 @@ public class FlowShopWithUncertainty implements Cloneable {
         this.elapsedTime = elapsedTime;
     }
 
-    public Integer getUpperBoundOfMinMaxRegretOptimalization() {
+    public Double getUpperBoundOfMinMaxRegretOptimalization() {
         return upperBoundOfMinMaxRegretOptimalization;
     }
 
-    public void setUpperBoundOfMinMaxRegretOptimalization(Integer resultOfMinMaxRegretOptimalization) {
+    public void setUpperBoundOfMinMaxRegretOptimalization(Double resultOfMinMaxRegretOptimalization) {
         this.upperBoundOfMinMaxRegretOptimalization = resultOfMinMaxRegretOptimalization;
     }
 
-    public Integer getLowerBoundOfMinMaxRegretOptimalization() {
+    public Double getLowerBoundOfMinMaxRegretOptimalization() {
         return lowerBoundOfMinMaxRegretOptimalization;
     }
 
-    public void setLowerBoundOfMinMaxRegretOptimalization(Integer lowerBoundOfMinMaxRegretOptimalization) {
+    public void setLowerBoundOfMinMaxRegretOptimalization(Double lowerBoundOfMinMaxRegretOptimalization) {
         this.lowerBoundOfMinMaxRegretOptimalization = lowerBoundOfMinMaxRegretOptimalization;
     }
 
@@ -256,15 +256,15 @@ public class FlowShopWithUncertainty implements Cloneable {
         FlowShopWithUncertainty newFlowShop = new FlowShopWithUncertainty(this.getTasks());
         swapRandomlyTwoTasks(newFlowShop, getTaskCount());
         final Object[] objects = SubAlgorithm2.solveGreedy(this, null, false);
-        newFlowShop.setUpperBoundOfMinMaxRegretOptimalization((int) objects[1]);//todo it's absolutely unnecessary. Przecie? robisz to ju? w SA. EDIT: jest potrzebne do initialTempHelpera
-        newFlowShop.setLowerBoundOfMinMaxRegretOptimalization((int) objects[0]);
+        newFlowShop.setUpperBoundOfMinMaxRegretOptimalization((double) objects[1]);//todo it's absolutely unnecessary. Przecie? robisz to ju? w SA. EDIT: jest potrzebne do initialTempHelpera
+        newFlowShop.setLowerBoundOfMinMaxRegretOptimalization((double) objects[0]);
         return newFlowShop;
     }
 
     public FlowShopWithUncertainty getNeighbour(double temperature) {
         swapRandomlyTwoTasks(this, getTaskCount());
         FlowShopWithUncertainty newFlowShop = new FlowShopWithUncertainty(this.getTasks());
-        newFlowShop.setUpperBoundOfMinMaxRegretOptimalization((int)SubAlgorithm2.solveGreedy(this, false, false)[0]);
+        newFlowShop.setUpperBoundOfMinMaxRegretOptimalization((double)SubAlgorithm2.solveGreedy(this, false, false)[0]);
         return newFlowShop;
     }
 

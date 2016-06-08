@@ -115,36 +115,37 @@ public class MainConsole {
 
     private static String[] measureSA(SimulatedAnnealing simulatedAnnealing, boolean isLowerBound) {
         //Helper array for debug
-        Object[][] debugHelperResults = new Object[REPETITION_FOR_SIMULATED_ANNEALING][4];
-
-        //calculate sumOfMinZ4 of all 5 repetitions
-        int sumOfMinZ4 = 0;
-        int sumOfMinZ4LowerBound = 0;
-        double sumOfMeasuredTimes = 0;
-        for(int i=0; i < REPETITION_FOR_SIMULATED_ANNEALING ; i++)
-        {
-            System.out.println("measureSA : " + i);
-            Object[] SAresult = simulatedAnnealing.solveSA(isLowerBound, false);
-            sumOfMinZ4 += (int) SAresult[1];
-            sumOfMinZ4LowerBound += (int) SAresult[4];
-            sumOfMeasuredTimes += (double) SAresult[3];
-            debugHelperResults[i] = SAresult;
-        }
-        //calculate average value
-        double averageOfMinZ4 = sumOfMinZ4 / REPETITION_FOR_SIMULATED_ANNEALING;
-        double averageOfMinZ4LowerBound = sumOfMinZ4LowerBound / REPETITION_FOR_SIMULATED_ANNEALING;
-        double averageOfMeasuredTimes = sumOfMeasuredTimes / REPETITION_FOR_SIMULATED_ANNEALING;
-
-        DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols(Locale.GERMAN);
-        otherSymbols.setDecimalSeparator(',');
-        NumberFormat formatter = new DecimalFormat("#0.00");
-        formatter.setGroupingUsed(false);
-
-        String[] results = new String[3];
-        results[0] = formatter.format(averageOfMinZ4);
-        results[1] = formatter.format(averageOfMinZ4LowerBound);
-        results[2] = formatter.format(averageOfMeasuredTimes);
-        return  results;
+//        Object[][] debugHelperResults = new Object[REPETITION_FOR_SIMULATED_ANNEALING][4];
+//
+//        //calculate sumOfMinZ4 of all 5 repetitions
+//        int sumOfMinZ4 = 0;
+//        int sumOfMinZ4LowerBound = 0;
+//        double sumOfMeasuredTimes = 0;
+//        for(int i=0; i < REPETITION_FOR_SIMULATED_ANNEALING ; i++)
+//        {
+//            System.out.println("measureSA : " + i);
+//            Object[] SAresult = simulatedAnnealing.solveSA(isLowerBound, false);
+//            sumOfMinZ4 += (int) SAresult[1];
+//            sumOfMinZ4LowerBound += (int) SAresult[4];
+//            sumOfMeasuredTimes += (double) SAresult[3];
+//            debugHelperResults[i] = SAresult;
+//        }
+//        //calculate average value
+//        double averageOfMinZ4 = sumOfMinZ4 / REPETITION_FOR_SIMULATED_ANNEALING;
+//        double averageOfMinZ4LowerBound = sumOfMinZ4LowerBound / REPETITION_FOR_SIMULATED_ANNEALING;
+//        double averageOfMeasuredTimes = sumOfMeasuredTimes / REPETITION_FOR_SIMULATED_ANNEALING;
+//
+//        DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols(Locale.GERMAN);
+//        otherSymbols.setDecimalSeparator(',');
+//        NumberFormat formatter = new DecimalFormat("#0.00");
+//        formatter.setGroupingUsed(false);
+//
+//        String[] results = new String[3];
+//        results[0] = formatter.format(averageOfMinZ4);
+//        results[1] = formatter.format(averageOfMinZ4LowerBound);
+//        results[2] = formatter.format(averageOfMeasuredTimes);
+//        return  results;
+        return null;
     }
 
 }

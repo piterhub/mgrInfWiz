@@ -190,4 +190,15 @@ public class FlowShop implements Cloneable{
         return new FlowShop(tasks);
     }
 
+    public static void main(String[] args)
+    {
+        FlowShop flowShop = new FlowShop(Arrays.asList(
+                new Task(Arrays.asList(1d,1d,1d,1d),0),
+                new Task(Arrays.asList(2d,2d,1d,1d),1),
+                new Task(Arrays.asList(1d,2d,2d,2d),2),
+                new Task(Arrays.asList(100d,100d,1d,100d),3)
+        ));
+        final Double result = flowShop.makeSpan();
+        System.out.println(result);
+    }
 }

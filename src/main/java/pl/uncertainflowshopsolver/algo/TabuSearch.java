@@ -27,7 +27,7 @@ public class TabuSearch {
 
     private FlowShopWithUncertainty uncertainFlowShop;
     private TabuList mTabuList;
-    private int globalMinimum;
+    private double globalMinimum;
     private int iterationWithoutImprovementCount;
     private int iterationWithoutImprovementForDiversificationPurposeCount;
 
@@ -70,13 +70,13 @@ public class TabuSearch {
         /***********Hybridisation**************/
         MIH mih = new MIH(uncertainFlowShop);
         final Object[] mihResult = mih.solve(false, false);
-        System.out.println("MIH UB result: " + (int)mihResult[1]);
+        System.out.println("MIH UB result: " + (double)mihResult[1]);
         FlowShopWithUncertainty helperFlowShop = (FlowShopWithUncertainty) mihResult[3];
 
         final Object[] result1 = SubAlgorithm2.solveGreedy(uncertainFlowShop, null, false);
         final Object[] result2 = SubAlgorithm2.solveGreedy(helperFlowShop, null, false);
         Object[] result;
-        if((int)result1[1] <= (int)result2[1])
+        if((double)result1[1] <= (double)result2[1])
         {
             result = result1;
         }
@@ -87,8 +87,8 @@ public class TabuSearch {
         /**************************************/
 
         /***********Global minimum**************/
-        globalMinimum = (int) result[1];
-        int globalMinimumForLowerBound = (int) result[0];
+        globalMinimum = (double) result[1];
+        double globalMinimumForLowerBound = (double) result[0];
         FlowShopWithUncertainty uncertainFlowShop_for_minimum = uncertainFlowShop.clone();
         uncertainFlowShop_for_minimum.setUpperBoundOfMinMaxRegretOptimalization(globalMinimum);
         uncertainFlowShop_for_minimum.setLowerBoundOfMinMaxRegretOptimalization(globalMinimumForLowerBound);
@@ -126,14 +126,14 @@ public class TabuSearch {
             }
 
             FlowShopWithUncertainty bestNeighbour = getBestNeighbour(uncertainFlowShop);
-            int currentValue = bestNeighbour.getUpperBoundOfMinMaxRegretOptimalization();  //upper bound
+            double currentValue = bestNeighbour.getUpperBoundOfMinMaxRegretOptimalization();  //upper bound
 
             uncertainFlowShop = bestNeighbour.clone();
             if (globalMinimum > currentValue) {
                 globalMinimum = currentValue;
                 uncertainFlowShop_for_minimum = bestNeighbour.clone();
                 uncertainFlowShop_for_minimum.setUpperBoundOfMinMaxRegretOptimalization(globalMinimum);
-                uncertainFlowShop_for_minimum.setLowerBoundOfMinMaxRegretOptimalization((int) SubAlgorithm2.solveGreedy(uncertainFlowShop, true, false)[0]);
+                uncertainFlowShop_for_minimum.setLowerBoundOfMinMaxRegretOptimalization((double) SubAlgorithm2.solveGreedy(uncertainFlowShop, true, false)[0]);
                 lastImprovementIteration = iterations;
                 lastImprovementIterationInTermOfDiversification = iterations;
             }
@@ -175,11 +175,11 @@ public class TabuSearch {
         System.out.println();
 
         FlowShopWithUncertainty minimumHelperFlowShop = uncertainFlowShop.clone();
-        minimumHelperFlowShop.setUpperBoundOfMinMaxRegretOptimalization(-1);
+        minimumHelperFlowShop.setUpperBoundOfMinMaxRegretOptimalization(-1d);
         for (int i = 0; i < minimumHelperFlowShop.getTaskCount(); i++) {
             FlowShopWithUncertainty newFlowShop = minimumHelperFlowShop.clone();
             Collections.shuffle(newFlowShop.getTasks());
-            int resultForNewValue = getObjectiveFunctionValue(newFlowShop);
+            double resultForNewValue = getObjectiveFunctionValue(newFlowShop);
             if(minimumHelperFlowShop.getUpperBoundOfMinMaxRegretOptimalization() == -1 || resultForNewValue < minimumHelperFlowShop.getUpperBoundOfMinMaxRegretOptimalization())
             {
                 minimumHelperFlowShop=newFlowShop.clone();
@@ -214,9 +214,9 @@ public class TabuSearch {
                 taskOrder.add(taskWithUncertainty.getOriginalPosition());
             }
 
-            SortedMap<Integer, FlowShopWithUncertainty> notTabuNeighbours = new TreeMap<>();    //todo lepiej zamienic na bestFlowShopTillNow, jeśli aspiration criteria się jakoś sensownie nie zmieni lub nie dojdzie pamięć długoterminowa
-            
-            int bestResultTillNow = -1;
+            SortedMap<Double, FlowShopWithUncertainty> notTabuNeighbours = new TreeMap<>();    //todo lepiej zamienic na bestFlowShopTillNow, jeśli aspiration criteria się jakoś sensownie nie zmieni lub nie dojdzie pamięć długoterminowa
+
+            double bestResultTillNow = -1;
             int indexOfTabuTask1 = -1;
             int indexOfTabuTask2 = -1;
 
@@ -227,7 +227,7 @@ public class TabuSearch {
                     if(isMoveNotTabuOrFulfillAspirationCriteria(taskOrder, i, j, uncertainFlowShop))
                     {
                         final FlowShopWithUncertainty neighbour = swapTwoTasksGivingNewFlowShopWithUncertainty(uncertainFlowShop, i, j);
-                        final int resultForNeighbour = getObjectiveFunctionValue(neighbour);
+                        final double resultForNeighbour = getObjectiveFunctionValue(neighbour);
 //                        neighbour.setUpperBoundOfMinMaxRegretOptimalization(resultForNeighbour);//todo lepiej zamienic na bestFlowShopTillNow, jeśli aspiration criteria się jakoś sensownie nie zmieni lub nie dojdzie pamięć długoterminowa
                         notTabuNeighbours.put(resultForNeighbour, neighbour);
                         if(resultForNeighbour < bestResultTillNow || bestResultTillNow == -1)
@@ -288,8 +288,8 @@ public class TabuSearch {
         this.configurationProvider = configurationProvider;
     }
 
-    public int getObjectiveFunctionValue(FlowShopWithUncertainty uncertainFlowShop){
-        return (int) SubAlgorithm2.solveGreedy(uncertainFlowShop,false,false)[0];
+    public double getObjectiveFunctionValue(FlowShopWithUncertainty uncertainFlowShop){
+        return (double) SubAlgorithm2.solveGreedy(uncertainFlowShop,false,false)[0];
     }
 
     private class TabuList {

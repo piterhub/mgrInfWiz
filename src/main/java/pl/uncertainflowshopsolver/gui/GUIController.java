@@ -103,7 +103,7 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
     private Map<String, WhichAlgorithmEnum> algorithmEnumMap;
 
     public LineChart lineChart;
-    private XYChart.Series<Integer, Integer> series = new XYChart.Series<Integer, Integer>();
+    private XYChart.Series<Integer, Double> series = new XYChart.Series<>();
 
     private SAConfiguration activeSAConfiguration;
     private TSPConfiguration activeTSPConfiguration;
@@ -113,7 +113,7 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
     private AlgorithmState algorithmState = AlgorithmState.STOPPED;
     private Thread algorithmThread;
 
-    private Map<Integer, Integer> iterationFitnessMap = Collections.synchronizedMap(new HashMap<Integer, Integer>());
+    private Map<Integer, Double> iterationFitnessMap = Collections.synchronizedMap(new HashMap<Integer, Double>());
     private int bestSolutionIteration = -1;
     private FlowShopWithUncertainty bestSolution;
 
