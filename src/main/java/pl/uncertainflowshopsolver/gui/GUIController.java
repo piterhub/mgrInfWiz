@@ -55,7 +55,6 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
     public DoubleTextBox0To1 desiredInitialAcceptanceProbabilityDoubleTextBox0To1;
     public IntegerTextBox epocheLengthIntegerTextBox;
     public DoubleTextBox0To1 decayRateDoubleTextBox0To1;
-    public DoubleTextBox0To1 endTemperatureDoubleTextBox0To1;
     public DoubleTextBox0To1 errorThresholdDoubleTextBox0To1;
     public IntegerTextBox samplesCardinalityIntegerTextBox;
     public IntegerTextBox maxNumberOfIterationsIntegerTextBox;
@@ -87,6 +86,7 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
     public IntegerTextBox maxIterWithoutImprovementAspirationIntegerTextBox;
     public IntegerTextBox maxIterWithoutImprovementDiversificationIntegerTextBox;
     public IntegerTextBox maxNumberOfIterationsAsStopTabuSearchIntegerTextBox;
+    public IntegerTextBox SA_maxIterWithoutImproDiversificationIntegerTextBox;
     private NumberBinding thirdProperty;
     private NumberBinding fourthProperty;
     private NumberBinding fifthProperty;
@@ -205,7 +205,6 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
 //        desiredInitialAcceptanceProbabilityDoubleTextBox0To1.doubleProperty().set(0.925);
 //        epocheLengthIntegerTextBox.insertText(0, "10");
 //        decayRateDoubleTextBox0To1.insertText(0, "0.995");
-//        endTemperatureDoubleTextBox0To1.insertText(0, "0.5");
 //        errorThresholdDoubleTextBox0To1.insertText(0, "0.0001");
 //        samplesCardinalityIntegerTextBox.insertText(0, "10000");
 //        maxNumberOfIterationsIntegerTextBox.insertText(0, "1000");
@@ -304,11 +303,10 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
                 .withDesiredInitialAcceptanceProbability(desiredInitialAcceptanceProbabilityDoubleTextBox0To1.getValue())
                 .withEpocheLength(epocheLengthIntegerTextBox.getValue())
                 .withDecayRate(decayRateDoubleTextBox0To1.getValue())
-                .withEndTemperature(endTemperatureDoubleTextBox0To1.getValue())
                 .withErrorThreshold(errorThresholdDoubleTextBox0To1.getValue())
                 .withSamplesCardinality(samplesCardinalityIntegerTextBox.getValue())
                 .withMaxNumberOfIterations(maxNumberOfIterationsIntegerTextBox.getValue())
-//                .withCutOffEnergyLevel(cutOffEnergyLevelDoubleTextBox.getValue())
+                .withMaxIterationsWithoutImprovementForDiversificationPurpose(SA_maxIterWithoutImproDiversificationIntegerTextBox.getValue())
                 .withWayToGenerateNeighborhood(wayToGenerateNeighborhoodEnum)
                 .withUncertainFlowshop(flowShop)
                 .build();
@@ -568,7 +566,7 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
         desiredInitialAcceptanceProbabilityDoubleTextBox0To1.setDisable(isNotEnabled);
         epocheLengthIntegerTextBox.setDisable(isNotEnabled);
         decayRateDoubleTextBox0To1.setDisable(isNotEnabled);
-        endTemperatureDoubleTextBox0To1.setDisable(isNotEnabled);
+        SA_maxIterWithoutImproDiversificationIntegerTextBox.setDisable(isNotEnabled);
         errorThresholdDoubleTextBox0To1.setDisable(isNotEnabled);
         samplesCardinalityIntegerTextBox.setDisable(isNotEnabled);
         maxNumberOfIterationsIntegerTextBox.setDisable(isNotEnabled);

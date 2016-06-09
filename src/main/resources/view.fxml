@@ -220,8 +220,8 @@
                                                             </VBox>
                                                             <VBox prefHeight="200.0" prefWidth="100.0">
                                                                 <children>
-                                                                    <Label text="End temperature (double)" />
-                                                                    <DoubleTextBox0To1 fx:id="endTemperatureDoubleTextBox0To1" />
+                                                                    <Label text="Max iter. w/o improvement (diversification)" />
+                                                                    <IntegerTextBox fx:id="SA_maxIterWithoutImproDiversificationIntegerTextBox" />
                                                                 </children>
                                                             </VBox>
                                                             <VBox prefHeight="200.0" prefWidth="100.0">

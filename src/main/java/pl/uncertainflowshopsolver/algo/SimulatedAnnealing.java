@@ -157,9 +157,9 @@ public class SimulatedAnnealing {
             if(isDiversificationNeeded()) {
                 setBestUncertainFlowShopAfterDiversification();
                 lastImprovementIterationInTermOfDiversification = iterations;
-                System.out.println("\nThe temp was: " + initialTemperature);
+                System.out.println("The temp was: " + initialTemperature);
                 initialTemperature = mInitialTemperature;
-                System.out.println("\nThe temp is now: " + initialTemperature);
+                System.out.println("The temp is now: " + initialTemperature);
             }
 
             for (int i = 0; i < configuration.getEpocheLength(); i++) {
@@ -232,12 +232,13 @@ public class SimulatedAnnealing {
     }
 
     private void setBestUncertainFlowShopAfterDiversification() {
-        System.out.println("\nShuffle! \nWas :");
-        for (TaskWithUncertainty task : uncertainFlowShop.getTasks())
-        {
-            System.out.print(" " + task.getOriginalPosition() + " ");
-        }
-        System.out.println();
+        System.out.println("\nShuffle!");
+////        System.out.println("\nShuffle! \nWas :");
+//        for (TaskWithUncertainty task : uncertainFlowShop.getTasks())
+//        {
+//            System.out.print(" " + task.getOriginalPosition() + " ");
+//        }
+//        System.out.println();
 
         FlowShopWithUncertainty minimumHelperFlowShop = uncertainFlowShop.clone();
         minimumHelperFlowShop.setUpperBoundOfMinMaxRegretOptimalization(-1d);
@@ -249,17 +250,17 @@ public class SimulatedAnnealing {
             {
                 minimumHelperFlowShop=newFlowShop.clone();
                 minimumHelperFlowShop.setUpperBoundOfMinMaxRegretOptimalization(resultForNewValue);
-                System.out.println("New UpperBoundOfMinMaxRegretOptimalization of minimumHelperFlowShop: " + minimumHelperFlowShop.getUpperBoundOfMinMaxRegretOptimalization());
+//                System.out.println("New UpperBoundOfMinMaxRegretOptimalization of minimumHelperFlowShop: " + minimumHelperFlowShop.getUpperBoundOfMinMaxRegretOptimalization());
             }
         }
         uncertainFlowShop = minimumHelperFlowShop.clone();
         uncertainFlowShop.setUpperBoundOfMinMaxRegretOptimalization(minimumHelperFlowShop.getUpperBoundOfMinMaxRegretOptimalization());
 
-        System.out.println("\nIs :");
-        for (TaskWithUncertainty task : uncertainFlowShop.getTasks())
-        {
-            System.out.print(" " + task.getOriginalPosition() + " ");
-        }
+//        System.out.println("\nIs :");
+//        for (TaskWithUncertainty task : uncertainFlowShop.getTasks())
+//        {
+//            System.out.print(" " + task.getOriginalPosition() + " ");
+//        }
     }
 
     public static void main(String[] args) {

@@ -30,6 +30,8 @@ public class MainConsoleWithMocks {
 
     public static final String PATH_TO_RESOURCES = "C:/Users/pkubicki/IdeaProjects/mgrInfWiz/resources";
     public static String PATH_TO_FILE_WITH_UNCERTAIN_FLOWSHOP = "resources/1_[n50, m3, K100, C50].txt";
+    public static final String PATH_TO_FILE_WITH_UNCERTAIN_FLOWSHOP1 = "resources/1_[n50, m3, K100, C50].txt";
+    public static double SA_RESULT;
 
     /**
      * Use this to run without GUI
@@ -40,20 +42,22 @@ public class MainConsoleWithMocks {
         /**
          * Strojenie alpha:
          */
-        int HOW_MANY_REPETITIONS_FOR_CONCRETE_INSTANCE = 5;
-        int HOW_MANY_INSTANCES = 5;
-        int HOW_MANY_ALFAS= 5;
+        int HOW_MANY_REPETITIONS_FOR_CONCRETE_INSTANCE = 5;//5;
+        int HOW_MANY_INSTANCES = 5;//5;
         double[] CHECKED_ALFAS = {0.975, 0.980, 0.985, 0.990, 0.995};
 
-        final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM.dd-HH.mm-ss");
-        final String timestamp = simpleDateFormat.format(new Date());
-        PrintWriter pw = new PrintWriter(new File(PATH_TO_RESOURCES + "/STROJENIE_" + timestamp +".csv"));
+        final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM-HH.mm-ss");
+        String timestamp = simpleDateFormat.format(new Date());
+        PrintWriter pw = new PrintWriter(new File(PATH_TO_RESOURCES + "/STROJENIE_alfa_" + timestamp +".csv"));
         StringBuilder sb = new StringBuilder();
 
         final ConfigurationProviderMock configurationProviderMock = new ConfigurationProviderMock();
         final EventDispatcherMock eventDispatcher = new EventDispatcherMock(null);
 
         for (int instance = 1; instance <= HOW_MANY_INSTANCES; instance++) {
+
+            sb.append(instance);
+            sb.append(';');
 
             FlowShopWithUncertainty uncertainFlowShopInstance;
             try {
@@ -62,46 +66,121 @@ public class MainConsoleWithMocks {
                 e.printStackTrace();
                 return;
             }
-
-//            System.out.println(uncertainFlowShopInstance.toString() + "\n");
+            configurationProviderMock.handleChangeOfUncertainFlowShop(uncertainFlowShopInstance);
 
             for (int repetition = 0; repetition < HOW_MANY_REPETITIONS_FOR_CONCRETE_INSTANCE; repetition++) {
 
-                SimulatedAnnealing SAAlgorithm = new SimulatedAnnealing();
-                SAAlgorithm.setConfigurationProvider(configurationProviderMock);
-                SAAlgorithm.setEventDispatcher(eventDispatcher);
-                SAAlgorithm.start();
+                sb.append(repetition+1);
+                sb.append(';');
 
-                while(!eventDispatcher.algorithmIsEnded){}
+                for (int alfa = 0; alfa < CHECKED_ALFAS.length; alfa++) {
 
+                    configurationProviderMock.handleChangeOfAlpha(CHECKED_ALFAS[alfa]);
 
-//                configurationProviderMock.handleChangeOfAlpha();
-//
-//
-//                MIH mih = new MIH(uncertainFlowShopInstance);
-//                measureMIHLowerBound(mih, sb);
-////            measureMIHUpperBound(mih, sb);
-//
-//                SimulatedAnnealing simulatedAnnealing = new SimulatedAnnealing(uncertainFlowShopInstance);
-////            measureSALowerBound(simulatedAnnealing, sb);
-//                measureSAUpperBound(simulatedAnnealing, sb);
+                    SimulatedAnnealing SAAlgorithm = new SimulatedAnnealing();
+                    SAAlgorithm.setConfigurationProvider(configurationProviderMock);
+                    SAAlgorithm.setEventDispatcher(eventDispatcher);
+                    SAAlgorithm.start();
+
+                    while(!eventDispatcher.algorithmIsEnded){}
+
+                    sb.append(SA_RESULT);
+                    sb.append(';');
+                }
+
+                sb.append('\n');
+                if(repetition < HOW_MANY_REPETITIONS_FOR_CONCRETE_INSTANCE-1)
+                {
+                    sb.append(instance);
+                    sb.append(';');
+                }
             }
             PATH_TO_FILE_WITH_UNCERTAIN_FLOWSHOP = changePathToFileForNextRun(instance);
             System.out.println(PATH_TO_FILE_WITH_UNCERTAIN_FLOWSHOP);
+
+            try {
+                Thread.sleep(240000);//pause 4 min
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
-
-
 
         pw.write(sb.toString());
         pw.close();
-        System.out.println("done!");
+        System.out.println("done 1!");
+
+        /**
+         * Strojenie P_0:
+         */
+        double[] CHECKED_P_0 = {0.75, 0.80, 0.85, 0.90, 0.95};
+
+        timestamp = simpleDateFormat.format(new Date());
+        pw = new PrintWriter(new File(PATH_TO_RESOURCES + "/STROJENIE_P0_" + timestamp +".csv"));
+        sb = new StringBuilder();
+        PATH_TO_FILE_WITH_UNCERTAIN_FLOWSHOP = PATH_TO_FILE_WITH_UNCERTAIN_FLOWSHOP1;
+
+        final ConfigurationProviderMock configurationProviderMock2 = new ConfigurationProviderMock();
+        final EventDispatcherMock eventDispatcher2 = new EventDispatcherMock(null);
+
+        for (int instance = 1; instance <= HOW_MANY_INSTANCES; instance++) {
+
+            sb.append(instance);
+            sb.append(';');
+
+            FlowShopWithUncertainty uncertainFlowShopInstance;
+            try {
+                uncertainFlowShopInstance = UncertainFlowShopParser.parseFileToFlowShopWithUncertainty(PATH_TO_FILE_WITH_UNCERTAIN_FLOWSHOP);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return;
+            }
+            configurationProviderMock.handleChangeOfUncertainFlowShop(uncertainFlowShopInstance);
+
+            for (int repetition = 0; repetition < HOW_MANY_REPETITIONS_FOR_CONCRETE_INSTANCE; repetition++) {
+
+                sb.append(repetition+1);
+                sb.append(';');
+
+                for (int pZero = 0; pZero < CHECKED_P_0.length; pZero++) {
+
+                    configurationProviderMock.handleChangeOfDesiredInitialAcceptanceProbability(CHECKED_P_0[pZero]);
+
+                    SimulatedAnnealing SAAlgorithm = new SimulatedAnnealing();
+                    SAAlgorithm.setConfigurationProvider(configurationProviderMock2);
+                    SAAlgorithm.setEventDispatcher(eventDispatcher2);
+                    SAAlgorithm.start();
+
+                    while(!eventDispatcher.algorithmIsEnded){}
+
+                    sb.append(SA_RESULT);
+                    sb.append(';');
+                }
+
+                sb.append('\n');
+                if(repetition < HOW_MANY_REPETITIONS_FOR_CONCRETE_INSTANCE-1)
+                {
+                    sb.append(instance);
+                    sb.append(';');
+                }
+            }
+            PATH_TO_FILE_WITH_UNCERTAIN_FLOWSHOP = changePathToFileForNextRun(instance);
+            System.out.println(PATH_TO_FILE_WITH_UNCERTAIN_FLOWSHOP);
+
+            try {
+                Thread.sleep(240000);//pause 4 min
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        pw.write(sb.toString());
+        pw.close();
+        System.out.println("done 2!");
 
 
-
-        int MINIMUM_INSTANCE = 26;
-        int MAXIMUM_INSTANCE = 50;
-        int DELTA_OF_TASK_COUNT_BETWEEN_EACH_TEST_INSTANCE = 2;
-//
+//        int MINIMUM_INSTANCE = 26;
+//        int MAXIMUM_INSTANCE = 50;
+//        int DELTA_OF_TASK_COUNT_BETWEEN_EACH_TEST_INSTANCE = 2;
 
 //        for (int i = 0; i < HOW_MANY_REPETITIONS_FOR_CONCRETE_INSTANCE; i++) {
 //
@@ -115,7 +194,6 @@ public class MainConsoleWithMocks {
 //        }
 
 
-//
 //        TabuSearch TSAlgorithm = new TabuSearch();
 //        TSAlgorithm.setConfigurationProvider(new ConfigurationProviderMock());
 //        TSAlgorithm.setEventDispatcher(new EventDispatcherMock(null));
@@ -130,12 +208,13 @@ public class MainConsoleWithMocks {
     private static class ConfigurationProviderMock implements ConfigurationProvider {
 
         private double desiredInitialAcceptanceProbability = 0.95;
-        private double decayRate = 0.9925;//0.9995;
+        private double decayRate = 0.995;
         private int maxNumberOfIterations = 10000;
         private int maxIterationsWithoutImprovementForDiversificationPurpose = 1001;
         private int maxIterationsWithoutImprovementAsStopCriterion = 5000;
         private int epocheLength = 5;
         private int samplesCardinality = 5000;  //10000
+        private FlowShopWithUncertainty uncertainFlowShop;
 
         //exp(-80/(1163*(0.9995)^10000)) = 0.00003637018534505723
         //exp(-80/(1163*(0.99995)^80000)) = 0.023375839279601084
@@ -143,7 +222,13 @@ public class MainConsoleWithMocks {
         public void handleChangeOfAlpha(double newValue)
         {
             this.decayRate = newValue;
-            System.out.println("\nConfigurationProviderMock#decayRate: " + this.decayRate + "\n");
+//            System.out.println("\nConfigurationProviderMock#decayRate: " + this.decayRate + "\n");
+        }
+
+        public void handleChangeOfUncertainFlowShop(FlowShopWithUncertainty uncertainFlowShop)
+        {
+            this.uncertainFlowShop = uncertainFlowShop;
+//            System.out.println("\nConfigurationProviderMock#uncertainFlowShop:\n" + this.uncertainFlowShop + "\n");
         }
 
         public void handleChangeOfDesiredInitialAcceptanceProbability(double newValue)
@@ -215,9 +300,9 @@ public class MainConsoleWithMocks {
                 bestSolution = flowShop;
 
 //                System.out.println("\n\nBest solution updated: ");
-                System.out.println("Iteration: " + iteration +
-                        " \nLowerBound Of MinMaxRegret Optimalization: " + flowShop.getLowerBoundOfMinMaxRegretOptimalization() +
-                        " \nUpperBound Of MinMaxRegret Optimalization: " + flowShop.getUpperBoundOfMinMaxRegretOptimalization());
+//                System.out.println("Iteration: " + iteration +
+//                        " \nLowerBound Of MinMaxRegret Optimalization: " + flowShop.getLowerBoundOfMinMaxRegretOptimalization() +
+//                        " \nUpperBound Of MinMaxRegret Optimalization: " + flowShop.getUpperBoundOfMinMaxRegretOptimalization());
 
             }
         }
@@ -235,6 +320,7 @@ public class MainConsoleWithMocks {
             System.out.println("Result for LB:" + flowShopWithUncertainty.getLowerBoundOfMinMaxRegretOptimalization() + "");
             System.out.println("Result for UB:" + flowShopWithUncertainty.getUpperBoundOfMinMaxRegretOptimalization() + "");
             flowShopWithUncertainty.toString();
+            SA_RESULT = flowShopWithUncertainty.getUpperBoundOfMinMaxRegretOptimalization();
             algorithmIsEnded = true;
         }
 
