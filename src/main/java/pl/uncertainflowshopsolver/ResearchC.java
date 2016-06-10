@@ -36,7 +36,7 @@ public class ResearchC {
     private static final String PATH_TO_RESOURCES = "C:/Users/pkubicki/IdeaProjects/mgrInfWiz/resources";
     private static final String PREFIX_PATH_TO_FILE = "/BADANIA_C_";
 //    public static String PATH_TO_FILE_WITH_UNCERTAIN_FLOWSHOP = "resources/1_[n50, m3, K100, C50].txt";
-    private static final int HOW_MANY_INSTANCES = 5;
+    private static final int HOW_MANY_INSTANCES = 10;
     private static final int HOW_MANY_REPETITIONS_FOR_CONCRETE_INSTANCE = 3;
     private static final int MINIMUM_INSTANCE = 20;
     private static final int MAXIMUM_INSTANCE = 200;
@@ -55,18 +55,18 @@ public class ResearchC {
 
     public static void main(String[] args) throws FileNotFoundException {
 
+        NumberFormat formatter = new DecimalFormat("#0.00");
+        formatter.setGroupingUsed(false);
+
         final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM-HH.mm-ss");
         String timestamp = simpleDateFormat.format(new Date());
         PrintWriter pw = new PrintWriter(new File(PATH_TO_RESOURCES + PREFIX_PATH_TO_FILE + timestamp +".csv"));
-        StringBuilder sb = new StringBuilder();
+//        StringBuilder sb = new StringBuilder();
 
         ConfigurationProviderMock configurationProviderMock = new ConfigurationProviderMock();
         EventDispatcherMock eventDispatcher = new EventDispatcherMock(null);
 
         for (int C = MINIMUM_INSTANCE; C <= MAXIMUM_INSTANCE; C+=DELTA_OF_TASK_COUNT_BETWEEN_EACH_TEST_INSTANCE) {
-
-            sb.append(C);
-            sb.append(';');
 
             pw.print(C);    //TODO which approach is better? With or w/o StringBuilder?
             pw.print(";");
@@ -125,31 +125,17 @@ public class ResearchC {
             z_TS_Average = z_TS_Average /(HOW_MANY_INSTANCES * HOW_MANY_REPETITIONS_FOR_CONCRETE_INSTANCE);
             t_TS_Average = t_TS_Average /(HOW_MANY_INSTANCES * HOW_MANY_REPETITIONS_FOR_CONCRETE_INSTANCE);
 
-            sb.append(z_MIH_Average);
-            sb.append(';');
-            sb.append(z_SA_Average);
-            sb.append(';');
-            sb.append(z_TS_Average);
-            sb.append(';');
-            sb.append(t_MIH_Average);
-            sb.append(';');
-            sb.append(t_SA_Average);
-            sb.append(';');
-            sb.append(t_TS_Average);
-            sb.append(';');
-            sb.append("\n");
-
-            pw.print(z_MIH_Average);
+            pw.print(formatter.format(z_MIH_Average));
             pw.print(";");
-            pw.print(z_SA_Average);
+            pw.print(formatter.format(z_SA_Average));
             pw.print(";");
-            pw.print(z_TS_Average);
+            pw.print(formatter.format(z_TS_Average));
             pw.print(";");
-            pw.print(t_MIH_Average);
+            pw.print(formatter.format(t_MIH_Average));
             pw.print(";");
-            pw.print(t_SA_Average);
+            pw.print(formatter.format(t_SA_Average));
             pw.print(";");
-            pw.print(t_TS_Average);
+            pw.print(formatter.format(t_TS_Average));
             pw.print(";");
             pw.print("\n");
 
@@ -158,7 +144,7 @@ public class ResearchC {
             System.out.println("*********************");
         }
 
-        pw.write(sb.toString());
+//        pw.write(sb.toString());
         pw.close();
         System.out.println("done!");
 
