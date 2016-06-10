@@ -18,6 +18,7 @@ import static pl.uncertainflowshopsolver.gui.event.AlgorithmEventDispatcher.Endi
 public class TabuSearch {
 
     private static final Random random = new Random();
+    private static final double MAX_TIME_OF_EXECUTION_IN_SECONDS = 300;
 
     private AlgorithmEventDispatcher eventDispatcher;
     private ConfigurationProvider configurationProvider;
@@ -70,7 +71,7 @@ public class TabuSearch {
         /***********Hybridisation**************/
         MIH mih = new MIH(uncertainFlowShop);
         final Object[] mihResult = mih.solve(false, false);
-        System.out.println("MIH UB result: " + (double)mihResult[1]);
+        System.out.println("(TS) MIH UB result: " + (double)mihResult[1]);
         FlowShopWithUncertainty helperFlowShop = (FlowShopWithUncertainty) mihResult[3];
 
         final Object[] result1 = SubAlgorithm2.solveGreedy(uncertainFlowShop, null, false);
@@ -146,11 +147,23 @@ public class TabuSearch {
                     iterationWithoutImprovementCount > configuration.getMaxIterationsWithoutImprovementAsStopCriterion()) {
                 break;
             }
+
+            long stopTime = System.currentTimeMillis();
+            double elapsedLastPeriodOfTime = (stopTime - midTime_3) / 1000d; //in seconds
+            double elapsedTime_delta4 = elapsedTime_delta3 + elapsedTime_delta1;
+            double elapsedTime = (elapsedLastPeriodOfTime + elapsedTime_delta4) / 1000d; //in seconds
+            elapsedTime = Math.floor(elapsedTime * 100) / 100;  //display a truncated 3.545555555 to 3.54, but rounded to 3.55.
+
+            if (elapsedTime > MAX_TIME_OF_EXECUTION_IN_SECONDS) {
+                System.out.println("\n TS MAX_TIME_OF_EXECUTION_IN_SECONDS reached. \n");
+                break;
+            }
         }
         long stopTime = System.currentTimeMillis();
         double elapsedLastPeriodOfTime = (stopTime - midTime_3) / 1000d; //in seconds
         double elapsedTime_delta4 = elapsedTime_delta3 + elapsedTime_delta1;
         double elapsedTime = (elapsedLastPeriodOfTime + elapsedTime_delta4) / 1000d; //in seconds
+        elapsedTime = Math.floor(elapsedTime * 100) / 100;  //display a truncated 3.545555555 to 3.54, but rounded to 3.55.
         uncertainFlowShop_for_minimum.setElapsedTime(elapsedTime);
 
         // Last update
@@ -167,12 +180,12 @@ public class TabuSearch {
     }
 
     private void setBestUncertainFlowShopAfterDiversification() {
-        System.out.println("\nShuffle! \nWas :");
-        for (TaskWithUncertainty task : uncertainFlowShop.getTasks())
-        {
-            System.out.print(" " + task.getOriginalPosition() + " ");
-        }
-        System.out.println();
+        System.out.println("\nShuffle!");
+//        for (TaskWithUncertainty task : uncertainFlowShop.getTasks())
+//        {
+//            System.out.print(" " + task.getOriginalPosition() + " ");
+//        }
+//        System.out.println();
 
         FlowShopWithUncertainty minimumHelperFlowShop = uncertainFlowShop.clone();
         minimumHelperFlowShop.setUpperBoundOfMinMaxRegretOptimalization(-1d);
@@ -184,18 +197,18 @@ public class TabuSearch {
             {
                 minimumHelperFlowShop=newFlowShop.clone();
                 minimumHelperFlowShop.setUpperBoundOfMinMaxRegretOptimalization(resultForNewValue);
-                System.out.println("New UpperBoundOfMinMaxRegretOptimalization of minimumHelperFlowShop: " + minimumHelperFlowShop.getUpperBoundOfMinMaxRegretOptimalization());
+//                System.out.println("New UpperBoundOfMinMaxRegretOptimalization of minimumHelperFlowShop: " + minimumHelperFlowShop.getUpperBoundOfMinMaxRegretOptimalization());
             }
         }
         uncertainFlowShop = minimumHelperFlowShop.clone();
         uncertainFlowShop.setUpperBoundOfMinMaxRegretOptimalization(minimumHelperFlowShop.getUpperBoundOfMinMaxRegretOptimalization());
 
-        System.out.println("\nIs :");
-        for (TaskWithUncertainty task : uncertainFlowShop.getTasks())
-        {
-            System.out.print(" " + task.getOriginalPosition() + " ");
-        }
-        System.out.println();
+//        System.out.println("\nIs :");
+//        for (TaskWithUncertainty task : uncertainFlowShop.getTasks())
+//        {
+//            System.out.print(" " + task.getOriginalPosition() + " ");
+//        }
+//        System.out.println();
     }
 
     private boolean isDiversificationNeeded() {

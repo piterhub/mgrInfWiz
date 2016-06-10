@@ -35,8 +35,8 @@ public class SAConfigurationImpl implements SAConfiguration {
         this.uncertainFlowShop = uncertainFlowShop;
         this.maxIterationsWithoutImprovementForDiversificationPurpose = maxIterationsWithoutImprovementForDiversificationPurpose;
         this.maxIterationsWithoutImprovementAsStopCriterion = maxIterationsWithoutImprovementAsStopCriterion;
-        System.out.println("\nDECAY RATE IS NOW: " + this.decayRate + "\n");
-        System.out.println("\nP_0 IS NOW: " + this.desiredInitialAcceptanceProbability + "\n");
+//        System.out.println("\nDECAY RATE IS NOW: " + this.decayRate + "\n");
+//        System.out.println("\nP_0 IS NOW: " + this.desiredInitialAcceptanceProbability + "\n");
     }
 
     public static SAConfigurationImplBuilder newBuilder() {

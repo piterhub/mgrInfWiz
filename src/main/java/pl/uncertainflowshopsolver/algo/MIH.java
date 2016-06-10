@@ -24,15 +24,21 @@ public class MIH {
         this.uncertainFlowShop = uncertainFlowShop;
     }
 
+    /**
+     *
+     * @param lowerBound
+     * @param printDebug
+     * @return Object[]:
+     * -[0]: double
+     * -[1]: double
+     * -[2]: not String, but double
+     * -[3]: FlowShopWithUncertainty
+     */
     public Object[] solve(boolean lowerBound, boolean printDebug) {
         //1. The main part -> determinization of uncertain flow shop and solve it with NEH. That's because we measure it's time.
         long startTime = System.currentTimeMillis();
         final FlowShop determinedFlowShop = getDeterminedFlowShop();
-//        System.out.println("\n" + determinedFlowShop + "\n");
         final FlowShop flowShop = NehAlgorithm.solve(determinedFlowShop);
-        final double resultForDeterminizedFlowShop = NehAlgorithm.solve(determinedFlowShop, true);
-//        System.out.println("\n" + flowShop + "\n");
-//        System.out.println("resultForDeterminizedFlowShop: " + resultForDeterminizedFlowShop + "\n");
         long stopTime = System.currentTimeMillis();
         long elapsedTime = stopTime - startTime;
 
@@ -40,8 +46,6 @@ public class MIH {
         List<TaskWithUncertainty> newUncertainTasks = getListOfUncertainTasksOrderedDueToNeh(flowShop);
 
         uncertainFlowShop = new FlowShopWithUncertainty(newUncertainTasks);
-
-//        System.out.println(uncertainFlowShop.toString());
 
         final Object[] resultsInside = SubAlgorithm2.solveGreedy(uncertainFlowShop, null, printDebug);
         final double resultOfLowerBound = (double) resultsInside[0];
@@ -52,11 +56,12 @@ public class MIH {
         result[0] = resultOfLowerBound;
         result[1] = resultOfUpperBound;
 
-        DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols(Locale.GERMAN);
-        otherSymbols.setDecimalSeparator(',');
-        NumberFormat formatter = new DecimalFormat("#0.00");
-        formatter.setGroupingUsed(false);
-        result[2] = formatter.format(elapsedTime / 1000d);  //It will be in seconds
+//        DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols(Locale.GERMAN);
+//        otherSymbols.setDecimalSeparator(',');
+//        NumberFormat formatter = new DecimalFormat("#0.00");
+//        formatter.setGroupingUsed(false);
+//        result[2] = formatter.format(elapsedTime / 1000d);  //It will be in seconds
+        result[2] = Math.floor(elapsedTime / 1000d * 100) / 100; //e.g. 3.545555555 to 3.54, but rounded to 3.55
 
         result[3] = uncertainFlowShop;
 

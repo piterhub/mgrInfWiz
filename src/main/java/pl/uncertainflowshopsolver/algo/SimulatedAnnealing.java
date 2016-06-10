@@ -22,6 +22,7 @@ import static pl.uncertainflowshopsolver.gui.event.AlgorithmEventDispatcher.*;
 public class SimulatedAnnealing {
 
     private static final Random random = new Random();
+    private static final double MAX_TIME_OF_EXECUTION_IN_SECONDS = 300;
 
     private AlgorithmEventDispatcher eventDispatcher;
     private ConfigurationProvider configurationProvider;
@@ -77,7 +78,7 @@ public class SimulatedAnnealing {
         /***********Hybridisation**************/
         MIH mih = new MIH(uncertainFlowShop);
         final Object[] mihResult = mih.solve(false, false);
-        System.out.println("MIH UB result: " + (double)mihResult[1]);
+        System.out.println("(SA) MIH UB result: " + (double)mihResult[1]);
         FlowShopWithUncertainty helperFlowShop = (FlowShopWithUncertainty) mihResult[3];
 
         final Object[] result1 = SubAlgorithm2.solveGreedy(uncertainFlowShop, null, false);
@@ -157,9 +158,9 @@ public class SimulatedAnnealing {
             if(isDiversificationNeeded()) {
                 setBestUncertainFlowShopAfterDiversification();
                 lastImprovementIterationInTermOfDiversification = iterations;
-                System.out.println("The temp was: " + initialTemperature);
+                System.out.print(" The temp was: " + initialTemperature);
                 initialTemperature = mInitialTemperature;
-                System.out.println("The temp is now: " + initialTemperature);
+                System.out.print(" and is now: " + initialTemperature);
             }
 
             for (int i = 0; i < configuration.getEpocheLength(); i++) {
@@ -204,11 +205,23 @@ public class SimulatedAnnealing {
                     iterations - lastImprovementIteration > configuration.getMaxIterationsWithoutImprovementAsStopCriterion()) {
                 break;
             }
+
+            long stopTime = System.currentTimeMillis();
+            double elapsedLastPeriodOfTime = (stopTime - midTime_3) / 1000d; //in seconds
+            double elapsedTime_delta4 = elapsedTime_delta3 + elapsedTime_delta1;
+            double elapsedTime = (elapsedLastPeriodOfTime + elapsedTime_delta4) / 1000d; //in seconds
+            elapsedTime = Math.floor(elapsedTime * 100) / 100;  //display a truncated 3.545555555 to 3.54, but rounded to 3.55.
+
+            if (elapsedTime > MAX_TIME_OF_EXECUTION_IN_SECONDS) {
+                System.out.println("\n TS MAX_TIME_OF_EXECUTION_IN_SECONDS reached. \n");
+                break;
+            }
         }
         long stopTime = System.currentTimeMillis();
         double elapsedLastPeriodOfTime = (stopTime - midTime_3) / 1000d; //in seconds
         double elapsedTime_delta4 = elapsedTime_delta3 + elapsedTime_delta1;
         double elapsedTime = (elapsedLastPeriodOfTime + elapsedTime_delta4) / 1000d; //in seconds
+        elapsedTime = Math.floor(elapsedTime * 100) / 100;  //display a truncated 3.545555555 to 3.54, but rounded to 3.55.
         uncertainFlowShop_for_minimum.setElapsedTime(elapsedTime);
 
         // Last update

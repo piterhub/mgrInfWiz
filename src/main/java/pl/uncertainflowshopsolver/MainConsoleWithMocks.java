@@ -1,6 +1,8 @@
 package pl.uncertainflowshopsolver;
 
+import pl.uncertainflowshopsolver.algo.MIH;
 import pl.uncertainflowshopsolver.algo.SimulatedAnnealing;
+import pl.uncertainflowshopsolver.algo.TabuSearch;
 import pl.uncertainflowshopsolver.config.ConfigurationProvider;
 import pl.uncertainflowshopsolver.config.TSPConfiguration;
 import pl.uncertainflowshopsolver.config.impl.TSPConfigurationImpl;
@@ -39,6 +41,34 @@ public class MainConsoleWithMocks {
      */
     public static void main(String[] args) throws FileNotFoundException {
 
+//        tuneAlphaAndDesiredInitialAcceptanceProbability();
+
+        FlowShopWithUncertainty flowShopWithUncertainty;
+
+        try {
+            flowShopWithUncertainty = UncertainFlowShopParser.parseFileToFlowShopWithUncertainty(PATH_TO_FILE_WITH_UNCERTAIN_FLOWSHOP);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        ConfigurationProviderMock configurationProviderMock = new ConfigurationProviderMock();
+        configurationProviderMock.handleChangeOfUncertainFlowShop(flowShopWithUncertainty);
+
+        TabuSearch TSAlgorithm = new TabuSearch();
+        TSAlgorithm.setConfigurationProvider(configurationProviderMock);
+        TSAlgorithm.setEventDispatcher(new EventDispatcherMock(null));
+        TSAlgorithm.start();
+    }
+
+    /**
+     * Strojenie alfa i P_0.
+     * Notice: 5 instances x 5 repetitions (runs) x 5 values of parameter x 2 parameters it takes about 10h.
+     * Results are written to .csv file, which is a base to choose the proper combination of alpha and P_0.
+     *
+     * @throws FileNotFoundException
+     */
+    private static void tuneAlphaAndDesiredInitialAcceptanceProbability() throws FileNotFoundException {
         /**
          * Strojenie alpha:
          */
@@ -99,7 +129,7 @@ public class MainConsoleWithMocks {
             System.out.println(PATH_TO_FILE_WITH_UNCERTAIN_FLOWSHOP);
 
             try {
-                Thread.sleep(240000);//pause 4 min
+                Thread.sleep(240000);//pause 4 min for cool down the processor
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -167,7 +197,7 @@ public class MainConsoleWithMocks {
             System.out.println(PATH_TO_FILE_WITH_UNCERTAIN_FLOWSHOP);
 
             try {
-                Thread.sleep(240000);//pause 4 min
+                Thread.sleep(240000);//pause 4 min for cool down the processor
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -176,28 +206,6 @@ public class MainConsoleWithMocks {
         pw.write(sb.toString());
         pw.close();
         System.out.println("done 2!");
-
-
-//        int MINIMUM_INSTANCE = 26;
-//        int MAXIMUM_INSTANCE = 50;
-//        int DELTA_OF_TASK_COUNT_BETWEEN_EACH_TEST_INSTANCE = 2;
-
-//        for (int i = 0; i < HOW_MANY_REPETITIONS_FOR_CONCRETE_INSTANCE; i++) {
-//
-//        }
-
-//        try {
-//            MIH mih = new MIH(UncertainFlowShopParser.parseFileToFlowShopWithUncertainty(PATH_TO_FILE_WITH_UNCERTAIN_FLOWSHOP));
-//            mih.solve(true, true);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-
-
-//        TabuSearch TSAlgorithm = new TabuSearch();
-//        TSAlgorithm.setConfigurationProvider(new ConfigurationProviderMock());
-//        TSAlgorithm.setEventDispatcher(new EventDispatcherMock(null));
-//        TSAlgorithm.start();
     }
 
     private static String changePathToFileForNextRun(int index) {
@@ -222,13 +230,11 @@ public class MainConsoleWithMocks {
         public void handleChangeOfAlpha(double newValue)
         {
             this.decayRate = newValue;
-//            System.out.println("\nConfigurationProviderMock#decayRate: " + this.decayRate + "\n");
         }
 
         public void handleChangeOfUncertainFlowShop(FlowShopWithUncertainty uncertainFlowShop)
         {
             this.uncertainFlowShop = uncertainFlowShop;
-//            System.out.println("\nConfigurationProviderMock#uncertainFlowShop:\n" + this.uncertainFlowShop + "\n");
         }
 
         public void handleChangeOfDesiredInitialAcceptanceProbability(double newValue)
@@ -238,43 +244,33 @@ public class MainConsoleWithMocks {
 
         @Override
         public SAConfiguration getSAConfiguration() {
-            try {
-                return SAConfigurationImpl.newBuilder()
-                        .withDesiredInitialAcceptanceProbability(desiredInitialAcceptanceProbability)
-                        .withEpocheLength(epocheLength)
-                        .withDecayRate(decayRate)
-                        .withEndTemperature(0.5)
-                        .withErrorThreshold(0.0001)
-                        .withSamplesCardinality(samplesCardinality)
-                        .withMaxNumberOfIterations(maxNumberOfIterations)
-                        .withUncertainFlowshop(UncertainFlowShopParser.parseFileToFlowShopWithUncertainty(PATH_TO_FILE_WITH_UNCERTAIN_FLOWSHOP))
-                        .withMaxIterationsWithoutImprovementForDiversificationPurpose(maxIterationsWithoutImprovementForDiversificationPurpose)
-                        .withMaxIterationsWithoutImprovementAsStopCriterion(maxIterationsWithoutImprovementAsStopCriterion)
-                        .build();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return null;
+            return SAConfigurationImpl.newBuilder()
+                    .withDesiredInitialAcceptanceProbability(desiredInitialAcceptanceProbability)
+                    .withEpocheLength(epocheLength)
+                    .withDecayRate(decayRate)
+                    .withEndTemperature(0.5)
+                    .withErrorThreshold(0.0001)
+                    .withSamplesCardinality(samplesCardinality)
+                    .withMaxNumberOfIterations(maxNumberOfIterations)
+                    .withUncertainFlowshop(uncertainFlowShop)
+                    .withMaxIterationsWithoutImprovementForDiversificationPurpose(maxIterationsWithoutImprovementForDiversificationPurpose)
+                    .withMaxIterationsWithoutImprovementAsStopCriterion(maxIterationsWithoutImprovementAsStopCriterion)
+                    .build();
         }
 
         @Override
         public TSPConfiguration getTSPConfiguration() {
 //            final WayToGenerateNeighborhoodEnum wayToGenerateNeighborhoodEnum = initializerNameClassMap.get(initializerChoiceBox.getValue());
-            try {
-                return TSPConfigurationImpl.newBuilder()
-                        .withSizeOfNeighborhood(1225)
-                        .withLengthOfTabuList(50)
-                        .withIterationsWithoutImprovementAsAdditionalAspirationCriterion(10)
-                        .withMaxIterationsWithoutImprovementForDiversificationPurpose(250)
-                        .withMaxIterationsAsStopCriterion(15000)
-                        .withMaxIterationsWithoutImprovementAsStopCriterion(1000)
-    //                    .withWayToGenerateNeighborhood(wayToGenerateNeighborhoodEnum)
-                        .withUncertainFlowshop(UncertainFlowShopParser.parseFileToFlowShopWithUncertainty(PATH_TO_FILE_WITH_UNCERTAIN_FLOWSHOP))
-                        .build();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return null;
+            return TSPConfigurationImpl.newBuilder()
+                    .withSizeOfNeighborhood(1225)
+                    .withLengthOfTabuList(50)
+                    .withIterationsWithoutImprovementAsAdditionalAspirationCriterion(10)
+                    .withMaxIterationsWithoutImprovementForDiversificationPurpose(250)
+                    .withMaxIterationsAsStopCriterion(maxNumberOfIterations)
+                    .withMaxIterationsWithoutImprovementAsStopCriterion(1000)
+//                    .withWayToGenerateNeighborhood(wayToGenerateNeighborhoodEnum)
+                    .withUncertainFlowshop(uncertainFlowShop)
+                    .build();
         }
     }
 
