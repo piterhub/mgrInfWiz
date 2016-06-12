@@ -37,10 +37,10 @@ public class ResearchC {
     private static final String PREFIX_PATH_TO_FILE = "/BADANIA_C_";
 //    public static String PATH_TO_FILE_WITH_UNCERTAIN_FLOWSHOP = "resources/1_[n50, m3, K100, C50].txt";
     private static final int HOW_MANY_INSTANCES = 10;
-    private static final int HOW_MANY_REPETITIONS_FOR_CONCRETE_INSTANCE = 3;
-    private static final int MINIMUM_INSTANCE = 20;
+    private static final int HOW_MANY_REPETITIONS_FOR_CONCRETE_INSTANCE = 4;
+    private static final int MINIMUM_INSTANCE = 10;
     private static final int MAXIMUM_INSTANCE = 200;
-    private static final int DELTA_OF_TASK_COUNT_BETWEEN_EACH_TEST_INSTANCE = 20;
+    private static final int DELTA_OF_TASK_COUNT_BETWEEN_EACH_TEST_INSTANCE = 10;
     private static final int N = 10; //task count
     private static final int M = 3;  //machines count
     private static final int K = 100;
