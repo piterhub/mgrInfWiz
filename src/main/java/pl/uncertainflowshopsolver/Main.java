@@ -10,6 +10,7 @@ import pl.uncertainflowshopsolver.algo.SimulatedAnnealing;
 import pl.uncertainflowshopsolver.algo.TabuSearch;
 import pl.uncertainflowshopsolver.gui.GUIController;
 
+import java.io.InputStream;
 import java.net.URL;
 
 public class Main extends Application {
@@ -28,9 +29,10 @@ public class Main extends Application {
 
         prepareAlgorithm();
 
-//        ClassLoader classLoader = getClass().getClassLoader();
+        ClassLoader classLoader = getClass().getClassLoader();
 //        final URL iconURL = classLoader.getResource("/icon.png");
-//        primaryStage.getIcons().add(new Image(iconURL.toString()));
+        final InputStream resourceAsStream = this.getClass().getResourceAsStream("/icon.png");//.getResource("/icon.png");
+        primaryStage.getIcons().add(new Image(resourceAsStream));
         primaryStage.setTitle(APPLICATION_NAME);
         mainScene = new Scene(root, GUI_WIDTH, GUI_HEIGHT);
         primaryStage.setScene(mainScene);

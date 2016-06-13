@@ -1,6 +1,5 @@
 package pl.uncertainflowshopsolver.gui;
 
-import com.sun.deploy.util.StringUtils;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ChangeListener;

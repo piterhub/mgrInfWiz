@@ -637,26 +637,26 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
     }
 
     private void enableEditingConfiguration() {
-        setEditingPartOfConfiguration(false);
-        setEditingSecondPartOfConfiguration(false);
+        setEditingAlgorithmsOptionsConfiguration(false);
+        setEditingInputAndOutputConfiguration(false);
 
     }
 
     private void disableEditingConfiguration() {
-        setEditingPartOfConfiguration(true);
-        setEditingSecondPartOfConfiguration(true);
+        setEditingAlgorithmsOptionsConfiguration(true);
+        setEditingInputAndOutputConfiguration(true);
     }
 
     private void enableEditingPartOfConfiguration() {
-        setEditingPartOfConfiguration(false);
+        setEditingAlgorithmsOptionsConfiguration(false);
 
     }
 
     private void disableEditingPartOfConfiguration() {//TODO rename
-        setEditingPartOfConfiguration(true);
+        setEditingAlgorithmsOptionsConfiguration(true);
     }
 
-    private void setEditingPartOfConfiguration(boolean isNotEnabled) {
+    private void setEditingAlgorithmsOptionsConfiguration(boolean isNotEnabled) {
         desiredInitialAcceptanceProbabilityDoubleTextBox0To1.setDisable(isNotEnabled);
         epocheLengthIntegerTextBox.setDisable(isNotEnabled);
         decayRateDoubleTextBox0To1.setDisable(isNotEnabled);
@@ -675,9 +675,12 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
         maxNumberOfIterationsAsStopTabuSearchIntegerTextBox.setDisable(isNotEnabled);
     }
 
-    private void setEditingSecondPartOfConfiguration(boolean isNotEnabled)
+    private void setEditingInputAndOutputConfiguration(boolean isNotEnabled)
     {
-        generateFlowShopButton.setDisable(isNotEnabled);
+        if(selectedDirectory != null && !isNotEnabled)
+        {
+            generateFlowShopButton.setDisable(isNotEnabled);
+        }
         chooseFolderToSaveResultButton.setDisable(isNotEnabled);
         taskCount.setDisable(isNotEnabled);
         machineCount.setDisable(isNotEnabled);
