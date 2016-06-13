@@ -52,6 +52,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class GUIController implements ConfigurationProvider, AlgorithmEventListener, Initializable {
+    private static final int MAXIMUM_NUMBER_OF_OPERATIONS = 500;
+
     public ChoiceBox<String> initializerChoiceBox;
     public DoubleTextBox0To1 desiredInitialAcceptanceProbabilityDoubleTextBox0To1;
     public IntegerTextBox epocheLengthIntegerTextBox;
@@ -95,6 +97,7 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
     private boolean isSANotTSChosen = true;
 
     private FlowShopWithUncertainty flowShop;
+    private NumberBinding maxProblemProperty;
 
     public FlowShopWithUncertainty getFlowShop() {
         return flowShop;
@@ -161,7 +164,10 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
                 {
                     if(algorithmChoiceBox.getItems().get((Integer) newValue) == "MIH")
                     {
-                        startStopButton.setDisable(false);
+                        if ((flowShop.getTaskCount() * flowShop.getM()) <= MAXIMUM_NUMBER_OF_OPERATIONS)
+                        {
+                            startStopButton.setDisable(false);
+                        }
                         saOptionsTitledPane.setDisable(true);
                         tsOptionsTitledPane.setDisable(true);
                         chartTitledPane.setDisable(true);
@@ -230,6 +236,7 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
         disableEditingPartOfConfiguration();
         prepareSABinding();
         prepareTSBinding();
+        prepareMaxProblemBinding();
         algorithmChoiceBox.setDisable(true);
 
         this.addPropertyChangeListener(new PropertyChangeListener() {
@@ -613,7 +620,12 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
                 if(firstSAProperty.greaterThan(0).getValue())
                 {
                     if(flowShop != null)
-                        startStopButton.setDisable(false);
+                    {
+                        if (flowShop.getTaskCount() * flowShop.getM() <= MAXIMUM_NUMBER_OF_OPERATIONS)
+                        {
+                            startStopButton.setDisable(false);
+                        }
+                    }
                 }
             }
         });
@@ -630,7 +642,29 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
                 if(fourthTSProperty.greaterThan(0).getValue())
                 {
                     if(flowShop != null)
-                        startStopButton.setDisable(false);
+                    {
+                        if (flowShop.getTaskCount() * flowShop.getM() <= MAXIMUM_NUMBER_OF_OPERATIONS)
+                        {
+                            startStopButton.setDisable(false);
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    private void prepareMaxProblemBinding() {
+        maxProblemProperty = Bindings.multiply(taskCount.integerProperty(), machineCount.integerProperty());
+        maxProblemProperty.addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observableValue, Number oldValue, Number newValue) {
+                if(maxProblemProperty.greaterThan(MAXIMUM_NUMBER_OF_OPERATIONS).getValue())
+                {
+                    startStopButton.setDisable(true);
+                }
+                else
+                {
+                    startStopButton.setDisable(false);
                 }
             }
         });
@@ -695,13 +729,18 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
     }
 
     private void updateProgressBar(int iteration) {
+
         if(isSANotTSChosen)
         {
+            if(iteration > activeSAConfiguration.getMaxNumberOfIterations())
+                return;
             progressLabel.setText(String.valueOf(iteration) + "/" + activeSAConfiguration.getMaxNumberOfIterations());
             progressBar.setProgress((double) iteration / activeSAConfiguration.getMaxNumberOfIterations());
         }
         else
         {
+            if(iteration > activeTSConfiguration.getMaxIterationsAsStopCriterion())
+                return;
             progressLabel.setText(String.valueOf(iteration) + "/" + activeTSConfiguration.getMaxIterationsAsStopCriterion());
             progressBar.setProgress((double) iteration / activeTSConfiguration.getMaxIterationsAsStopCriterion());
         }

@@ -126,12 +126,6 @@ public class MainConsoleWithMocks {
             }
             PATH_TO_FILE_WITH_UNCERTAIN_FLOWSHOP = changePathToFileForNextRun(instance);
             System.out.println(PATH_TO_FILE_WITH_UNCERTAIN_FLOWSHOP);
-
-            try {
-                Thread.sleep(240000);//pause 4 min for cool down the processor
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
         }
 
         pw.write(sb.toString());
@@ -194,12 +188,6 @@ public class MainConsoleWithMocks {
             }
             PATH_TO_FILE_WITH_UNCERTAIN_FLOWSHOP = changePathToFileForNextRun(instance);
             System.out.println(PATH_TO_FILE_WITH_UNCERTAIN_FLOWSHOP);
-
-            try {
-                Thread.sleep(240000);//pause 4 min for cool down the processor
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
         }
 
         pw.write(sb.toString());
