@@ -23,15 +23,16 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import pl.uncertainflowshopsolver.algo.MIH;
 import pl.uncertainflowshopsolver.algo.SimulatedAnnealing;
 import pl.uncertainflowshopsolver.algo.TabuSearch;
 import pl.uncertainflowshopsolver.algo.util.WayToGenerateNeighborhoodEnum;
 import pl.uncertainflowshopsolver.algo.util.WhichAlgorithmEnum;
 import pl.uncertainflowshopsolver.config.SAConfiguration;
 import pl.uncertainflowshopsolver.config.ConfigurationProvider;
-import pl.uncertainflowshopsolver.config.TSPConfiguration;
+import pl.uncertainflowshopsolver.config.TSConfiguration;
 import pl.uncertainflowshopsolver.config.impl.SAConfigurationImpl;
-import pl.uncertainflowshopsolver.config.impl.TSPConfigurationImpl;
+import pl.uncertainflowshopsolver.config.impl.TSConfigurationImpl;
 import pl.uncertainflowshopsolver.flowshop.FlowShopWithUncertainty;
 import pl.uncertainflowshopsolver.gui.event.AlgorithmEventDispatcher;
 import pl.uncertainflowshopsolver.gui.event.AlgorithmEventListener;
@@ -60,7 +61,6 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
     public IntegerTextBox maxNumberOfIterationsIntegerTextBox;
 //    public IntegerTextBox maxIterationsWithoutImprovementIntegerTextBox;
 //    public DoubleTextBox0To1 cutOffEnergyLevelDoubleTextBox;
-    public Label totalBeesLabel;
     public ProgressBar progressBar;
     public Label progressLabel;
     public Button startStopButton;
@@ -87,28 +87,27 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
     public IntegerTextBox maxIterWithoutImprovementDiversificationIntegerTextBox;
     public IntegerTextBox maxNumberOfIterationsAsStopTabuSearchIntegerTextBox;
     public IntegerTextBox SA_maxIterWithoutImproDiversificationIntegerTextBox;
-    private NumberBinding thirdProperty;
-    private NumberBinding fourthProperty;
-    private NumberBinding fifthProperty;
-    private File defaultDirectory;
+    public LineChart lineChart;
+
+    private XYChart.Series<Integer, Double> series = new XYChart.Series<>();
+
     private boolean isChartUpdateAllowed = true;
+    private boolean isSANotTSChosen = true;
+
+    private FlowShopWithUncertainty flowShop;
 
     public FlowShopWithUncertainty getFlowShop() {
         return flowShop;
     }
 
-    private FlowShopWithUncertainty flowShop;
-
     private Map<String, WayToGenerateNeighborhoodEnum> initializerNameClassMap;
     private Map<String, WhichAlgorithmEnum> algorithmEnumMap;
 
-    public LineChart lineChart;
-    private XYChart.Series<Integer, Double> series = new XYChart.Series<>();
+    private SimulatedAnnealing SAalgorithm;
+    private TabuSearch TSAlgorithm;
 
     private SAConfiguration activeSAConfiguration;
-    private TSPConfiguration activeTSPConfiguration;
-    private SimulatedAnnealing algorithmSA;
-    private TabuSearch algorithmTS;
+    private TSConfiguration activeTSConfiguration;
 
     private AlgorithmState algorithmState = AlgorithmState.STOPPED;
     private Thread algorithmThread;
@@ -117,10 +116,26 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
     private int bestSolutionIteration = -1;
     private FlowShopWithUncertainty bestSolution;
 
-    private NumberBinding firstProperty;
-    private NumberBinding secondProperty;
+    /**
+     * These NumberBindings must be class fields due to ChangeListeners, which use them!
+     */
+    private NumberBinding firstSAProperty;
+    private NumberBinding secondSAProperty;
+    private NumberBinding thirdSAProperty;
+    private NumberBinding fourthSAProperty;
+    private NumberBinding fifthSAProperty;
+
+    private NumberBinding firstTSProperty;
+    private NumberBinding secondTSProperty;
+    private NumberBinding thirdTSProperty;
+    private NumberBinding fourthTSProperty;
+
+    private File defaultDirectory;
     private File selectedDirectory;
 
+    /**
+     * It is used in order to control, whether {@link FlowShopWithUncertainty} flowShop is chosen, or not.
+     */
     protected PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);;
 
     @Override
@@ -131,13 +146,14 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
         initializerNameClassMap.put("Fischer-Yates shuffle", WayToGenerateNeighborhoodEnum.FISCHER_YATES_SHUFFLE);
         initializerChoiceBox.setItems(FXCollections.observableArrayList(initializerNameClassMap.keySet()));
         initializerChoiceBox.getSelectionModel().select(0);
+        initializerTSChoiceBox.setItems(FXCollections.observableArrayList(initializerNameClassMap.keySet()));
+        initializerTSChoiceBox.getSelectionModel().selectFirst();
 
         algorithmEnumMap = new HashMap<>();
         algorithmEnumMap.put("Simulated Annealing", WhichAlgorithmEnum.SIMULATED_ANNEALING);
         algorithmEnumMap.put("MIH", WhichAlgorithmEnum.MIH);
         algorithmEnumMap.put("Tabu Search", WhichAlgorithmEnum.TABU_SEARCH);
         algorithmChoiceBox.setItems(FXCollections.observableArrayList(algorithmEnumMap.keySet()));
-        algorithmChoiceBox.getSelectionModel().select(0);
         algorithmChoiceBox.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observableValue, Number number, Number newValue) {
@@ -152,21 +168,26 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
                     }
                     else if(algorithmChoiceBox.getItems().get((Integer) newValue) == "Simulated Annealing")
                     {
+                        enableEditingPartOfConfiguration();
                         startStopButton.setDisable(true);
                         saOptionsTitledPane.setDisable(false);
                         tsOptionsTitledPane.setDisable(true);
                         chartTitledPane.setDisable(false);
+                        propertyChangeSupport.firePropertyChange("SAChosen",null, null);
                     }
                     else if(algorithmChoiceBox.getItems().get((Integer) newValue) == "Tabu Search")
                     {
+                        enableEditingPartOfConfiguration();
                         startStopButton.setDisable(true);
                         saOptionsTitledPane.setDisable(true);
                         tsOptionsTitledPane.setDisable(false);
                         chartTitledPane.setDisable(false);
+                        propertyChangeSupport.firePropertyChange("TSChosen",null, null);
                     }
                 }
             }
         });
+        algorithmChoiceBox.getSelectionModel().selectFirst();
 
         maxNumberOfIterationsIntegerTextBox.integerProperty().addListener(new ChangeListener<Number>() {
             @Override
@@ -184,6 +205,22 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
             }
         });
 
+        maxNumberOfIterationsAsStopTabuSearchIntegerTextBox.integerProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observableValue, Number oldValue, Number newValue) {
+                progressLabel.setText("0/" + newValue.intValue());
+                progressBar.setProgress(0.0);
+                if(maxNumberOfIterationsAsStopTabuSearchIntegerTextBox.integerProperty().getValue() > 2000) {
+                    lineChart.setDisable(true);
+                    isChartUpdateAllowed = false;
+                }
+                else {
+                    lineChart.setDisable(false);
+                    isChartUpdateAllowed = true;
+                }
+            }
+        });
+
         lineChart.getXAxis().setAutoRanging(false);
         lineChart.getData().add(series);
         lineChart.setAnimated(false);
@@ -191,13 +228,23 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
         startStopButton.setDisable(true);
         generateFlowShopButton.setDisable(true);
         disableEditingPartOfConfiguration();
-        prepareTotalBeesBinding();
+        prepareSABinding();
+        prepareTSBinding();
+        algorithmChoiceBox.setDisable(true);
 
         this.addPropertyChangeListener(new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent event) {
                 if (event.getPropertyName().equals("FlowShopChosen")) {
-                    enableEditingPartOfConfiguration();
+//                    enableEditingPartOfConfiguration();
+                    algorithmChoiceBox.setDisable(false);
+                    algorithmChoiceBox.getSelectionModel().selectLast();
+                }
+                else if (event.getPropertyName().equals("SAChosen")) {
+                    isSANotTSChosen = true;
+                }
+                else if (event.getPropertyName().equals("TSChosen")) {
+                    isSANotTSChosen = false;
                 }
             }
         });
@@ -219,7 +266,15 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
 
         if(algorithmChoiceBox.getSelectionModel().getSelectedItem() == "MIH")
         {
-            System.out.println("mih dupa");
+            if (algorithmState == AlgorithmState.STOPPED) {
+                if (flowShop != null) {
+                    MIH mih = new MIH(flowShop);
+                    final Object[] resultMIH = mih.solve(true, false);
+                    bestSolutionTextArea.setText("MIH result: " + resultMIH[0] + "\n" + "Sequence result:\n" + resultMIH[3].toString());
+                }
+            } else {
+                TSAlgorithm.stop();
+            }
         }
         else if(algorithmChoiceBox.getSelectionModel().getSelectedItem() == "Simulated Annealing")
         {
@@ -229,19 +284,33 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
                     algorithmThread = new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            algorithmSA.start();
+                            SAalgorithm.start();
                         }
                     });
                     algorithmThread.setDaemon(true);
                     algorithmThread.start();
                 }
             } else {
-                algorithmSA.stop();
+                SAalgorithm.stop();
             }
         }
         else if(algorithmChoiceBox.getSelectionModel().getSelectedItem() == "Tabu Search")
         {
-            System.out.println("ts dupa");
+            activeTSConfiguration = getTSConfiguration();
+            if (algorithmState == AlgorithmState.STOPPED) {
+                if (flowShop != null) {
+                    algorithmThread = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            TSAlgorithm.start();
+                        }
+                    });
+                    algorithmThread.setDaemon(true);
+                    algorithmThread.start();
+                }
+            } else {
+                TSAlgorithm.stop();
+            }
         }
     }
 
@@ -315,18 +384,19 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
     }
 
     @Override
-    public TSPConfiguration getTSPConfiguration() {
+    public TSConfiguration getTSConfiguration() {
         final WayToGenerateNeighborhoodEnum wayToGenerateNeighborhoodEnum = initializerNameClassMap.get(initializerChoiceBox.getValue());
-        this.activeTSPConfiguration = TSPConfigurationImpl.newBuilder()
+        this.activeTSConfiguration = TSConfigurationImpl.newBuilder()
                 .withSizeOfNeighborhood(sizeOfNeighborhoodIntegerTextBox.getValue())
                 .withLengthOfTabuList(lengthOfTabuListIntegerTextBox.getValue())
                 .withIterationsWithoutImprovementAsAdditionalAspirationCriterion(maxIterWithoutImprovementAspirationIntegerTextBox.getValue())
                 .withMaxIterationsWithoutImprovementForDiversificationPurpose(maxIterWithoutImprovementDiversificationIntegerTextBox.getValue())
                 .withMaxIterationsAsStopCriterion(maxNumberOfIterationsAsStopTabuSearchIntegerTextBox.getValue())
                 .withWayToGenerateNeighborhood(wayToGenerateNeighborhoodEnum)
+                .withUncertainFlowshop(flowShop)
                 .build();
 
-        return activeTSPConfiguration;
+        return activeTSConfiguration;
     }
 
     @Override
@@ -516,7 +586,14 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
     private void clearChart() {
         iterationFitnessMap.clear();
         series.getData().clear();
-        ((NumberAxis) lineChart.getXAxis()).setUpperBound((double) activeSAConfiguration.getMaxNumberOfIterations());
+        if(isSANotTSChosen)
+        {
+            ((NumberAxis) lineChart.getXAxis()).setUpperBound((double) activeSAConfiguration.getMaxNumberOfIterations());
+        }
+        else
+        {
+            ((NumberAxis) lineChart.getXAxis()).setUpperBound((double) activeTSConfiguration.getMaxIterationsAsStopCriterion());
+        }
     }
 
     private void updateChart(int iteration) {
@@ -524,16 +601,33 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
             series.getData().add(new XYChart.Data<>(iteration, iterationFitnessMap.get(iteration)));
     }
 
-    private void prepareTotalBeesBinding() {
-        firstProperty = Bindings.multiply(desiredInitialAcceptanceProbabilityDoubleTextBox0To1.doubleProperty(), decayRateDoubleTextBox0To1.doubleProperty());
-        secondProperty = Bindings.multiply(epocheLengthIntegerTextBox.integerProperty(), errorThresholdDoubleTextBox0To1.doubleProperty());
-        thirdProperty = Bindings.multiply(samplesCardinalityIntegerTextBox.integerProperty(), maxNumberOfIterationsIntegerTextBox.integerProperty());
-        fourthProperty = Bindings.multiply(firstProperty, secondProperty);
-        fifthProperty = Bindings.multiply(fourthProperty, thirdProperty);
-        fifthProperty.addListener(new ChangeListener<Number>() {
+    private void prepareSABinding() {
+        firstSAProperty = Bindings.multiply(desiredInitialAcceptanceProbabilityDoubleTextBox0To1.doubleProperty(), decayRateDoubleTextBox0To1.doubleProperty());
+        secondSAProperty = Bindings.multiply(epocheLengthIntegerTextBox.integerProperty(), errorThresholdDoubleTextBox0To1.doubleProperty());
+        thirdSAProperty = Bindings.multiply(samplesCardinalityIntegerTextBox.integerProperty(), maxNumberOfIterationsIntegerTextBox.integerProperty());
+        fourthSAProperty = Bindings.multiply(firstSAProperty, secondSAProperty);
+        fifthSAProperty = Bindings.multiply(fourthSAProperty, thirdSAProperty);
+        fifthSAProperty.addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observableValue, Number oldValue, Number newValue) {
-                if(firstProperty.greaterThan(0).getValue())
+                if(firstSAProperty.greaterThan(0).getValue())
+                {
+                    if(flowShop != null)
+                        startStopButton.setDisable(false);
+                }
+            }
+        });
+    }
+
+    private void prepareTSBinding() {
+        firstTSProperty = Bindings.multiply(sizeOfNeighborhoodIntegerTextBox.integerProperty(), lengthOfTabuListIntegerTextBox.integerProperty());
+        secondTSProperty = Bindings.multiply(maxIterWithoutImprovementAspirationIntegerTextBox.integerProperty(), maxIterWithoutImprovementDiversificationIntegerTextBox.integerProperty());
+        thirdTSProperty = Bindings.multiply(maxNumberOfIterationsAsStopTabuSearchIntegerTextBox.integerProperty(), secondTSProperty);
+        fourthTSProperty = Bindings.multiply(firstTSProperty, thirdTSProperty);
+        fourthTSProperty.addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observableValue, Number oldValue, Number newValue) {
+                if(fourthTSProperty.greaterThan(0).getValue())
                 {
                     if(flowShop != null)
                         startStopButton.setDisable(false);
@@ -558,7 +652,7 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
 
     }
 
-    private void disableEditingPartOfConfiguration() {
+    private void disableEditingPartOfConfiguration() {//TODO rename
         setEditingPartOfConfiguration(true);
     }
 
@@ -572,7 +666,7 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
         maxNumberOfIterationsIntegerTextBox.setDisable(isNotEnabled);
 //        cutOffEnergyLevelDoubleTextBox.setDisable(isNotEnabled);
         initializerChoiceBox.setDisable(isNotEnabled);
-        algorithmChoiceBox.setDisable(isNotEnabled);
+//        algorithmChoiceBox.setDisable(isNotEnabled); TODO 1
         initializerTSChoiceBox.setDisable(isNotEnabled);
         sizeOfNeighborhoodIntegerTextBox.setDisable(isNotEnabled);
         lengthOfTabuListIntegerTextBox.setDisable(isNotEnabled);
@@ -594,12 +688,20 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
     }
 
     public void setSAAlgorithm(SimulatedAnnealing algorithm) {
-        this.algorithmSA = algorithm;
+        this.SAalgorithm = algorithm;
     }
 
     private void updateProgressBar(int iteration) {
-        progressLabel.setText(String.valueOf(iteration) + "/" + activeSAConfiguration.getMaxNumberOfIterations());
-        progressBar.setProgress((double) iteration / activeSAConfiguration.getMaxNumberOfIterations());
+        if(isSANotTSChosen)
+        {
+            progressLabel.setText(String.valueOf(iteration) + "/" + activeSAConfiguration.getMaxNumberOfIterations());
+            progressBar.setProgress((double) iteration / activeSAConfiguration.getMaxNumberOfIterations());
+        }
+        else
+        {
+            progressLabel.setText(String.valueOf(iteration) + "/" + activeTSConfiguration.getMaxIterationsAsStopCriterion());
+            progressBar.setProgress((double) iteration / activeTSConfiguration.getMaxIterationsAsStopCriterion());
+        }
     }
 
 
@@ -634,6 +736,10 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
         final String timestamp = simpleDateFormat.format(new Date());
         final String fileName = "m" + machineCount.getValue() + "_n" + taskCount.getValue() + "_uncertainFlowShop_" + timestamp + ".txt";
         flowShopWithUncertainty.toFile(fileName, Paths.get(selectedDirectory.getAbsolutePath()));
+    }
+
+    public void setTSAlgorithm(TabuSearch TSAlgorithm) {
+        this.TSAlgorithm = TSAlgorithm;
     }
 
     private enum AlgorithmState {

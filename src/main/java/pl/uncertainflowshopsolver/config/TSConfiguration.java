@@ -3,7 +3,7 @@ package pl.uncertainflowshopsolver.config;
 import pl.uncertainflowshopsolver.algo.util.WayToGenerateNeighborhoodEnum;
 import pl.uncertainflowshopsolver.flowshop.FlowShopWithUncertainty;
 
-public interface TSPConfiguration {
+public interface TSConfiguration {
 
     /**
      * @return N - number of probes of choose the best neighbor, when N = taskCount, then it's not probabilistic tabu search

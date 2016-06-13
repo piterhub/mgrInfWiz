@@ -2,10 +2,10 @@ package pl.uncertainflowshopsolver.config.impl;
 
 
 import pl.uncertainflowshopsolver.algo.util.WayToGenerateNeighborhoodEnum;
-import pl.uncertainflowshopsolver.config.TSPConfiguration;
+import pl.uncertainflowshopsolver.config.TSConfiguration;
 import pl.uncertainflowshopsolver.flowshop.FlowShopWithUncertainty;
 
-public class TSPConfigurationImpl implements TSPConfiguration{
+public class TSConfigurationImpl implements TSConfiguration {
 
     private int sizeOfNeighborhood;
     private int lengthOfTabuList;
@@ -18,7 +18,7 @@ public class TSPConfigurationImpl implements TSPConfiguration{
     private WayToGenerateNeighborhoodEnum wayToGenerateNeighborhoodEnum;
     private FlowShopWithUncertainty uncertainFlowShop;
 
-    private TSPConfigurationImpl(){}
+    private TSConfigurationImpl(){}
 
     public static TSPConfigurationImplBuilder newBuilder() {
         return new TSPConfigurationImplBuilder();
@@ -66,10 +66,10 @@ public class TSPConfigurationImpl implements TSPConfiguration{
 
     public static class TSPConfigurationImplBuilder {
 
-        TSPConfigurationImpl mTSPConfigurationImpl;
+        TSConfigurationImpl mTSPConfigurationImpl;
 
         public TSPConfigurationImplBuilder() {
-            this.mTSPConfigurationImpl = new TSPConfigurationImpl();
+            this.mTSPConfigurationImpl = new TSConfigurationImpl();
         }
 
         public TSPConfigurationImplBuilder withSizeOfNeighborhood(int pSizeOfNeighborhood) {
@@ -112,7 +112,10 @@ public class TSPConfigurationImpl implements TSPConfiguration{
             return this;
         }
 
-        public TSPConfigurationImpl build() {
+        public TSConfigurationImpl build() {
+            if(mTSPConfigurationImpl.maxIterationsWithoutImprovementAsStopCriterion == 0) {
+                mTSPConfigurationImpl.maxIterationsWithoutImprovementAsStopCriterion = mTSPConfigurationImpl.maxIterationsAsStopCriterion;
+            }
             return mTSPConfigurationImpl;
         }
     }

@@ -1,11 +1,10 @@
 package pl.uncertainflowshopsolver;
 
-import pl.uncertainflowshopsolver.algo.MIH;
 import pl.uncertainflowshopsolver.algo.SimulatedAnnealing;
 import pl.uncertainflowshopsolver.algo.TabuSearch;
 import pl.uncertainflowshopsolver.config.ConfigurationProvider;
-import pl.uncertainflowshopsolver.config.TSPConfiguration;
-import pl.uncertainflowshopsolver.config.impl.TSPConfigurationImpl;
+import pl.uncertainflowshopsolver.config.TSConfiguration;
+import pl.uncertainflowshopsolver.config.impl.TSConfigurationImpl;
 import pl.uncertainflowshopsolver.flowshop.FlowShopWithUncertainty;
 import pl.uncertainflowshopsolver.gui.event.AlgorithmEventDispatcher;
 import pl.uncertainflowshopsolver.gui.event.AlgorithmEventListener;
@@ -259,9 +258,9 @@ public class MainConsoleWithMocks {
         }
 
         @Override
-        public TSPConfiguration getTSPConfiguration() {
+        public TSConfiguration getTSConfiguration() {
 //            final WayToGenerateNeighborhoodEnum wayToGenerateNeighborhoodEnum = initializerNameClassMap.get(initializerChoiceBox.getValue());
-            return TSPConfigurationImpl.newBuilder()
+            return TSConfigurationImpl.newBuilder()
                     .withSizeOfNeighborhood(1225)
                     .withLengthOfTabuList(50)
                     .withIterationsWithoutImprovementAsAdditionalAspirationCriterion(10)

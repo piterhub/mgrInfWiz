@@ -4,9 +4,13 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import pl.uncertainflowshopsolver.algo.SimulatedAnnealing;
+import pl.uncertainflowshopsolver.algo.TabuSearch;
 import pl.uncertainflowshopsolver.gui.GUIController;
+
+import java.net.URL;
 
 public class Main extends Application {
     public static final String GUI_FXML_PATH = "/view.fxml";
@@ -24,6 +28,9 @@ public class Main extends Application {
 
         prepareAlgorithm();
 
+//        ClassLoader classLoader = getClass().getClassLoader();
+//        final URL iconURL = classLoader.getResource("/icon.png");
+//        primaryStage.getIcons().add(new Image(iconURL.toString()));
         primaryStage.setTitle(APPLICATION_NAME);
         mainScene = new Scene(root, GUI_WIDTH, GUI_HEIGHT);
         primaryStage.setScene(mainScene);
@@ -33,7 +40,9 @@ public class Main extends Application {
     public void prepareAlgorithm() {
 //        BeesAlgorithm algorithm = new BeesAlgorithm(guiController);
         SimulatedAnnealing simulatedAnnealing = new SimulatedAnnealing(guiController);
+        TabuSearch tabuSearch = new TabuSearch(guiController);
         guiController.setSAAlgorithm(simulatedAnnealing);
+        guiController.setTSAlgorithm(tabuSearch);
     }
 
     public static void main(String[] args) {

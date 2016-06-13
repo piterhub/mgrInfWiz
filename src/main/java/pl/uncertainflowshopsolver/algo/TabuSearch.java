@@ -1,7 +1,7 @@
 package pl.uncertainflowshopsolver.algo;
 
 import pl.uncertainflowshopsolver.config.ConfigurationProvider;
-import pl.uncertainflowshopsolver.config.TSPConfiguration;
+import pl.uncertainflowshopsolver.config.TSConfiguration;
 import pl.uncertainflowshopsolver.flowshop.FlowShopWithUncertainty;
 import pl.uncertainflowshopsolver.flowshop.TaskWithUncertainty;
 import pl.uncertainflowshopsolver.gui.GUIController;
@@ -23,7 +23,7 @@ public class TabuSearch {
     private AlgorithmEventDispatcher eventDispatcher;
     private ConfigurationProvider configurationProvider;
 
-    private TSPConfiguration configuration;
+    private TSConfiguration configuration;
     private volatile boolean running;   //volatile to avoid "visibility" problem, when the updates of one thread are not visible to other threads.
 
     private FlowShopWithUncertainty uncertainFlowShop;
@@ -60,7 +60,7 @@ public class TabuSearch {
     }
 
     private void prepareConfiguration() {
-        configuration = configurationProvider.getTSPConfiguration();
+        configuration = configurationProvider.getTSConfiguration();
     }
 
     private void solve()
