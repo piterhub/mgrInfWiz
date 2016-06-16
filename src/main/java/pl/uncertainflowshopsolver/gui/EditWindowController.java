@@ -7,11 +7,13 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
+import javafx.scene.image.Image;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import pl.uncertainflowshopsolver.flowshop.FlowShopWithUncertainty;
 import pl.uncertainflowshopsolver.testdata.UncertainFlowShopParser;
 
+import java.io.InputStream;
 import java.net.URL;
 import java.util.ResourceBundle;
 

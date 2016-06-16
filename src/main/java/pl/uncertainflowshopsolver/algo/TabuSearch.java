@@ -219,7 +219,7 @@ public class TabuSearch {
     }
 
     private FlowShopWithUncertainty getBestNeighbour(FlowShopWithUncertainty uncertainFlowShop) {
-        if(isAllNeighborhoodCalculated())   //classical flow shop
+        if(true/*isAllNeighborhoodCalculated()*/)   //classical flow shop, NOW THIS OPTION ONLY
         {
             List<Integer> taskOrder = new ArrayList<>();
             for (TaskWithUncertainty taskWithUncertainty : uncertainFlowShop.getTasks())
@@ -280,7 +280,7 @@ public class TabuSearch {
 
     /**
      * When user wants to calculate whole neighborhood and gives a big parameter "size of neighborhood".
-     * It would be then classical Tabu Search. Otherwise - it would be probabilistic one.
+     * It would be then classical Tabu Search. Otherwise - it would be the probabilistic one.
      *
      * @return true if whole neighborhood
      */

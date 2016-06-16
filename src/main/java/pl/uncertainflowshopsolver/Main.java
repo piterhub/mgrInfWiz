@@ -16,8 +16,8 @@ import java.net.URL;
 public class Main extends Application {
     public static final String GUI_FXML_PATH = "/view.fxml";
     public static final String APPLICATION_NAME = "Solver of Flow Shop problem with tasks intervals uncertainty";
-    public static final int GUI_WIDTH = 1400;
-    public static final int GUI_HEIGHT = 700;
+    public static final int GUI_WIDTH = 1280;
+    public static final int GUI_HEIGHT = 720;
     private GUIController guiController;
     private Scene mainScene;
 
@@ -29,9 +29,7 @@ public class Main extends Application {
 
         prepareAlgorithm();
 
-        ClassLoader classLoader = getClass().getClassLoader();
-//        final URL iconURL = classLoader.getResource("/icon.png");
-        final InputStream resourceAsStream = this.getClass().getResourceAsStream("/icon.png");//.getResource("/icon.png");
+        final InputStream resourceAsStream = this.getClass().getResourceAsStream("/icon.png");
         primaryStage.getIcons().add(new Image(resourceAsStream));
         primaryStage.setTitle(APPLICATION_NAME);
         mainScene = new Scene(root, GUI_WIDTH, GUI_HEIGHT);
@@ -40,7 +38,6 @@ public class Main extends Application {
     }
 
     public void prepareAlgorithm() {
-//        BeesAlgorithm algorithm = new BeesAlgorithm(guiController);
         SimulatedAnnealing simulatedAnnealing = new SimulatedAnnealing(guiController);
         TabuSearch tabuSearch = new TabuSearch(guiController);
         guiController.setSAAlgorithm(simulatedAnnealing);

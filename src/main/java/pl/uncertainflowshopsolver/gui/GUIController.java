@@ -17,6 +17,7 @@ import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.layout.VBoxBuilder;
 import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
@@ -52,7 +53,9 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class GUIController implements ConfigurationProvider, AlgorithmEventListener, Initializable {
+
     private static final int MAXIMUM_NUMBER_OF_OPERATIONS = 500;
+    private static final String EDIT_WINDOW_NAME = "Flow Shop edit";
 
     public ChoiceBox<String> initializerChoiceBox;
     public DoubleTextBox0To1 desiredInitialAcceptanceProbabilityDoubleTextBox0To1;
@@ -356,6 +359,9 @@ public class GUIController implements ConfigurationProvider, AlgorithmEventListe
             Scene scene = new Scene(root);
             s.setScene(scene);
             editWindowController.setStage(s);
+            final InputStream resourceAsStream = this.getClass().getResourceAsStream("/icon.png");
+            s.getIcons().add(new Image(resourceAsStream));
+            s.setTitle(EDIT_WINDOW_NAME);
             s.show();
         } catch (IOException e) {
             e.printStackTrace();
